@@ -1,12 +1,10 @@
 ---
-title: helloword
+title: test
 author: owen
 date: '2020-06-07'
-slug: helloword
+slug: test
 categories:
   - R
 tags:
   - plot
 ---
-
-hello world
