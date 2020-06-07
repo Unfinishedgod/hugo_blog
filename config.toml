@@ -33,7 +33,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
     # path to the favicon, under "static"
 
-    favicon = "favicon.ico"
+    favicon = "Gareth_Frank_Bale_circle_index.ico"
 
     [params.logo]
     url = "Gareth_Frank_Bale.PNG"
