@@ -2,6 +2,10 @@
 <section id="comments">
   <div id="disqus_thread"></div>
   <script>
+  var logicalName = '{{ .File.LogicalName }}';
+  if (logicalName == "_index.md")
+  return;
+    
   var disqus_config = function () {
   {{ with .Site.Params.disqusURL }}
     this.page.url = "{{ . }}" +{{ if eq $.Type "404" }} "/404.html" {{ else }} location.pathname{{ end }};
@@ -23,3 +27,5 @@
   <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </section>
 {{ end }}
+
+
