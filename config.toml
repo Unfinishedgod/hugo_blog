@@ -1,6 +1,6 @@
 baseurl = "/"
 languageCode = "en-us"
-title = "A Hugo website"
+title = "미완성의신"
 theme = "hugo-lithium"
 googleAnalytics = "UA-145407326-5"
 disqusShortname = "hugoblog-4"
@@ -14,10 +14,10 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
     url = "/about/"
 [[menu.main]]
     name = "GitHub"
-    url = "https://github.com/rstudio/blogdown"
+    url = "https://github.com/Unfinishedgod"
 [[menu.main]]
-    name = "Twitter"
-    url = "https://twitter.com/rstudio"
+    name = "Facebook"
+    url = "https://www.facebook.com/shjj08"
 
 [params]
     description = "A website built through Hugo and blogdown."
@@ -32,10 +32,10 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
     MathJaxVersion = "2.7.5"
 
     # path to the favicon, under "static"
-    favicon = "favicon.ico"
+    favicon = "Gareth_Frank_Bale_circle_index.ico"
 
     [params.logo]
-    url = "logo.png"
+    url = "Gareth_Frank_Bale_circle_index.png"
     width = 50
     height = 50
     alt = "Logo"

@@ -3,4 +3,7 @@ date: "2016-05-05T21:48:51-07:00"
 title: About
 ---
 
-This is a "hello world" example website for the [**blogdown**](https://github.com/rstudio/blogdown) package. The theme was forked from [@jrutheiser/hugo-lithium-theme](https://github.com/jrutheiser/hugo-lithium-theme) and modified by [Yihui Xie](https://github.com/yihui/hugo-lithium).
+
+우리 인간은 미완성의 신들이다. 뛰어난 데이터 과학자를 꿈꾸는. 책을 좋아하는. 그런 사람입니다.
+
+ 
