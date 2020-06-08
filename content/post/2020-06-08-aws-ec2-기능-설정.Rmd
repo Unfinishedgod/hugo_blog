@@ -11,9 +11,9 @@ tags:
 ---
 
 
-<center>
-![](/image/setting_ec2https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/512px-Amazon_Web_Services_Logo.svg.png){#id .class width="30%"}
-</center>
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/512px-Amazon_Web_Services_Logo.svg.png){#id .class width="30%"}
+
 
 <br><br>
 
@@ -37,7 +37,7 @@ EC2 인스턴스 유형을 변경해보자. 변경 하려는 이유는 R을 실�
 <br>
 
 <center>
-![](/image/setting_ec2setting_ec2_1.PNG){#id .class width='100%'}
+![](./image/setting_ec2/setting_ec2_1.PNG){#id .class width='100%'}
 </center>
 
 <br>
@@ -52,7 +52,7 @@ EC2 인스턴스 유형을 변경해보자. 변경 하려는 이유는 R을 실�
 <br>
 
 <center>
-![](/image/setting_ec2setting_ec2_2.PNG){#id .class width='100%'}
+![](./image/setting_ec2/setting_ec2_2.PNG){#id .class width='100%'}
 </center>
 
 <br>
@@ -66,7 +66,7 @@ EC2 인스턴스 유형을 변경해보자. 변경 하려는 이유는 R을 실�
 - 인스턴스 설정 - 인스턴스 유형 변경 클릭
 
 <center>
-![](/image/setting_ec2setting_ec2_3.PNG){#id .class width='100%'}
+![](./image/setting_ec2/setting_ec2_3.PNG){#id .class width='100%'}
 </center>
 
 <br>
@@ -76,7 +76,7 @@ EC2 인스턴스 유형을 변경해보자. 변경 하려는 이유는 R을 실�
 요금제는 t2.large로 변경 해주고 확인 버튼 클릭을 해주면 인스턴스가 변경 된다.
 
 <center>
-![](/image/setting_ec2setting_ec2_4.PNG){#id .class width='70%'}
+![](./image/setting_ec2/setting_ec2_4.PNG){#id .class width='70%'}
 </center>
 
 <br>
@@ -96,7 +96,7 @@ EC2 인스턴스 유형을 변경해보자. 변경 하려는 이유는 R을 실�
 - 구글 키워드: 리눅스 용량 확인
 
 <center>
-![](/image/setting_ec2setting_ec2_5.PNG){#id .class width='100%'}
+![](./image/setting_ec2/setting_ec2_5.PNG){#id .class width='100%'}
 </center>
 
 <br>
@@ -109,7 +109,7 @@ EC2 인스턴스 유형을 변경해보자. 변경 하려는 이유는 R을 실�
 - 볼륨 수정 클릭
 
 <center>
-![](/image/setting_ec2setting_ec2_7.PNG){#id .class width='100%'}
+![](./image/setting_ec2/setting_ec2_7.PNG){#id .class width='100%'}
 </center>
 
 <br>
@@ -119,7 +119,7 @@ EC2 인스턴스 유형을 변경해보자. 변경 하려는 이유는 R을 실�
 볼륨 수정 팝업창이 나오는데, 아마존에서는 최대 30GB까지 지원을 하고 있으며 이번에는 24GB로 마무리를 하도록 하자. 
 
 <center>
-![](/image/setting_ec2setting_ec2_7.PNG){#id .class width='70%'}
+![](./image/setting_ec2/setting_ec2_7.PNG){#id .class width='70%'}
 </center>
 
 <br>
