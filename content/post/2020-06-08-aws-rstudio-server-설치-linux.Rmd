@@ -13,7 +13,7 @@ tags:
 
 
 <center>
-![](image/install_r/install_r_1.PNG){#id .class width='80%'}
+![](../image/install_r/install_r_1.PNG){#id .class width='80%'}
 </center>
 
 <br>
