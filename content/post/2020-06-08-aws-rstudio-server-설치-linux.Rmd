@@ -13,10 +13,10 @@ tags:
 
 
 <center>
-![](../image/install_r/install_r_1.PNG){#id .class width='80%'}
+![](/images/image_file/install_r/install_r_1.PNG){#id .class width='100%'}
 </center>
 
-<br>
+
 
 AWS에 EC2구축과 세팅까지 완료 했으니 이제, Rstudio server를 설치 해보자. Rstudio server를 설치 하게 되면, 그때서부터는 R환경을 어디서든 사용할 수 있게 된다. EC2에 Rstudio server를 설치 하기 위해선 조건이 있는데, 8787포트를 열어 두는 것. 이는 지난번 EC2구축 할때 열어 두었으니 다시한번 상기만 해두고 넘어가도록 하자. Rstudio server설치하기까지의 전반적인 과정은 다음과 같다. 
 
@@ -25,7 +25,7 @@ AWS에 EC2구축과 세팅까지 완료 했으니 이제, Rstudio server를 설�
 - Rstudio server 설치
 - 한글 폰트 적용
 
-<br>
+
 
 # EC2 기본 업데이트 
 
@@ -42,7 +42,7 @@ sudo yum update -y
 sudo yum install -y R
 ```
 
-<br>
+
 
 # R 설치 
 
@@ -58,10 +58,10 @@ sudo yum install -y R
 
 
 <center>
-![](image/install_r/install_r_2.PNG){#id .class width='80%'}
+![](/images/image_file/install_r/install_r_2.PNG){#id .class width='100%'}
 </center>
 
-<br>
+
 
 # Rstudio server 설치
 
@@ -71,13 +71,13 @@ R까지 설치를 마무리 지었으니 Rstudio server설치를 해보자. Rstu
 
 이곳에서 Linux Platform에 맞추어 설치를 해주면 되는데, 아마존 리눅스2는 Red Hat/CentOS계열이라 우리는 Red Hat/CentOS로 들어가자.
 
-<br>
+
 
 <center>
-![](image/install_r/install_r_3.PNG){#id .class width='80%'}
+![](/images/image_file/install_r/install_r_3.PNG){#id .class width='100%'}
 </center>
 
-<br>
+
 
 이후 나오는 링크에서 Install for Red Hat / CentOS 6-7에 해당하는 코드를 그대로 복사 하여 설치 해주도록 하자.
 
@@ -88,7 +88,7 @@ wget https://download2.rstudio.org/server/centos6/x86_64/rstudio-server-rhel-1.2
 sudo yum install rstudio-server-rhel-1.2.5042-x86_64.rpm
 ```
 
-<br>
+
 
 ## Rstudio server 설치 확인
 
@@ -96,13 +96,13 @@ sudo yum install rstudio-server-rhel-1.2.5042-x86_64.rpm
 
 - 탄력적 IP확인은 AWS EC2 인스턴스에서 확인을 하면 된다. 참고: [[AWS] EC2 구축 하기](https://unfinishedgod.github.io/docs/aws/create_ec2/create_ec2.html)
 
-<br>
+
 
 <center>
-![](image/install_r/install_r_4.PNG){#id .class width='80%'}
+![](/images/image_file/install_r/install_r_4.PNG){#id .class width='100%'}
 </center>
 
-<br>
+
 
 ## 계정 생성
 
@@ -118,13 +118,13 @@ root계정 password설정을 해주었으면, root 계정으로 들어가주자.
 su
 ```
 
-<br>
+
 
 <center>
-![](image/install_r/install_r_5.PNG){#id .class width='80%'}
+![](/images/image_file/install_r/install_r_5.PNG){#id .class width='100%'}
 </center>
 
-<br>
+
 
 이제 계정을 생성해주자.
 
@@ -138,10 +138,10 @@ passwd {비밀번호}
 ## Rstudio server 접속 확인
 
 <center>
-![](image/install_r/install_r_6.PNG){#id .class width='80%'}
+![](/images/image_file/install_r/install_r_6.PNG){#id .class width='100%'}
 </center>
 
-<br>
+
 
 # 한글 설정
 
@@ -149,7 +149,7 @@ passwd {비밀번호}
 
 - [AWS에서 구축한 Rstudio 한글 깨짐 해결 방안](https://medium.com/@unfinishedgod/aws%EC%97%90%EC%84%9C-%EA%B5%AC%EC%B6%95%ED%95%9C-rstudio-plot-%ED%95%9C%EA%B8%80-%EA%B9%A8%EC%A7%90-%ED%95%B4%EA%B2%B0-%EB%B0%A9%EC%95%88-5ada27828fd4)
 
-<br>
+
 
 # 총평
 
