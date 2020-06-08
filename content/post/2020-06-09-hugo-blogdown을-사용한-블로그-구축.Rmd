@@ -122,8 +122,3 @@ Key값으로 휴고 버전을 적어주어야 하는데 Rstudio console에서 `h
 - 구글 검색 노출(Google search console)
 - Logo, Favicon 설정
 - 목차 설정(Blogdown에서 제공하는건 년도별로 되어 있음)
-
-
-
-
-
