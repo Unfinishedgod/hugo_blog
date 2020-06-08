@@ -13,7 +13,7 @@ tags:
 
 
 <center>
-![](./image/install_r/install_r_1.PNG){#id .class width='80%'}
+![](image/install_r/install_r_1.PNG){#id .class width='80%'}
 </center>
 
 <br>
@@ -58,7 +58,7 @@ sudo yum install -y R
 
 
 <center>
-![](./image/install_r/install_r_2.PNG){#id .class width='80%'}
+![](image/install_r/install_r_2.PNG){#id .class width='80%'}
 </center>
 
 <br>
@@ -74,7 +74,7 @@ R까지 설치를 마무리 지었으니 Rstudio server설치를 해보자. Rstu
 <br>
 
 <center>
-![](./image/install_r/install_r_3.PNG){#id .class width='80%'}
+![](image/install_r/install_r_3.PNG){#id .class width='80%'}
 </center>
 
 <br>
@@ -99,7 +99,7 @@ sudo yum install rstudio-server-rhel-1.2.5042-x86_64.rpm
 <br>
 
 <center>
-![](./image/install_r/install_r_4.PNG){#id .class width='80%'}
+![](image/install_r/install_r_4.PNG){#id .class width='80%'}
 </center>
 
 <br>
@@ -121,7 +121,7 @@ su
 <br>
 
 <center>
-![](./image/install_r/install_r_5.PNG){#id .class width='80%'}
+![](image/install_r/install_r_5.PNG){#id .class width='80%'}
 </center>
 
 <br>
@@ -138,7 +138,7 @@ passwd {비밀번호}
 ## Rstudio server 접속 확인
 
 <center>
-![](./image/install_r/install_r_6.PNG){#id .class width='80%'}
+![](image/install_r/install_r_6.PNG){#id .class width='80%'}
 </center>
 
 <br>

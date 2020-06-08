@@ -46,7 +46,7 @@ Elastic Compute Cloud의 준말로 가상의 운영체제를 만들어 사용가
 서비스 -> EC2 클릭 
 
 <center>
-![](./image/create_ec2/step_1.PNG){#id .class width="85%"}
+![](image/create_ec2/step_1.PNG){#id .class width="85%"}
 </center>
 
   </div>
@@ -54,7 +54,7 @@ Elastic Compute Cloud의 준말로 가상의 운영체제를 만들어 사용가
 인스턴스 메뉴 -> 인스턴스 시작 클릭
 
 <center>
-![](./image/create_ec2/step_2.PNG){#id .class width="100%"}
+![](image/create_ec2/step_2.PNG){#id .class width="100%"}
 </center>
 
   </div>
@@ -73,7 +73,7 @@ Elastic Compute Cloud의 준말로 가상의 운영체제를 만들어 사용가
 우선 AMI를 선택 해주자. 기본적으로 여러 운영체제가 있지만 **Amozon Linux 2**를 선택해서 실행하자.
 
 <center>
-![](./image/create_ec2/step_3.PNG){#id .class width='100%'}
+![](image/create_ec2/step_3.PNG){#id .class width='100%'}
 </center>
 
 <br>
@@ -83,7 +83,7 @@ Elastic Compute Cloud의 준말로 가상의 운영체제를 만들어 사용가
 이제 인스턴스 유형을 선택 하자. 아마존은 기본적으로 프리티어(무료)로 서비스를 제공 한다. 그러나 프리티어는 어디까지나 최소한의 서비스라 사양이 매우 좋지 않다. 우선은 프리티어로 선택 하고 다음 블로그에는 인스턴스를 업그레이드 하는 내용을 적어보려 한다.
 
 <center>
-![](./image/create_ec2/step_4.PNG){#id .class width='100%'}
+![](image/create_ec2/step_4.PNG){#id .class width='100%'}
 </center>
 
 <br>
@@ -93,7 +93,7 @@ Elastic Compute Cloud의 준말로 가상의 운영체제를 만들어 사용가
 퍼블링 IP 자동 할당에 Select Box 옵션을 활성화 로 변경 해준다. 
 
 <center>
-![](./image/create_ec2/step_5.PNG){#id .class width='100%'}
+![](image/create_ec2/step_5.PNG){#id .class width='100%'}
 </center>
 
 <br>
@@ -103,7 +103,7 @@ Elastic Compute Cloud의 준말로 가상의 운영체제를 만들어 사용가
 내 운영체제의 기본적인 용량이 8GB로 되어 있다. 아마존은 무료로 최대 30GB까지 지원 가능하며 일단은 기본 8GB로 선택을 해주도록 하자. 이 역시 다음 블로그에 한꺼번에 용량 설정 하는 방법을 포스팅 하려고 한다.
 
 <center>
-![](./image/create_ec2/step_6.PNG){#id .class width='100%'}
+![](image/create_ec2/step_6.PNG){#id .class width='100%'}
 </center>
 
 <br>
@@ -113,7 +113,7 @@ Elastic Compute Cloud의 준말로 가상의 운영체제를 만들어 사용가
 특별한 내용이 없으니 다음 버튼
 
 <center>
-![](./image/create_ec2/step_7.PNG){#id .class width='100%'}
+![](image/create_ec2/step_7.PNG){#id .class width='100%'}
 </center>
 
 <br>
@@ -126,7 +126,7 @@ Elastic Compute Cloud의 준말로 가상의 운영체제를 만들어 사용가
 - Jupyter notebook: 8888
 
 <center>
-![](./image/create_ec2/step_8.PNG){#id .class width='100%'}
+![](image/create_ec2/step_8.PNG){#id .class width='100%'}
 </center>
 
 <br>
@@ -136,7 +136,7 @@ Elastic Compute Cloud의 준말로 가상의 운영체제를 만들어 사용가
 이제 시작하기 버튼을 누르면 팝업창이 노출되면서 키 페어를 생성하도록 유도 한다. 이는 후에 putty에 사용할 ppk를 생성하기 위한 과정이며 적당한 네이밍으로 키페어를 다운 받고 인스턴스 시작을 클릭 해주자.
 
 <center>
-![](./image/create_ec2/step_10.PNG){#id .class width='100%'}
+![](image/create_ec2/step_10.PNG){#id .class width='100%'}
 </center>
 
 <br>
@@ -147,7 +147,7 @@ Elastic Compute Cloud의 준말로 가상의 운영체제를 만들어 사용가
 우선 다음과 같이 인스턴스가 생성됨을 확인 할 수 있다. 이제 다음으로 넘어가자. 
 
 <center>
-![](./image/create_ec2/step_11.PNG){#id .class width='100%'}
+![](image/create_ec2/step_11.PNG){#id .class width='100%'}
 </center>
 
 <br><br>
@@ -163,7 +163,7 @@ Elastic Compute Cloud의 준말로 가상의 운영체제를 만들어 사용가
 네트워크 및 보안 -> 탄력적 IP에 탄력적 IP 주소 할당 버튼 클릭
 
 <center>
-![](./image/create_ec2/step_12.PNG){#id .class width='100%'}
+![](image/create_ec2/step_12.PNG){#id .class width='100%'}
 </center>
 
 <br>
@@ -173,7 +173,7 @@ Elastic Compute Cloud의 준말로 가상의 운영체제를 만들어 사용가
 생성된 IP 주소를 클릭해주자. 이를 생성한 인스턴스에 연결하는 작업을 진행할 것이다.
 
 <center>
-![](./image/create_ec2/step_13.PNG){#id .class width='100%'}
+![](image/create_ec2/step_13.PNG){#id .class width='100%'}
 </center>릭
 
 <br>
@@ -183,7 +183,7 @@ Elastic Compute Cloud의 준말로 가상의 운영체제를 만들어 사용가
 탄력적 IP의 정보를 확인해주자. 특별한건 없고 바로 **탄력적 IP 연결**버튼 클릭
 
 <center>
-![](./image/create_ec2/step_14.PNG){#id .class width='100%'}
+![](image/create_ec2/step_14.PNG){#id .class width='100%'}
 </center>
 
 <br>
@@ -193,7 +193,7 @@ Elastic Compute Cloud의 준말로 가상의 운영체제를 만들어 사용가
 이제 생성한 인스턴스에 탄력적 IP를 연결해주자. 인스턴스 Select box에 생성한 인스턴스 네임을 선택하고 연결 버튼 클릭
 
 <center>
-![](./image/create_ec2/step_15.PNG){#id .class width='100%'}
+![](image/create_ec2/step_15.PNG){#id .class width='100%'}
 </center>
 
 <br>
@@ -201,7 +201,7 @@ Elastic Compute Cloud의 준말로 가상의 운영체제를 만들어 사용가
 ## 탄력적 IP 주소 확인
 
 <center>
-![](./image/create_ec2/step_16.PNG){#id .class width='70%'}
+![](image/create_ec2/step_16.PNG){#id .class width='70%'}
 </center>
 
 <br><br>
@@ -219,7 +219,7 @@ Putty와 Puttygen을 다운받도록 하자. Puttygen은 키페어를 .ppk로 �
 - [Download PuTTY: latest release (0.73)](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html)
 
 <center>
-![](./image/create_ec2/step_17.PNG){#id .class width='80%'}
+![](image/create_ec2/step_17.PNG){#id .class width='80%'}
 </center>
 
 <br>
@@ -230,7 +230,7 @@ Putty와 Puttygen을 다운받도록 하자. Puttygen은 키페어를 .ppk로 �
 - 다운로드 폴더에 키페어 선택 하고 열기 버튼 (옵션은 **All File**)
 
 <center>
-![](./image/create_ec2/step_18.PNG){#id .class width='100%'}
+![](image/create_ec2/step_18.PNG){#id .class width='100%'}
 </center>
 
 <br>
@@ -240,7 +240,7 @@ Putty와 Puttygen을 다운받도록 하자. Puttygen은 키페어를 .ppk로 �
 이제 aws에서 받은 키페어를 가지고 .ppk로 변환 하는 마지막 작업이다. Save private key 버튼을 클릭하고 나오는 확인 창에 예 버튼을 해서 마무리를 해주자.
 
 <center>
-![](./image/create_ec2/step_19.PNG){#id .class width='80%'}
+![](image/create_ec2/step_19.PNG){#id .class width='80%'}
 </center>
 
 <br>
@@ -254,7 +254,7 @@ Putty와 Puttygen을 다운받도록 하자. Puttygen은 키페어를 .ppk로 �
 - Puttygen에서 생성한 .ppk 클릭 
 
 <center>
-![](./image/create_ec2/step_20.PNG){#id .class width='100%'}
+![](image/create_ec2/step_20.PNG){#id .class width='100%'}
 </center>
 
 <br>
@@ -269,7 +269,7 @@ Putty와 Puttygen을 다운받도록 하자. Puttygen은 키페어를 .ppk로 �
 이렇게 설정한후 Save를 해주어야 다음에 Putty에서 실행 할때 저장된 이름으로 쉽게 서버를 실행할 수 있다.
 
 <center>
-![](./image/create_ec2/step_21.PNG){#id .class width='80%'}
+![](image/create_ec2/step_21.PNG){#id .class width='80%'}
 </center>
 
 <br><br>
@@ -279,7 +279,7 @@ Putty와 Puttygen을 다운받도록 하자. Puttygen은 키페어를 .ppk로 �
 Putty에서 성공적으로 서버를 실행하면 다음과 같은 화면이 나오게 된다.
 
 <center>
-![](./image/create_ec2/step_22.PNG){#id .class width='80%'}
+![](image/create_ec2/step_22.PNG){#id .class width='80%'}
 </center>
 
 <br><br>
@@ -289,7 +289,7 @@ Putty에서 성공적으로 서버를 실행하면 다음과 같은 화면이 �
 AWS EC2는 서버를 켜두면 그 만큼 금액이 지불되는 방식이다. 때문에 필요에 따라 서버를 꺼야 하는데, 인스턴스 우클릭후 다음의 시작/중지 버튼으로 시작과 중지를 꼭 해주도록 하자. 
 
 <center>  
-![](./image/create_ec2/step_23.PNG){#id .class width='80%'}
+![](image/create_ec2/step_23.PNG){#id .class width='80%'}
 </center>
 
 ---
