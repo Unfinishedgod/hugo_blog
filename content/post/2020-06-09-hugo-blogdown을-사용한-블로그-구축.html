@@ -1,0 +1,97 @@
+---
+title: '[Hugo Blog] 1. Blogdown을 사용한 블로그 구축'
+author: 최의용
+date: '2020-06-09'
+slug: hugo-blogdown을-사용한-블로그-구축
+categories:
+  - Hugo
+tags:
+  - Hugo
+  - github블로그
+  - blogdown
+  - 휴고
+---
+
+
+
+<center>
+<img src="https://bookdown.org/yihui/blogdown/images/logo.png" />
+</center>
+<p>Blogdown을 사용해 휴고 블로그를 만들어 보자. 깃헙 블로그를 만드는 방법을 전혀 모르는 상태에서 시작하기에 이것저것 자료를 찾아봐도 너무 부족하기에 꼭 만들면서 하나하나씩 step 별로 블로그를 구축할 수 있는 글을 꼭 쓰려고 했었고, <strong>드디어</strong> 지금 그 글을 쓰기 시작하고 있다. 휴고가 빠르고 좋다더라 하는 이야기는 충분히 다른 곳에서 들었을테니 이곳에서는 바로 만드는 방법을 알아보도록 하자. 그 전에 블로그를 만드는데 있어서 다음의 참고자료를 소개한다. 지킬에 비해 상당히 한글 자료가 없어서 고생 했음에도 많은 참고를 하게 되었다. (정말 감사합니다.)</p>
+<ul>
+<li>xmMOOC님의 블로그: <a href="https://statkclee.github.io/comp_document/ds-blogdown.html">데이터 과학을 위한 저작도구: Computational Documents</a></li>
+<li>박찬엽님의 유튜브: <a href="https://www.youtube.com/watch?v=zeYn0maX1nQ&amp;t=2891s">R코홀릭! R로 블로그를 만들어보자! blogdown</a></li>
+<li>Issac Lee님의 유튜브: <a href="https://www.youtube.com/watch?v=E3W6UmaItQo&amp;t=208s">R blogdown을 사용한 나만의 블로그 만들기</a></li>
+</ul>
+<div id="전반적인-흐름" class="section level2">
+<h2>전반적인 흐름</h2>
+<p><img src="/images/image_file/hugo_setup/hugo_setup_1.PNG" id="id" class="class" style="width:100.0%" /></p>
+<p>전반적인 흐름은 위와 같다. Rstudio에서 블로그 작업을 하고, Git에 Push. 그러면 Netlify에서 이를 가지고 호스팅을 해주게 되는것.</p>
+</div>
+<div id="구현-환경" class="section level2">
+<h2>구현 환경</h2>
+<p>우선은 <strong>윈도우</strong>, <strong>Rstudio</strong>에서 시작한다. 어떤 차이가 있을지는 모르겠지만 당시에 aws ec2에서 시도할때는 매번 실패 했어서 윈도우와, Rstudio를 추천한다.</p>
+</div>
+<div id="step-1.-git-repository-생성-rstudio-연결" class="section level2">
+<h2>Step 1. Git Repository 생성 &amp; Rstudio 연결</h2>
+<p>우선 Git Repository를 생성 하는 것부터 시작하자. 블로그에 사용할 git repository를 생성해주자. git이 익숙하지 않다면 다음의 링크를 참고 하자.
+- 박찬엽님의 블로그:<a href="https://mrchypark.github.io/post/github-rstudio%EB%A1%9C-github-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B8%B0/">rstudio로 github 프로젝트 시작하기</a></p>
+<p>다음 두사진에서 볼수 있듯, git repo를 생성하고, clone하기 위한 준비를 맞춰주자.</p>
+<p><img src="/images/image_file/hugo_setup/hugo_setup_2.PNG" id="id" class="class" style="width:100.0%" /></p>
+<p><img src="/images/image_file/hugo_setup/hugo_setup_3.PNG" id="id" class="class" style="width:100.0%" /></p>
+<p>그리고 나서 Rstudio에서 new project에서 github를 연결해주면 된다.</p>
+<p><img src="/images/image_file/hugo_setup/hugo_setup_4.PNG" id="id" class="class" style="width:100.0%" /></p>
+</div>
+<div id="step-2.-blogodown-패키지-설치-install-hugo" class="section level2">
+<h2>Step 2. blogodown 패키지 설치 &amp; install hugo</h2>
+<p>Rstudio로 넘어와서 다음의 코드를 실행해주자.</p>
+<pre><code>install.packages(&quot;blogdown&quot;) # hugo 패키지 설치
+library(blogdown) # hugo 라이브러리
+install_hugo() # hugo 설치
+new_site() # 새 사이트 생성</code></pre>
+<p>위의 코드를 정상적으로 실행 했다면 다음의 화면이 나오는데 절반은 이미 성공이다.</p>
+<p><img src="/images/image_file/hugo_setup/hugo_setup_5.PNG" id="id" class="class" style="width:100.0%" /></p>
+<p>우측 하단 패널에서 Viewer탭을 실행 해보면 다음과 같이 내컴퓨터 에서만 볼 수 있는 블로그가 생성된 셈. 포스팅 하는 방법은 블로그를 완성하고 나서 알아보고 계속해서 블로그를 구축하도록 하자.</p>
+<p><img src="/images/image_file/hugo_setup/hugo_setup_6.PNG" id="id" class="class" style="width:100.0%" /></p>
+</div>
+<div id="step-3.-git-push-준비" class="section level2">
+<h2>Step 3. Git push 준비</h2>
+<p>이제 git에 올려야 하는데 해야할 절차가 있다. <strong>.gitignore</strong>폴더에서 <code>/public</code> 코드를 넣어 주는것. <code>new_site()</code>코드를 통해 생성시 여러 폴더가 생성되는데, 이중에서 public폴더는 Git에 올릴때 제외 해주는 역할을 한다.</p>
+<p><img src="/images/image_file/hugo_setup/hugo_setup_7.PNG" id="id" class="class" style="width:100.0%" /></p>
+<p>이제 생성된 폴더를 가지고 git에 올리도록 하자. Git bash에서 올려도 좋고, 찬엽님의 글을 참고 해서 올려도 좋다.</p>
+<p><img src="/images/image_file/hugo_setup/hugo_setup_8.PNG" id="id" class="class" style="width:100.0%" /></p>
+</div>
+<div id="step-4.-netlify" class="section level2">
+<h2>Step 4. Netlify</h2>
+<p>Git에 정상적으로 올렸으면 Netlify에 연결을 시켜 이를 웹에 호스팅 시켜주도록 하자. 이 작업을 마무리 해야 netlify에서 우리가 작업한 것들을 웹에 적용시켜 준다. (netlify 링크: <a href="https://www.netlify.com/" class="uri">https://www.netlify.com/</a>) 회원가입시 github와 연동된 아이디를 사용해서 마무리를 하고 다음의 화면에서 New site from Git 버튼을 클릭해준다.</p>
+<p><img src="/images/image_file/hugo_setup/hugo_setup_9.PNG" id="id" class="class" style="width:100.0%" /></p>
+<p>이후 Create a new site 화면에서 Github 버튼 클릭</p>
+<p><img src="/images/image_file/hugo_setup/hugo_setup_10.PNG" id="id" class="class" style="width:100.0%" /></p>
+<p>계속 해서 Repository access를 All repositories로 설정을 해주고, 생성한 Git repository를 선택</p>
+<p><img src="/images/image_file/hugo_setup/hugo_setup_11.PNG" id="id" class="class" style="width:100.0%" /></p>
+<p>다음과 사진과 같이 작성해주고 Show advanced 버튼을 클릭해준다.</p>
+<p><img src="/images/image_file/hugo_setup/hugo_setup_12.PNG" id="id" class="class" style="width:100.0%" /></p>
+<p>Key값으로 휴고 버전을 적어주어야 하는데 Rstudio console에서 <code>hugo_version()</code>을 실행 하여 버전을 확인해준다. 여기까지만 해도 블로그의 생성은 끝이 났다.</p>
+<p><img src="/images/image_file/hugo_setup/hugo_setup_13.PNG" id="id" class="class" style="width:100.0%" /></p>
+</div>
+<div id="step-5.-블로그-도메인-변경" class="section level1">
+<h1>Step 5. 블로그 도메인 변경</h1>
+<p>블로그를 생성 해주었으면 Depoly가 진행되면서 완성이 되었다는 화면을 볼수 있다. 그러나 다음 사진과 같이 도메인 명이 이상한데 Domain setting 버튼을 클릭후 원하는 블로그 이름으로 설정해주도록 하자. 최종적으로는 다음과 같은 블로그이름이 생성된다. 이렇게 blogodown을 사용한 hugo 블로그 생성은 끝이 났으며 블로그 포스팅 및 포스팅시 이미지 경로에 대한 내용은 바로 다음 블로그에 작성하도록 하겠다.</p>
+<ul>
+<li><a href="https://(생성한" class="uri">https://(생성한</a> 블로그 이름).netlify.app/</li>
+</ul>
+<p><img src="/images/image_file/hugo_setup/hugo_setup_14.PNG" id="id" class="class" style="width:100.0%" /></p>
+</div>
+<div id="총평" class="section level1">
+<h1>총평</h1>
+<p>그동안 워드프레스, 미디엄, 지킬기본 블로그를 사용해왔다. 그러다 2월 Hugo에 대해 알게 되었고, 휴고가 좋다더라~ 휴고가 빠르다더라~ 라는 글과 함께 휴고 블로그를 만들어 보려 했었다. 물론 2월 한달간 내내 실패 하고, 다시 집을 알아본다고 3개월이나 시간을 쏟다가 이제야 여유가 생겨 작업을 하기 시작했다. 아직도 꽤 복잡해서 블로그를 3번이나 스크린샷을 찍어가면서 만들었으며, 우연한 계기로 무언가가 되었어도 다시 만들었을때는 또 안되는 경우도 있었어서 시간이 꽤나 걸렸다. 써야할 글이 많으니 모듈화 시켜서 나누어서 쓸것이고 전반적으로는 목록은 다음과 같다.</p>
+<ul>
+<li>휴고 블로그 구축</li>
+<li>블로그 포스팅 및 이미지 업로드 방법</li>
+<li>Google Analytic 설정</li>
+<li>댓글기능(Disqus 설정)</li>
+<li>구글 검색 노출(Google search console)</li>
+<li>Logo, Favicon 설정</li>
+<li>목차 설정(Blogdown에서 제공하는건 년도별로 되어 있음)</li>
+</ul>
+</div>
