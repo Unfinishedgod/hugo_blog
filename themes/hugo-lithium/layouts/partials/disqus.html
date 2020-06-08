@@ -2,9 +2,7 @@
 <section id="comments">
   <div id="disqus_thread"></div>
   <script>
-  var logicalName = '{{ .File.LogicalName }}';
-  if (logicalName == "_index.md")
-  return;
+
     
   var disqus_config = function () {
   {{ with .Site.Params.disqusURL }}
