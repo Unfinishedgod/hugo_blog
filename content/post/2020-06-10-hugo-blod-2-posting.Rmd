@@ -1,5 +1,5 @@
 ---
-title: '[Hugo Blog] 2. Posting '
+title: '[Hugo Blog] 2. Posting 하는방법'
 author: 최의용
 date: '2020-06-10'
 slug: hugo-blod-2-posting
