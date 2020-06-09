@@ -1,5 +1,5 @@
 ---
-title: '[Hugo Blod] 2. Posting '
+title: '[Hugo Blog] 2. Posting '
 author: 최의용
 date: '2020-06-10'
 slug: hugo-blod-2-posting
@@ -13,4 +13,68 @@ tags:
 
 
 
-
+<p>지난번 블로그에 이어서 이번에는 hugo blog의 포스팅 하는 법을 알아보려고 한다. 포스팅을 하는데 있어 사진을 첨부하는데 경로 문제가 있어서 이도 같이 알아보자.</p>
+<div id="blog-posting" class="section level1">
+<h1>Blog Posting</h1>
+<div id="step-1.-posting-설정-생성" class="section level2">
+<h2>Step 1. Posting 설정 생성</h2>
+<ol style="list-style-type: decimal">
+<li>우선 Rstudio에 상단에 Addins 버튼 클릭</li>
+<li>Serve Site 클릭</li>
+</ol>
+<ul>
+<li>실시간으로 로컬에서 블로그의 상태를 확인할 수 있다.</li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>New Post 클릭</li>
+</ol>
+<p><img src="./posting/posting_1.PNG" id="id" class="class" style="width:100.0%" /></p>
+</div>
+<div id="step-2.-posting-설정" class="section level2">
+<h2>Step 2. Posting 설정</h2>
+<p>Addins에 New Post 버튼을 클릭하면 다음과 같은 설정이 나오는데 표에 맞는 정보대로 적당히 채워주자.</p>
+<ul>
+<li>이때 Format에서 Markdown, R Rmarkdown이 있는데 Blogdown이 좋은점은 Rmarkdown을 적당히 바꾸어서 블로그에 표현해줄 수 있다는 것.</li>
+</ul>
+<p><img src="/images/image_file/posting/posting_2.PNG" id="id" class="class" style="width:100.0%" /></p>
+</div>
+<div id="step-3.-블로그-확인" class="section level2">
+<h2>Step 3. 블로그 확인</h2>
+<p>위 그림에서 Done버튼을 클릭하면 우측과 같이 로컬에서 실시간으로 블로그 정보를 확인할 수 있다. 여기에 맞추어서 블로깅을 해주면 된다.</p>
+<p><img src="/images/image_file/posting/posting_3.PNG" id="id" class="class" style="width:100.0%" /></p>
+</div>
+<div id="step-4.-git-push" class="section level2">
+<h2>Step 4. Git push</h2>
+<p>이렇게 로컬에서 블로깅정보를 마무리 했으면, 이를 Git에 올려주자. Git에 올려주면 자연스럽게 Netlify에서 이를 호스팅 해주게 된다.</p>
+<ul>
+<li>지난 2주간 확인해본 결과 Netlify는 새벽(약 00:00~06:00)에는 아무리 Git에 올려도 호스팅을 해주지 않는다.</li>
+</ul>
+</div>
+</div>
+<div id="image-경로" class="section level1">
+<h1>Image 경로</h1>
+<p>블로그에 포스팅을 할때 단순하게 <code>![](현재경로/image.png)</code>를 하게 되면 실제 포스팅 할때 이미지가 깨지게 된다. 다음 그림을 보면 이유를 알 수 있는데, 포스팅을 할 경우 기본 경로로 블로그의 경로를 잡기 때문이다.</p>
+<p><img src="/images/image_file/posting/posting_4.PNG" id="id" class="class" style="width:100.0%" /></p>
+<div id="해결-방법" class="section level2">
+<h2>해결 방법</h2>
+<p>이를 해결하기 위해서는, 경로를 잡아주어야 하는데, 그 경로를 잡는 방볍이 themes&gt;(theme이름)&gt;static&gt;images 에 이미지를 업로드 하는 방법이다.</p>
+<p><img src="/images/image_file/posting/posting_5.PNG" id="id" class="class" style="width:100.0%" /></p>
+<ul>
+<li>추가로 이미지가 크면 기존 범위를 넘어가게 되는 경우가 있는데 이는 다음과 같이 설정 해주어서 기존 범위에 맞추어준다. (일괄적으로 바꿔주는 방법을 아직 찾지 못해서 일단 다음의 마크다운옹어를 사용하자.)</li>
+</ul>
+<p><img src="/images/image_file/posting/posting_6.PNG" id="id" class="class" style="width:100.0%" /></p>
+</div>
+</div>
+<div id="총평" class="section level1">
+<h1>총평</h1>
+<p>이렇게 휴고 블로그 다운 설치 부터 포스팅 방법까지 마무리를 하게 되었다. 특히 이미지가 깨져서 경로문제를 찾는데 상당한 시간을 소모 했는데 그래도 여기까지만 해도 블로깅 하는데 아무런 지장이 없다. 추가로 설정해야 할 것들은 Optional이지만 계속해서 블로깅을 하도록 하겠다. Hugo Blog에 대한 블로그 목록은 다음과 같다.</p>
+<ul>
+<li><a href="https://unfinishedgod.netlify.app/2020/06/09/hugo-blogdown%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%9C-%EB%B8%94%EB%A1%9C%EA%B7%B8-%EA%B5%AC%EC%B6%95/">휴고 블로그 구축</a></li>
+<li>블로그 포스팅 및 이미지 업로드 방법</li>
+<li>Google Analytic 설정</li>
+<li>댓글기능(Disqus 설정)</li>
+<li>구글 검색 노출(Google search console)</li>
+<li>Logo, Favicon 설정</li>
+<li>목차 설정(Blogdown에서 제공하는건 년도별로 되어 있음)</li>
+</ul>
+</div>
