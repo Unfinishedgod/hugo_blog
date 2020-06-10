@@ -10,9 +10,6 @@ tags:
   - ggplot2
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, fig.align = "center")
-```
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/rstudio/hex-stickers/master/PNG/ggplot2.png" width="200" height="200"><br>
