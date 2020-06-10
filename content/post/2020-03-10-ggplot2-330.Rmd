@@ -1,15 +1,14 @@
 ---
-title: 'ggplot2 버전 업데이트 리뷰 '
-author: ''
+title: ggplot2 버전 업데이트 리뷰
+author: 최의용
 date: '2020-03-10'
-slug: ggplot2-버전-업데이트-리뷰
+slug: ggplot2-330
 categories:
   - R
 tags:
   - R
   - ggplot2
 ---
-
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/rstudio/hex-stickers/master/PNG/ggplot2.png" width="200" height="200"><br>
@@ -262,5 +261,6 @@ ggplot(huron, aes(year)) +
 # 총평
 
 처음으로 새로운 버전에 대해 리뷰를 했다. 아직 많이 미숙해서 제대로 리뷰가 안되었으나 **하헌철**님의 도움으로 조금 더 전문적인 리뷰를 할 수 있게 되었다. 다음에는 일기처럼 쓰는게 아니라 좀 더 전문적으로 리뷰를 쓰는쪽으로 노력을 해봐야 겠다.
+
 
 
