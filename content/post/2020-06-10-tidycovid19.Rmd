@@ -77,6 +77,9 @@ tidycovid19 패키시에서는 많은 함수를 제공해주는데, 다음 코�
 library(tidyverse)
 library(tidycovid19)
 library(zoo)
+library(gifski)
+library(av)
+library(magick)
 
 df <- download_merged_data(cached = TRUE, silent = TRUE)
 
@@ -148,6 +151,7 @@ map_covid19(merged, cumulative = TRUE)
 ```{r}
 map_covid19(merged, type = "confirmed", region = "Asia") 
 ```
+
 ### 코로나 애니메이션
 
 정말 마음에 든다. 애니메이션 함수까지 제공을 해준다...
@@ -155,6 +159,7 @@ map_covid19(merged, type = "confirmed", region = "Asia")
 ```{r}
 map_covid19(merged, type = "confirmed", dates = unique(merged$date))
 ```
+
 
 # Shiny App 
 

@@ -120,6 +120,9 @@
 <pre class="r"><code>library(tidyverse)
 library(tidycovid19)
 library(zoo)
+library(gifski)
+library(av)
+library(magick)
 
 df &lt;- download_merged_data(cached = TRUE, silent = TRUE)
 
@@ -181,12 +184,11 @@ plot_covid19_spread(
 <h3>코로나 아시아 지도(누적 사망)</h3>
 <p>다음은 아시아만 따로 뽑아서 코로나 지도를 만든 모습.</p>
 <pre class="r"><code>map_covid19(merged, type = &quot;confirmed&quot;, region = &quot;Asia&quot;) </code></pre>
-<p><img src="/post/2020-06-10-tidycovid19_files/figure-html/unnamed-chunk-5-1.png" width="672" />
-### 코로나 애니메이션</p>
+<p><img src="/post/2020-06-10-tidycovid19_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+<div id="코로나-애니메이션" class="section level3">
+<h3>코로나 애니메이션</h3>
 <p>정말 마음에 든다. 애니메이션 함수까지 제공을 해준다…</p>
-<pre class="r"><code>map_covid19(merged, type = &quot;confirmed&quot;, dates = unique(merged$date))</code></pre>
-<pre><code>## Warning: No renderer available. Please install the gifski, av, or magick package
-## to create animated output</code></pre>
 </div>
 </div>
 </div>
