@@ -74,8 +74,6 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE)
 tidycovid19 패키시에서는 많은 함수를 제공해주는데, 다음 코드만 봐도 쉽게 시각화를 할수가 있다.
 
 ```{r}
-# Suggestion by AndreaPi (issue #19)
-
 library(tidyverse)
 library(tidycovid19)
 library(zoo)
@@ -129,6 +127,7 @@ plot_covid19_stripes(
   sort_countries = "countries"
 )
 ```
+
 ## Covid-19 지도 
 
 지도 데이터도 제공을 해준다. 함수 한방에. 기존에 지도를 뽑으려면 여러 조건들이 있고, 배워야 할게 많은데 이점은 정말 맘에 든다. `map_covid19()`함수를 사용하며 이 코드에 대해 자세히 알고 싶으면 다음 링크를 확인하자.
