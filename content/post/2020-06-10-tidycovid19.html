@@ -1,49 +1,23 @@
+---
+title: 'tidycovid19 패키지에 대해 알아보자.'
+author: 최의용
+date: '2020-06-10'
+slug: 'tidycovid19 패키지에 대해 알아보자.'
+categories:
+  - R
+tags:
+  - 미완성의신
+  - R
+  - tidyverse
+  - tidycovid19
+  - covid19
+  - corona
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
-
-<table>
-<tbody>
-<tr class="odd">
-<td>itle: ‘tidycovid19 패키지에 대해 알아보자.’</td>
-</tr>
-<tr class="even">
-<td>uthor: 최의용</td>
-</tr>
-<tr class="odd">
-<td>ate: ‘2020-06-10’</td>
-</tr>
-<tr class="even">
-<td>lug: ‘tidycovid19 패키지에 대해 알아보자.’</td>
-</tr>
-<tr class="odd">
-<td>ategories:</td>
-</tr>
-<tr class="even">
-<td>- R</td>
-</tr>
-<tr class="odd">
-<td>ags:</td>
-</tr>
-<tr class="even">
-<td>- 미완성의신</td>
-</tr>
-<tr class="odd">
-<td>- R</td>
-</tr>
-<tr class="even">
-<td>- tidyverse</td>
-</tr>
-<tr class="odd">
-<td>- tidycovid19</td>
-</tr>
-<tr class="even">
-<td>- covid19</td>
-</tr>
-<tr class="odd">
-<td>- corona</td>
-</tr>
-</tbody>
-</table>
+<p><img src="/post/2020-06-10-tidycovid19_files/unnamed-chunk-4-1.png" style="width:80.0%" /></p>
 <p>2020년 지금 우리는 코로나의 시대에 노출되어 있다. 가볍게 지나갈것 같았던 코로나는 약 7개월동안, 그리고 앞으로 언제까지도 지속될지 이제는 모르는 상황이다. R공부를 하면서 Tidyverse를 알게 되었고, Covid19에 대해 찾아 보다가 다음의 패키지를 알게 되었다. <code>tidycovid19</code>라는 패키지인데, 찾아 보니 많은 데이터를 넣어서 잘 만들어 좋은 패키지라 본다. joachim-gassen이라는 사람이 만든 패키지로 이분은 이 패키지를 다음과 같이 이름을 지었다.</p>
 <blockquote>
 <blockquote>
@@ -116,13 +90,10 @@
 </div>
 <div id="어떻게-사용할-수-있을까" class="section level1">
 <h1>어떻게 사용할 수 있을까</h1>
-<p>tidycovid19 패키시에서는 많은 함수를 제공해주는데, 다음 코드만 봐도 쉽게 시각화를 할수가 있다.</p>
+<p>tidycovid19 패키지 에서는 많은 함수를 제공해주는데, 다음 코드만 봐도 쉽게 시각화를 할 수가 있다.</p>
 <pre class="r"><code>library(tidyverse)
 library(tidycovid19)
 library(zoo)
-library(gifski)
-library(av)
-library(magick)
 
 df &lt;- download_merged_data(cached = TRUE, silent = TRUE)
 
@@ -188,7 +159,8 @@ plot_covid19_spread(
 </div>
 <div id="코로나-애니메이션" class="section level3">
 <h3>코로나 애니메이션</h3>
-<p>정말 마음에 든다. 애니메이션 함수까지 제공을 해준다…</p>
+<p>정말 마음에 든다. 애니메이션 함수까지 제공을 해준다. Rendering 문제로 이곳에는 이렇게 코드만 남겨두도록 하자.</p>
+<p><code>map_covid19(merged, type = "confirmed", dates = unique(merged$date))</code></p>
 </div>
 </div>
 </div>
