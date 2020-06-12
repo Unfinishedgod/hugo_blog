@@ -88,7 +88,7 @@ tags:
 </div>
 <div id="패키지-설치" class="section level1">
 <h1>패키지 설치</h1>
-<p><code>remotes::install_github("joachim-gassen/tidycovid19")</code> 코드를 사요해서 패키지 설치를 해주면 된다.</p>
+<p><code>remotes::install_github("joachim-gassen/tidycovid19")</code> 코드를 사용해서 패키지 설치를 해주면 된다.</p>
 </div>
 <div id="어떻게-사용할-수-있을까" class="section level1">
 <h1>어떻게 사용할 수 있을까</h1>
@@ -162,7 +162,9 @@ plot_covid19_spread(
 <div id="코로나-애니메이션" class="section level3">
 <h3>코로나 애니메이션</h3>
 <p>정말 마음에 든다. 애니메이션 함수까지 제공을 해준다. Rendering 문제로 이곳에는 이렇게 코드만 남겨두도록 하자.</p>
-<p><code>map_covid19(merged, type = "confirmed", dates = unique(merged$date))</code></p>
+<pre class="r"><code>map_covid19(merged, type = &quot;confirmed&quot;, dates = unique(merged$date))</code></pre>
+<pre><code>## Warning: No renderer available. Please install the gifski, av, or magick package
+## to create animated output</code></pre>
 </div>
 </div>
 </div>
