@@ -1,5 +1,5 @@
 ---
-title: '[Hugo Blog]블로그 세팅(GA, 댓글)'
+title: '[Hugo Blog] 3. 블로그 세팅(GA, 댓글)'
 author: 최의용
 date: '2020-06-12'
 slug: ''
