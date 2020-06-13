@@ -1,0 +1,139 @@
+---
+title: '[Hugo Blog]블로그 세팅(GA, 댓글)'
+author: 최의용
+date: '2020-06-12'
+slug: ''
+categories:
+  - Hugo
+tags:
+  - Hugo
+  - github블로그
+  - google analystics
+  - GA
+  - Disqus
+---
+
+블로그를 만들었으니 이제 블로그 세팅을 해보자. 이번에 할건 Google Analytics, 댓글 기능을 해줄 것이다.
+
+# 1. Google Analytics(GA) 연동
+
+블로그와 GA를 연동 시켜 보자. Google Anlytics(이하 GA)를 통해 블로그의 방문자 및 여러 통계를 확인하기 위함이다. 우선 GA 회원가입 부터하고 다음의 링크를 들어가자.
+
+- 링크: [Google Anlytics](https://analytics.google.com/analytics/web/#)
+
+
+## Step 1. 계정, 속성 만들기 
+
+- 왼쪽 하단의 Setting 버튼 클릭
+- 계정 만들기 버튼 클릭
+- 속성 만들기 버튼 클릭
+
+![](/post/2020-06-12-blog-setting_files/ga_1.PNG){width=100%}
+
+## Step 2. 속성 정보 입력
+
+- 속성 만들기 버튼을 클릭하면 웹버튼을 클릭
+- 웹사이트 이름, URL 설정 하고 만들기 클릭
+
+![](/post/2020-06-12-blog-setting_files/ga_2.PNG){width=100%}
+
+## Step 3. 추적 ID 확인, 복사
+
+이 단계까지 했다면 기본적으로 추적 코드를 부여 받는다. 
+
+- 속성만들기>추적정보>추적코드 를 가보면 추적 ID가 나오는데 이를 복사 하자.
+- Rstudio에서 config.toml 파일을 열어보면 '`googleAnalytics = `' 가 나오는데 여기에 복사 해주면 된다.
+- 마지막으로 Git push를 해주어야 한다.
+
+![](/post/2020-06-12-blog-setting_files/ga_3.PNG){width=100%}
+
+## 확인 
+
+이제 확인을 해보자. 확인을 하는 방법은 두가지가 있는데, 
+
+- 웹에 추적코드가 잘 붙어 있는지?
+- GA에서 확인이 가능한지?
+
+이를 하나씩 해보자. 
+
+### 웹에 코드 확인
+
+- 사이트를 가서 마우스 우클릭 -> 페이지 소스보기, 또는 Ctrl + U 버튼을 클릭해서 소스를 보자.
+- Ctrl + F 버튼으로 'Google'정도의 키워드로 찾았을때, 다음의 코드가 나오면 성공.
+
+![](/post/2020-06-12-blog-setting_files/ga_4.PNG){width=100%}
+
+### GA에서 확인
+
+사이트를 들어간 상태에서 GA를 클릭해보면 '현재 활성 사용자'가 나오면 성공. 
+
+<center>
+![](/post/2020-06-12-blog-setting_files/ga_5.PNG){width=80%}
+</center>
+
+
+# 2. 댓글 기능
+
+이번엔 댓글기능을 넣어보자. Disqus라는 댓글을 지원해주는 사이트가 있어서 이곳에서 사용하려고 한다. 역시 회원가입 먼저. 
+
+- [Disqus](https://disqus.com/)
+
+## Step 1. 
+
+가입하고 위의 사이트를 클릭하면 다음의 화면을 보게 된다.
+
+- Get started 버튼 클릭
+- 다음 화면에서 I want to install Disqus on my site 버튼 클릭.
+
+![](/post/2020-06-12-blog-setting_files/disqus_1.PNG){width=100%}
+
+## Step 2. 기본정보 입력
+
+이제부터 절차는 간단하다. 나오는대로 정보를 입력해주고 넘어가면 된다.
+
+![](/post/2020-06-12-blog-setting_files/disqus_2.PNG){width=80%}
+
+## Step 3. 설정
+
+Create Site 버튼을 클릭했으면 사이트 설정 View가 나오는데, 각각
+
+- Basic 클릭 (무료버전)
+- Configure Disqus 클릭
+- Disques Setup 클릭 
+
+을 해주고 넘어가자.
+
+![](/post/2020-06-12-blog-setting_files/disqus_3.PNG){width=100%}
+
+## Step 4. URL정보 입력, Shotname 확인
+
+최종적으로 우리가 알아야 할 것은 `Shortname`가 되겠다. 이 코드를 알아야 config.toml에 집어 넣을 수 있다.
+
+- URL 정보(사이트 주소)를 입력
+- shortname 정보 복사
+
+![](/post/2020-06-12-blog-setting_files/disqus_4.PNG){width=100%}
+
+## Step 5. disqusShortname 정보 입력
+
+이렇게 받아논 shortname을 config.toml의 '`disqusShortname = `'에 집어 넣어주자. 
+
+![](/post/2020-06-12-blog-setting_files/disqus_5.PNG){width=100%}
+
+## 확인
+
+Git push를 해주고 사이트를 들어가면 다음과 같이 댓글 기능이 추가된것을 볼 수 있다.
+
+![](/post/2020-06-12-blog-setting_files/disqus_6.PNG){width=80%}
+
+
+# 마무리 
+
+이렇게 Googla Anaytic, 댓글기능을 알아보았다. 특히 Googla Anlytics를 해두면, 내 블로그에 대한 트래킹을 수월하게 할수 있어서 관리하기에 용이하다. 이제 해야 할건 구글 검색 노출과, logo, favicon 설정 하는법, 그리고 테마 변경 하는법이 남았다.
+
+- [휴고 블로그 구축](https://unfinishedgod.netlify.app/2020/06/09/hugo-blogdown%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%9C-%EB%B8%94%EB%A1%9C%EA%B7%B8-%EA%B5%AC%EC%B6%95/)
+- [블로그 포스팅 및 이미지 업로드 방법](https://unfinishedgod.netlify.app/2020/06/10/hugo-blod-2-posting/)
+- Google Analytic, 댓글기능(Disqus)
+- 구글 검색 노출(Google search console)
+- Logo, Favicon 설정
+- 목차 설정(Blogdown에서 제공하는건 년도별로 되어 있음)
