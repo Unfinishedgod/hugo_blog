@@ -1,0 +1,23 @@
+---
+title: python_in_r
+author: 최의용
+date: '2020-06-15'
+slug: python-in-r
+categories:
+  - R
+  - python
+tags:
+  - R
+  - python
+---
+
+```{r}
+library(reticulate)
+```
+
+```{python}
+test_list = ['one', 'two']
+
+for i in test_list:
+  print(i)
+```
