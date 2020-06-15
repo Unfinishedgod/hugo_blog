@@ -6,6 +6,13 @@ googleAnalytics = "UA-145407326-5"
 disqusShortname = "hugoblog-4"
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
+# config.toml
+[outputs]
+home = ["HTML", "RSS", "JSON"]
+
+# config.toml
+enableRobotsTXT = true
+ 
 [permalinks]
     post = "/:year/:month/:day/:slug/"
 
