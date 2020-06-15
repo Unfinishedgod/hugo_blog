@@ -124,8 +124,9 @@ Create Site 버튼을 클릭했으면 사이트 설정 View가 나오는데, 각
 
 Git push를 해주고 사이트를 들어가면 다음과 같이 댓글 기능이 추가된것을 볼 수 있다.
 
+<center>
 ![](/post/2020-06-12-blog-setting_files/disqus_6.PNG){width=80%}
-
+</center>
 
 # 마무리 
 
