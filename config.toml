@@ -12,6 +12,11 @@ home = ["HTML", "RSS", "JSON"]
 
 # config.toml
 enableRobotsTXT = true
+
+# config.toml
+[sitemap]
+changefreq = "weekly"
+filename = "sitemap.xml"
  
 [permalinks]
     post = "/:year/:month/:day/:slug/"
