@@ -1,0 +1,79 @@
+---
+title: 'Rstudio AI Blog라는게 있더라'
+author: 최의용
+date: '2020-06-15'
+slug: 'Rstudio AI Blog라는게 있더라'
+categories:
+  - R
+tags:
+  - AI
+---
+
+
+
+<center>
+<img src="/post/2020-06-15-r-ai-guide_files/rstudio_ai_blog.PNG" style="width:100.0%" />
+</center>
+<p>AI의 시대. 모든 용어엔 ‘AI’라는 단어가 들어갈 정도로 한창 유행을 하고 있다. ’친환경 xxx’,’스마트 xxx’이라는 단어의 유행은 이미 지난지 오래고 이제는 ’AI xxx’라는 단어를 곳곳에서 볼 수 있다. 텐서블로우가 뭐~, 케라스가 뭐~, 파이토치가 뭐~ 하면서 이런저런 글들은 많고, 점점 딥러닝 라이브러리가 많아지면서 배우는데에 있어 혼란만 가중을 시키더라. R에서는? 케라스, 텐서플로 패키지가 이미 있긴 하다만 정보가 충분치는 않아 보인다. 그럼에도 R에서 AI를 잘 해보려고 하는 그런 움직임이 있더라. <br>
+<strong>그렇게 찾아보다 알게된 블로그가 있다. ’Rstudio AI Blog’라는 곳.</strong> R, Python둘의 비교를 하려고 쓰는 글이 아니다. 그저, 이러한 곳이 있다더라 하면서 소개를 한번 해볼까 한다. 공식링크는 다음과 같다.</p>
+<center>
+<a href="https://blogs.rstudio.com/ai/" class="uri">https://blogs.rstudio.com/ai/</a>
+</center>
+<div id="왜-rstudio-ai-blog인가" class="section level1">
+<h1>왜 RStudio AI Blog인가?</h1>
+<p>기존에 TensorFlow for R Blog라는 이름을 사용했었다가, Rstudio AI Blog로 이름을 바꿨다고 한다. 그러나, 이곳은(Multiverse Team이라고 칭하고 있다.) 그것 뿐만 아니라 sparklyr을 사용해 분산 컴퓨팅을 소개 하던가 또는 데이터 수집을 최적화 하는것도 포함되어 있다고 한다. 그리고 몇가지 이유가 있어서 이름을 바꾸었다고 한다. 자세한 내용은 다음 링크를 확인해보자.</p>
+<center>
+<p><img src="/post/2020-06-15-r-ai-guide_files/rstudio_ai_blog_1.PNG" style="width:85.0%" /></p>
+<a href="https://blogs.rstudio.com/ai/posts/2020-04-01-rstudio-ai-blog/">Introducing: The Rstudio AI Blog</a>
+</center>
+</div>
+<div id="무엇을-얻을수-있는가" class="section level1">
+<h1>무엇을 얻을수 있는가?</h1>
+<center>
+<img src="/post/2020-06-15-r-ai-guide_files/rstudio_ai_blog_2.PNG" style="width:30.0%" />
+</center>
+<p>사이트의 카테고리를 보면 다양하게, 그리고 많은양의 자료를 볼 수 있다. 이중에서 가장 눈에 띄는건 역시 TensorFlow/Keras(54). 그리고 Image Recognition &amp; Image Processing(12)가 눈에 띈다.</p>
+</div>
+<div id="최근에-내가-관심깊게-보려고-하는것" class="section level1">
+<h1>최근에 내가 관심깊게 보려고 하는것</h1>
+<p>Mnist를 한번 해보려 한다. mnist를 하면 keras로 예제가 나오기는 하는데 더 없을까? 하다가 여러개를 찾게 되었다. 가볍게 보다 보니 막상 하려면 이에 필요한 환경구축 하는것도 상당한 시간을 소모할것 같아 당장은 못해도 빠른 시일 내에 얼른 따라 해보고 포스팅을 해보려 한다.</p>
+<div id="easy-pixelcnn-with-tfprobability" class="section level3">
+<h3>1. Easy PixelCNN with tfprobability</h3>
+<p>PixelCNN은 매우 사실적으로 보이는 이미지를 생성하려고 설계된 딥러닝 아키텍쳐의 묶음이라고 한다. 특히 많이 나오는 용어가 tfprobability가 나오는데, 이 역시 하단에 간단히 소개 해보려 한다.</p>
+<center>
+<p><img src="/post/2020-06-15-r-ai-guide_files/rstudio_ai_blog_3.PNG" style="width:90.0%" /></p>
+<a href="https://blogs.rstudio.com/ai/posts/2020-05-29-pixelcnn/">Easy PixelCNN with tfprobability</a>
+</center>
+</div>
+<div id="auto-keras-tuning-free-deep-learning-trom-r" class="section level3">
+<h3>2. Auto-Keras: Tuning-free deep learning trom R</h3>
+<p>Auto-Keras라고 소개 하면서 자동으로 하이퍼파라미터 튜닝을 도와준다는데, 이는 한번 두고봐야 알것 같다. 제대로 읽어보고 따라해본 다음에야 평가를 내릴수 있다고 보고 있다.</p>
+<center>
+<p><img src="/post/2020-06-15-r-ai-guide_files/rstudio_ai_blog_5.PNG" style="width:90.0%" /></p>
+<a href="https://blogs.rstudio.com/ai/posts/2019-04-16-autokeras/">Auto-Keras: Tuning-free deep learning trom R</a>
+</center>
+</div>
+<div id="generating-image-with-keras-and-tensorflow-eager-execution" class="section level3">
+<h3>3. Generating image with Keras and TensorFlow eager execution</h3>
+<p>GANs(Generative Adversarial Networks)을 소개 하고 이를 R에서 Keras와 TensorFlow로 구현 하는 코드를 소개 해주는 글.</p>
+<center>
+<p><img src="/post/2020-06-15-r-ai-guide_files/rstudio_ai_blog_4.PNG" style="width:90.0%" /></p>
+<a href="https://blogs.rstudio.com/ai/posts/2018-08-26-eager-dcgan/">Generating image with Keras and TensorFlow eager execution</a>
+</center>
+</div>
+<div id="tfprobability-0.8-on-cran-now-how-can-you-use-it" class="section level3">
+<h3>4. tfprobability 0.8 on CRAN: Now how can you use it?</h3>
+<p><code>tfprobability</code> 패키지에 대한 소개와 이를 어떻게 사용할지 글이 담겨져 있다. 추가로 <code>tfprobability</code>패키지에 대한 소개링크도 같이 첨부 한다.</p>
+<ul>
+<li><a href="https://rstudio.github.io/tfprobability/">tfprobability</a></li>
+</ul>
+<center>
+<p><img src="/post/2020-06-15-r-ai-guide_files/rstudio_ai_blog_6.PNG" style="width:90.0%" /></p>
+<a href="https://blogs.rstudio.com/ai/posts/2019-11-07-tfp-cran/">tfprobability 0.8 on CRAN: Now how can you use it?</a>
+</center>
+</div>
+</div>
+<div id="총평" class="section level1">
+<h1>총평</h1>
+<p>Rstudio AI Blog를 알게된지는 한달이 좀 더 지난것 같다. 그 언젠가 하나씩 따라서 해봐야지 하고 막연하게 생각만 하고 있다가, 이번에는 그보다 좀더 구체화해서 한발짝 더 나아간 셈인다. 그냥 뜬구름 잡으면서 보다가 자세하게 보다보니 환경 구축부터 시작해서 알아야 할것들이 많아보인다. 역시나 갈길은 멀다.</p>
+</div>
