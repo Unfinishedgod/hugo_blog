@@ -15,7 +15,7 @@ enableRobotsTXT = true
 
 # config.toml
 [sitemap]
-changefreq = "weekly"
+changefreq = "daily"
 filename = "sitemap.xml"
  
 [permalinks]
