@@ -1,0 +1,360 @@
+---
+title: "[R] Kaggle Bike Sharing Demand"
+author: 최의용
+date: '2020-04-25'
+slug: "[R] Kaggle Bike Sharing Demand"
+categories:
+  - Kaggle
+tags:
+  - kaggle
+  - 캐글
+  - 미완성의신
+---
+
+
+
+<p align="center">
+<img src="https://storage.googleapis.com/kaggle-competitions/kaggle/3948/media/bikes.png"><br>
+<b>Bike Sharing Demand 링크: <a href="https://www.kaggle.com/c/bike-sharing-demand">Bike Sharing Demand</a></b><br>
+<b>Github Code: <a href="https://github.com/Unfinishedgod/Kaggle/blob/master/Bike_Sharing_Demand/Bike_Sharing_Demand.Rmd">Unifinished God/Kaggle</a></b><br>
+</p>
+<p><br></p>
+<div id="kaggle---bike-sharing-demand" class="section level1">
+<h1>0. Kaggle - Bike Sharing Demand</h1>
+<p>캐글 데이터 분석을 해보자. Bike Sharing Demand라는 주제로 자전거가 얼마나 대여가 될지 예측을 하는 문제다. 타이타닉 만큼 기본 주제로 여겨지며 XgBoost도 공부 해볼겸 한번 써보려 한다.</p>
+<p><br></p>
+<div id="데이터-다운로드" class="section level3">
+<h3>0.1 데이터 다운로드</h3>
+<p>데이터는 캐글의 Data시트에서 다운을 받으면 된다. 후에 api를 사용한 방법도 추가 하도록 하겠다.</p>
+<center>
+<img src="/post/2020-06-23-bike-sharing-demand_files/kaggle_download.png" style="width:80.0%" />
+</center>
+<p><br></p>
+</div>
+<div id="평가" class="section level3">
+<h3>0.2 평가</h3>
+<p>평가는 RMSLE(Root Mean Square Logarithmic Error)로 하며 이는 RMSE에 각각 log를 씌운것으로 오차에 대해서 과대평가된 항목보다 과소평가된 항목에 패널티를 더 주게 된다. 식은 다음과 같다.</p>
+<p align="center">
+<span class="math display">\[ \sqrt{\frac{1}{n} \sum(\log(a_i + 1) - \log(a_i+1))2 } \]</span>
+</p>
+<p><br></p>
+</div>
+<div id="데이터-형식" class="section level3">
+<h3>0.3 데이터 형식</h3>
+<p>Bike Sharing Demand 의 데이터는 다음과 같다. 이중에서 casual, registered는 test_set에 없어서 사용하지 않을 것이고, 날짜와 날씨 데이터로 이루어져 있다.</p>
+<ul>
+<li>datetime: 년-월-일 시간 데이터</li>
+<li>season: 1 = 봄, 2 = 여름, 3 = 가을, 4 = 겨울</li>
+<li>holiday: 공휴일 또는 주말</li>
+<li>workingday: 공휴일, 주말을 제외한 평일</li>
+<li>weather
+<ul>
+<li>1: 매우 맑음(Clear, Few clouds, Partly cloudy, Partly cloudy)</li>
+<li>2: 맑음(Mist + Cloudy, Mist + Broken clouds, Mist + Few clouds, Mist)</li>
+<li>3: 나쁨(Light Snow, Light Rain + Thunderstorm + Scattered clouds, Light Rain + Scattered clouds)</li>
+<li>4: 매우 나쁨(Heavy Rain + Ice Pallets + Thunderstorm + Mist, Snow + Fog)</li>
+</ul></li>
+<li>temp: 기온</li>
+<li>atemp: 체감온도 정도로 보자</li>
+<li>humidity: 상대 습도</li>
+<li>windspeed: 바람의 세기</li>
+<li>casual: 미등록 사용자 렌탈 수</li>
+<li>registered: 등록된 사용자 렌탈수</li>
+<li>count: 렌탈한 총 합</li>
+</ul>
+<p><br>
+<br></p>
+</div>
+</div>
+<div id="사전준비" class="section level1">
+<h1>1. 사전준비</h1>
+<p>분석을 하기에 앞서, 패키지를 불러 오고 데이터를 파악 해보자.</p>
+<p><br></p>
+<div id="load-packages" class="section level3">
+<h3>1.1 Load Packages</h3>
+<p>불러올 Packages는 다음과 같다.</p>
+<pre class="r"><code>library(tidyverse) 
+library(lubridate) 
+library(stringr)
+library(caret)
+library(readr)
+library(gridExtra)
+library(xgboost)
+library(Metrics)
+library(ggplot2)
+library(patchwork)</code></pre>
+<p><br></p>
+</div>
+<div id="data-load-전처리" class="section level3">
+<h3>1.2 Data Load &amp; 전처리</h3>
+<p>데이터를 불러오고 전처리를 해주도록 하자. xgboost를 사용하기 위해선, 각각의 데이터는 모두 숫자형으로 표현 되어야 한다. <strong>날짜 데이터</strong>는 년, 월, 시간, 요일로 따로 데이터를 불러 오도록 하자.</p>
+<pre class="r"><code>train_set &lt;- read_csv(&quot;train.csv&quot;)
+test_set &lt;- read_csv(&quot;test.csv&quot;)
+# submission &lt;- read_csv(&quot;sampleSubmission.csv&quot;)
+
+# remove casual registered
+train_set &lt;- train_set %&gt;% 
+  select(-casual, -registered) %&gt;%  
+  mutate(
+    year = year(datetime),
+    month = month(datetime),
+    hour = hour(datetime),
+    wday = wday(datetime))
+
+
+test_set &lt;- test_set %&gt;% 
+  mutate(
+    year = year(datetime),
+    month = month(datetime),
+    hour = hour(datetime),
+    wday = wday(datetime))</code></pre>
+<p><br></p>
+</div>
+<div id="데이터-자료형-파악" class="section level3">
+<h3>1.3 데이터 자료형 파악</h3>
+<pre class="r"><code>str(train_set)</code></pre>
+<pre><code>## tibble [10,886 × 14] (S3: tbl_df/tbl/data.frame)
+##  $ datetime  : POSIXct[1:10886], format: &quot;2011-01-01 00:00:00&quot; &quot;2011-01-01 01:00:00&quot; ...
+##  $ season    : num [1:10886] 1 1 1 1 1 1 1 1 1 1 ...
+##  $ holiday   : num [1:10886] 0 0 0 0 0 0 0 0 0 0 ...
+##  $ workingday: num [1:10886] 0 0 0 0 0 0 0 0 0 0 ...
+##  $ weather   : num [1:10886] 1 1 1 1 1 2 1 1 1 1 ...
+##  $ temp      : num [1:10886] 9.84 9.02 9.02 9.84 9.84 ...
+##  $ atemp     : num [1:10886] 14.4 13.6 13.6 14.4 14.4 ...
+##  $ humidity  : num [1:10886] 81 80 80 75 75 75 80 86 75 76 ...
+##  $ windspeed : num [1:10886] 0 0 0 0 0 ...
+##  $ count     : num [1:10886] 16 40 32 13 1 1 2 3 8 14 ...
+##  $ year      : num [1:10886] 2011 2011 2011 2011 2011 ...
+##  $ month     : num [1:10886] 1 1 1 1 1 1 1 1 1 1 ...
+##  $ hour      : int [1:10886] 0 1 2 3 4 5 6 7 8 9 ...
+##  $ wday      : num [1:10886] 7 7 7 7 7 7 7 7 7 7 ...</code></pre>
+<p><br></p>
+</div>
+<div id="데이터-요약" class="section level3">
+<h3>1.4 데이터 요약</h3>
+<pre class="r"><code>summary(train_set)</code></pre>
+<pre><code>##     datetime                       season         holiday       
+##  Min.   :2011-01-01 00:00:00   Min.   :1.000   Min.   :0.00000  
+##  1st Qu.:2011-07-02 07:15:00   1st Qu.:2.000   1st Qu.:0.00000  
+##  Median :2012-01-01 20:30:00   Median :3.000   Median :0.00000  
+##  Mean   :2011-12-27 05:56:22   Mean   :2.507   Mean   :0.02857  
+##  3rd Qu.:2012-07-01 12:45:00   3rd Qu.:4.000   3rd Qu.:0.00000  
+##  Max.   :2012-12-19 23:00:00   Max.   :4.000   Max.   :1.00000  
+##    workingday        weather           temp           atemp      
+##  Min.   :0.0000   Min.   :1.000   Min.   : 0.82   Min.   : 0.76  
+##  1st Qu.:0.0000   1st Qu.:1.000   1st Qu.:13.94   1st Qu.:16.66  
+##  Median :1.0000   Median :1.000   Median :20.50   Median :24.24  
+##  Mean   :0.6809   Mean   :1.418   Mean   :20.23   Mean   :23.66  
+##  3rd Qu.:1.0000   3rd Qu.:2.000   3rd Qu.:26.24   3rd Qu.:31.06  
+##  Max.   :1.0000   Max.   :4.000   Max.   :41.00   Max.   :45.45  
+##     humidity        windspeed          count            year     
+##  Min.   :  0.00   Min.   : 0.000   Min.   :  1.0   Min.   :2011  
+##  1st Qu.: 47.00   1st Qu.: 7.002   1st Qu.: 42.0   1st Qu.:2011  
+##  Median : 62.00   Median :12.998   Median :145.0   Median :2012  
+##  Mean   : 61.89   Mean   :12.799   Mean   :191.6   Mean   :2012  
+##  3rd Qu.: 77.00   3rd Qu.:16.998   3rd Qu.:284.0   3rd Qu.:2012  
+##  Max.   :100.00   Max.   :56.997   Max.   :977.0   Max.   :2012  
+##      month             hour            wday      
+##  Min.   : 1.000   Min.   : 0.00   Min.   :1.000  
+##  1st Qu.: 4.000   1st Qu.: 6.00   1st Qu.:2.000  
+##  Median : 7.000   Median :12.00   Median :4.000  
+##  Mean   : 6.521   Mean   :11.54   Mean   :3.999  
+##  3rd Qu.:10.000   3rd Qu.:18.00   3rd Qu.:6.000  
+##  Max.   :12.000   Max.   :23.00   Max.   :7.000</code></pre>
+<p><br></p>
+</div>
+<div id="결측치-파악" class="section level3">
+<h3>1.5 결측치 파악</h3>
+<pre class="r"><code>sum(is.na(train_set))</code></pre>
+<pre><code>## [1] 0</code></pre>
+<p><br>
+<br></p>
+</div>
+</div>
+<div id="데이터-시각화" class="section level1">
+<h1>2. 데이터 시각화</h1>
+<p>이렇게 데이터를 파악 해봤으니 이를 시각화 해보도록 하자. 시각화의 편의성을 위해서 숫자형 데이터는 모두 라벨링을 해주었다. 대신 <code>train_set_vis</code>라고 train_set를 따로 지정해주어 혼선이 없도록 해주었다.</p>
+<p><br></p>
+<div id="각-변수별-count와의-관계" class="section level3">
+<h3>2.1 각 변수별 Count와의 관계</h3>
+<p>각각의 변수는 Count와 어떤 관계를 보이는가? 가장 먼저 데이터가 count에 어떤 영향을 끼치는지 파악해보도록 하자. hour변수가 눈에 띄게 count에 영향을 끼치는 것을 확인할 수 있었다. 방법론적으로는 ggplot 객체를 한꺼번에 불러와서 list화 시키는 방법을 택했다. 그리고 나서 grid.arrange() 함수를 사용하여 이를 한눈에 볼 수 있도록 시각화를 했다. 이번에 참고 해볼만한 구글 키워드를 소개 하겠다.</p>
+<ul>
+<li>참고: map in tydiverse (lapply 보다 빠르게 병렬 처리를 해줄수 있다.)</li>
+<li>참고: grid.arrange in r (ggplot을 grid화 시켜서 표현을 할 수 있다.)</li>
+</ul>
+<pre class="r"><code>train_set_vis &lt;- train_set
+
+train_set_vis$season  &lt;- factor(train_set_vis$season, labels = c(&quot;Spring&quot;, &quot;Summer&quot;, &quot;Fall&quot;, &quot;Winter&quot;))
+train_set_vis$weather &lt;- factor(train_set_vis$weather, labels = c(&quot;Good&quot;, &quot;Normal&quot;, &quot;Bad&quot;, &quot;Very Bad&quot;))
+train_set_vis$holiday &lt;- factor(train_set_vis$holiday)
+train_set_vis$workingday &lt;- factor(train_set_vis$workingday)
+train_set_vis$year &lt;- factor(train_set_vis$year)
+train_set_vis$month &lt;- factor(train_set_vis$month)
+# train_set_vis$hour &lt;- factor(train_set_vis$hour)
+train_set_vis$wday &lt;- factor(train_set_vis$wday, labels = c(&quot;Sun&quot;,&quot;Mon&quot;, &quot;Tue&quot;,&quot;Wed&quot;,&quot;Thu&quot;,&quot;Fir&quot;,&quot;Sat&quot;))
+
+
+non_hour_list &lt;- (colnames(train_set_vis) != &quot;count&quot;)%&gt;%
+  which()
+
+lst &lt;- map(non_hour_list, function(i) {
+  df_list &lt;- colnames(train_set_vis)[i]
+
+  train_set_vis %&gt;%
+    select(df_list, count) %&gt;%
+    rename(aa = df_list) %&gt;%
+    ggplot(aes(aa,count)) +
+    geom_point(alpha=.2,color = &quot;#008ABC&quot;) +
+    labs(title = paste0(df_list,&quot; vs count&quot;), x = df_list, y = &quot;&quot;,color=df_list) +
+    theme_bw() +
+    theme(legend.position = &quot;bottom&quot;)
+})
+
+grid.arrange(grobs=lst, ncol=3)</code></pre>
+<p><img src="/post/2020-06-23-bike-sharing-demand_files/figure-html/unnamed-chunk-6-1.png" width="960" /></p>
+<p><br></p>
+</div>
+<div id="hour와-다른-변수들간의-관계" class="section level3">
+<h3>2.2 hour와 다른 변수들간의 관계</h3>
+<p>위 그림에서 count에 가장 많은 영향을 끼친 변수로는 hour임을 알 수 있었다. 그럼 이번엔 hour이 다른 변수와 어떤 관계 인지 확인 해보도록 하자.</p>
+<ul>
+<li>season: 의외로 Spring가 가장 낮은것을 확인 할수 있었다.</li>
+<li>holiday: 0, 1 이 뚜렷하게 구분이 되어 있다. 그러나.. 좀 더 확인해볼 필요가 있어보인다.</li>
+<li>workingday: 0,1 역시 뚜렷하게 구분 되어 있다.</li>
+<li>weather: 정말 뚜렷하게 날씨별로 구분이 되는걸 볼 수 있다.</li>
+<li>year: 2011년에 비해 2012년이 좀 더 많은걸 볼 수 있다.</li>
+<li>month: 월별로 구분이 되지만 뚜렷하게 알 수 있는 방법은 없다.</li>
+<li>wday: 요일별로 했을때 평일과 주말의 분포가 선명하게 보인다. 평일은 08시, 17시 (출퇴근시간), 주말은 12시에 뚜렷하게 솟아 오른걸 확인뿐만 아니라 이해를 할 수 있었다.</li>
+</ul>
+<pre class="r"><code>factor_list &lt;- sapply(train_set_vis, is.factor) %&gt;%
+  which()
+
+lst &lt;- lapply(factor_list, function(i) {
+  df_list &lt;- colnames(train_set_vis)[i]
+
+  train_set_vis %&gt;%
+    rename(aa = df_list) %&gt;%
+    group_by(aa, hour) %&gt;%
+    summarise(count = sum(count)) %&gt;%
+    ggplot(aes(x = hour, y = count, group = aa, colour = aa)) +
+    labs(title = paste0(&quot;Count by &quot;,df_list), x = &quot;Hour&quot;,  color = df_list) +
+    theme_bw() +
+    geom_line()
+})
+
+grid.arrange(grobs=lst, ncol=2)</code></pre>
+<p><img src="/post/2020-06-23-bike-sharing-demand_files/figure-html/unnamed-chunk-7-1.png" width="960" /></p>
+<p><br>
+<br></p>
+</div>
+</div>
+<div id="xgboost" class="section level1">
+<h1>3. Xgboost</h1>
+<p>이번엔 Xgboost를 사용하여 분석을 하기 위한 사전준비를 해주자. xgboost를 돌리기 위해선 데이터의 형식이 matrix형식이 되어야 한다.</p>
+<p><br></p>
+<div id="count-to-log-train-test-set-분리" class="section level3">
+<h3>3.1 Count to log &amp; Train / Test set 분리</h3>
+<p>Count에 log를 취해주자. 이는 RMSLE를 위한 것으로 로그를 취한 값의 RMSE를 최소화 한 것이 RMSLE가 최소화가 되기 때문이다. 또 모델을 돌릴때 datetime는 년, 월, 시간, 요일로 나누어 주었으니 빼주도록 하자.</p>
+<pre class="r"><code>train_set$count = log1p(train_set$count)
+
+X_train &lt;- train_set %&gt;%
+  select(-count, - datetime) %&gt;%
+  as.matrix()
+
+y_train &lt;- train_set$count
+
+X_test = test_set %&gt;% 
+  select(- datetime) %&gt;% 
+  as.matrix()</code></pre>
+<p><br></p>
+</div>
+<div id="grid-search-cross-validation-실행" class="section level3">
+<h3>3.2 Grid Search / Cross Validation 실행</h3>
+<p>Grid search와 Cross validation을 실행 해보자. xgboost를 돌리는데에 있어, 모델에 여러 조건을 넣어주기 위해 Grid search를 사용했고, 모델의 결과가 validataion에만 성능이 좋고, 실제 결과에는 성능이 좋지 않을지도 몰라 Cross validation을 해주도록 한다.(참고로 둘다 진행하는데 시간이 매우 오래 걸린다.) xgboost의 기술적인 설명은 다음 키워드를 참고하도록 하자</p>
+<ul>
+<li>참고: Xgboost in r</li>
+</ul>
+<pre class="r"><code>dtrain = xgb.DMatrix(X_train, label = y_train)
+
+searchGridSubCol &lt;- expand.grid(subsample = c(0.5, 0.6),
+                                colsample_bytree = c(0.5, 0.6),
+                                max_depth = c(7:15),
+                                min_child = seq(1),
+                                eta = c(0.05,0.1,0.15)
+)
+
+
+ntrees &lt;- 150
+
+rmseErrorsHyperparameters &lt;- apply(searchGridSubCol, 1, function(parameterList){
+
+  #Extract Parameters to test
+  currentSubsampleRate &lt;- parameterList[[&quot;subsample&quot;]]
+  currentColsampleRate &lt;- parameterList[[&quot;colsample_bytree&quot;]]
+  currentDepth &lt;- parameterList[[&quot;max_depth&quot;]]
+  currentEta &lt;- parameterList[[&quot;eta&quot;]]
+  currentMinChild &lt;- parameterList[[&quot;min_child&quot;]]
+
+  xgboostModelCV &lt;- xgb.cv(data =  dtrain, nrounds = ntrees, nfold = 5, showsd = TRUE,
+                           metrics = &quot;rmse&quot;, verbose = TRUE, &quot;eval_metric&quot; = &quot;rmse&quot;,
+                           &quot;objective&quot; = &quot;reg:linear&quot;, &quot;max.depth&quot; = currentDepth, &quot;eta&quot; = currentEta,
+                           &quot;subsample&quot; = currentSubsampleRate, &quot;colsample_bytree&quot; = currentColsampleRate
+                           , print_every_n = 10, &quot;min_child_weight&quot; = currentMinChild, booster = &quot;gbtree&quot;,
+                           early_stopping_rounds = 10)
+
+  xvalidationScores &lt;- as.data.frame(xgboostModelCV$evaluation_log)
+  rmse &lt;- tail(xvalidationScores$test_rmse_mean, 1)
+  trmse &lt;- tail(xvalidationScores$train_rmse_mean,1)
+  output &lt;- return(c(rmse, trmse,currentSubsampleRate, currentColsampleRate, currentDepth, currentEta, currentMinChild))})
+
+
+output &lt;- as.data.frame(t(rmseErrorsHyperparameters))
+varnames &lt;- c(&quot;TestRMSE&quot;, &quot;TrainRMSE&quot;, &quot;SubSampRate&quot;, &quot;ColSampRate&quot;, &quot;Depth&quot;, &quot;eta&quot;, &quot;currentMinChild&quot;)
+names(output) &lt;- varnames</code></pre>
+<p><br></p>
+</div>
+<div id="grid-search-cross-validation-결과" class="section level3">
+<h3>3.3 Grid Search / Cross Validation 결과</h3>
+<p>Grid Search / Cross Validation결과를 보자. tail()함수를 사용해서 마지막 6개만 뽑았으며, 결과는 다음과 같다. 이중에서 RMSE가 가장 낮은걸 선택하여 후에 지수화 하여 RMSLE가 낮은걸 선택하게 하려고 한다.</p>
+<pre class="r"><code>tail(output)</code></pre>
+<pre><code>##      TestRMSE TrainRMSE SubSampRate ColSampRate Depth  eta currentMinChild
+## 103 0.3097740 0.0216482         0.5         0.6    14 0.15               1
+## 104 0.3296116 0.0178716         0.6         0.6    14 0.15               1
+## 105 0.3661822 0.0262852         0.5         0.5    15 0.15               1
+## 106 0.3382482 0.0155748         0.6         0.5    15 0.15               1
+## 107 0.3214466 0.0313808         0.5         0.6    15 0.15               1
+## 108 0.3404442 0.0129830         0.6         0.6    15 0.15               1</code></pre>
+<p><br></p>
+</div>
+<div id="model" class="section level3">
+<h3>3.4 Model</h3>
+<p>Grid search &amp; Cross Validation 결과 최적의 파라미터를 적용해 다음의 파라미터를 집어넣어 결과를 보도록 하자. 그리고 xgboost에서 어떤 변수가 가장 의미가 있었는지 순서대로 확인할 수가 있다.</p>
+<pre class="r"><code>model = xgb.train(data = dtrain, 
+                  nround = 150, 
+                  max_depth = 10, 
+                  eta = 0.15, 
+                  subsample = 0.6,
+                  colsample_bytree = 0.6,
+                  min_child_weight = 1)
+
+
+xgb.importance(feature_names = colnames(X_train), model) %&gt;% 
+  xgb.plot.importance()</code></pre>
+<p><img src="/post/2020-06-23-bike-sharing-demand_files/figure-html/unnamed-chunk-11-1.png" width="960" /></p>
+<pre class="r"><code>preds = predict(model, X_test)
+preds = expm1(preds)
+
+solution = data.frame(datetime = test_set$datetime, count = preds)
+
+write.csv(solution, &quot;solution.csv&quot;, row.names = FALSE)</code></pre>
+<p><br>
+<br></p>
+</div>
+</div>
+<div id="score" class="section level1">
+<h1>4. Score</h1>
+<p>이렇게 돌린 결과 RMSLE는 0.41653이 나왔다. 최고 점수가 0.33756(2020-03-11 기준)에 비해 부족한 수준이지만, 앞으로 여러 캐글을 필사하면서 좀 더 성능을 높게할 수 있는 방법을 찾아보도록 하자.</p>
+<center>
+<img src="/post/2020-06-23-bike-sharing-demand_files/bike_sharing_score.png" style="width:80.0%" />
+</center>
+</div>
