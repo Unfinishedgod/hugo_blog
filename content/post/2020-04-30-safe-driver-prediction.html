@@ -96,25 +96,17 @@ test_set &lt;- read_csv(&quot;/home/owen/file/test.csv&quot;)</code></pre>
 <p>h2o.init() 함수를 통해 h2o와 R을 연결 시켜준다. 연결을 시켜주면 다음과 같은 정보를 얻을 수 있다. 자세한 내용은 다음을 참고 하자.
 - 참고: <a href="https://rpubs.com/BBSSDDSD/simple_h2o_intro_usage">R과 h2o 연결하기</a></p>
 <pre class="r"><code>h2o.init()</code></pre>
-<pre><code>## 
-## H2O is not running yet, starting it now...
-## 
-## Note:  In case of errors look at the following log files:
-##     /tmp/RtmpDnZELB/file11c14f36a824/h2o_owen_started_from_r.out
-##     /tmp/RtmpDnZELB/file11c1aafbfb4/h2o_owen_started_from_r.err
-## 
-## 
-## Starting H2O JVM and connecting: .. Connection successful!
+<pre><code>##  Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         3 seconds 13 milliseconds 
+##     H2O cluster uptime:         45 minutes 17 seconds 
 ##     H2O cluster timezone:       Asia/Seoul 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.30.0.1 
 ##     H2O cluster version age:    2 months and 19 days  
 ##     H2O cluster name:           H2O_started_from_R_owen_qvv887 
 ##     H2O cluster total nodes:    1 
-##     H2O cluster total memory:   1.73 GB 
+##     H2O cluster total memory:   1.52 GB 
 ##     H2O cluster total cores:    2 
 ##     H2O cluster allowed cores:  2 
 ##     H2O cluster healthy:        TRUE 
@@ -281,7 +273,7 @@ write.csv(Submission, &quot;Submission_AutoML.csv&quot;, row.names = F)</code></
 <div id="score" class="section level1">
 <h1>Score</h1>
 <center>
-<img src="/post/2020-04-30-safe-driver-prediction_files/score_porto.PNG" />
+<img src="/post/2020-04-30-safe-driver-prediction_files/score_porto.PNG" style="width:100.0%" />
 </center>
 </div>
 <div id="총평" class="section level1">
