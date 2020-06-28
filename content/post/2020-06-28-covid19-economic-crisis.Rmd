@@ -18,7 +18,7 @@ tags:
 
 - Mitigating the COVID Economic Crisis: Act Fast and Do Whatever It Takes & Economics in the Time of COVID-19 
 
-책을 읽다가 시기가 뭔가 현재락 맞지 않아보여서 보니 작가는 2020년 3월 17일을 **현재**라고 한걸 봐서 그 시기를 감안해서 읽는게 좋겠다. (지금은 6월 28일)
+책을 읽다가 시기가 뭔가 현재와 맞지 않아보여서 보니, 작가는 2020년 3월 17일을 **현재**라고 한걸 봐서 그 시기를 감안해서 읽는게 좋겠다. (지금은 6월 28일)
 
 <center>
 ![](/post/2020-06-28-covid19-economic-crisis_files/covid_2.PNG){width=60%}
