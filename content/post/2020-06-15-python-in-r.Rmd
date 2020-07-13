@@ -13,6 +13,8 @@ tags:
 
 ```{r}
 library(reticulate)
+
+use_condaenv()
 ```
 
 ```{python}
