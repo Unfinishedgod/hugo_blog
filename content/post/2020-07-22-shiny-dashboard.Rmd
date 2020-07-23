@@ -1,0 +1,17 @@
+---
+title: "R Shiny에 대한 간단한 소개글"
+author: 최의용
+date: '2020-07-22'
+slug: "R Shiny에 대한 간단한 소개글"
+categories:
+  - R
+  - shiny
+tags:
+  - R
+  - shiny
+  - dashboard
+---
+
+https://rstudio.github.io/shinydashboard/
+
+ - [Full Listing of the 2nd Annual RStudio Shiny Content Submissions](https://rpubs.com/minebocek/shiny-contest-2020-submissions)
