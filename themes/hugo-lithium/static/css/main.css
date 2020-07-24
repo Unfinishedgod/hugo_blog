@@ -94,7 +94,7 @@ code {
   max-width: 800px;
   margin: 40px auto 10px;
   padding: 0 15px;
-  font-size: 16px;
+  font-size: 5px;
   line-height: 1.7;
   color: #333;
 }
@@ -113,7 +113,7 @@ code {
 .article-duration {
   margin-top: 12px;
   float: right;
-  font-size: 10px;
+  font-size: 16px;
   padding: 1px 5px;
   font-weight: bold;
   border-radius: 3px;
@@ -180,7 +180,7 @@ code {
 
 .archive-item-date {
   color: #ccc;
-  font-size: 14px;
+  font-size: 16px;
   padding: 5px 0;
   margin-top: 5px;
   display: block;
@@ -268,7 +268,7 @@ code {
   }
 
   .content {
-    font-size: 19px;
+    font-size: 18px;
     line-height: 1.8;
   }
 
