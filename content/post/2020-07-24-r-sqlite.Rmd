@@ -43,7 +43,7 @@ con <- dbConnect(SQLite(),
 ```
 ### Table 생성
 
-간단한게 iris 데이터를 생성 해보자. 
+간단한게 iris 데이터를 생성해보자. 쿼리문으로 
 
 ```{r}
 dbWriteTable(con, "iris", iris)
