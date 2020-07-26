@@ -35,7 +35,7 @@ library(RSQLite)
 
 ### DB 생성
 
-dbConnet() 함수를 통해 다음의 코드를 사용해준다. dbConnect()안에 SQLite()는 드라이버명이고, dbname으로는 우리가 만들 DB이름을 적어 준다. 다음의 코드를 사용하고 확인해보면 test_sqlite.sqlte라는 파일이 생성된걸 확인할 수 있다.
+dbConnet() 함수를 통해 다음의 코드를 사용해준다. dbConnect()안에 SQLite()는 드라이버명이고, dbname에는 우리가 만들 DB이름을 적어 준다. 다음의 코드를 사용하고 확인해보면 test_sqlite.sqlte라는 파일이 생성된걸 확인할 수 있다.
 
 ```{r}
 con <- dbConnect(SQLite(), 
@@ -43,7 +43,15 @@ con <- dbConnect(SQLite(),
 ```
 ### Table 생성
 
-간단한게 iris 데이터를 생성해보자. 쿼리문으로 
+간단한게 iris 데이터를 생성해보자. 테이블 생성방법은 두가지인데 dbSendQuery()함수를 사용해서 쿼리문을 사용해서 생성하던가, dbWriteTable()함수를 사용해 생성과 동시에 통째로 집어 넣는 방법이 있다. 연습해볼 데이터는 iris로 우선 쿼리문을 사용해서 테이블을 생성해보자.
+
+#### 쿼리문으로 생성
+
+```{r}
+dbSendQuery()
+```
+
+
 
 ```{r}
 dbWriteTable(con, "iris", iris)
