@@ -1,0 +1,141 @@
+---
+title: "Bookdown:Github page에 Publish하기"
+author: 최의용
+date: '2020-08-04'
+slug: "Bookdown:Github page에 Publish하기"
+categories:
+  - R
+tags:
+  - r
+  - bookdown
+---
+
+
+
+<center>
+<img src="/post/2020-08-04-bookdown-publish_files/logo.png" style="width:30.0%" />
+</center>
+<p>Bookdown에 대해 알아보려 한다. 그동안 많이 Bookdown으로 잘 만들어진 Webbook를 보다가 넘어가곤 했는데, 책을 보면서 필사와 함께 정리를 하고 싶은 생각에 시작하게 되었다. 책의 많은 내용들을 한번씩 따라 해보고 정리를 하기에 블로그는 중,단편적인 글을 써야 하는 어려움이 있기 때문이다. Bookdown의 공식 가이드는 다음과 같다.</p>
+<ul>
+<li><a href="https://bookdown.org/yihui/bookdown/">bookdown: Authoring Books and Technical Documents with R Markdown</a></li>
+</ul>
+<p>이곳을 참고해도 좋으며, 이번 블로그에서는 Bookdown을 웹에 퍼블리쉬 하는 법에 대해 정리를 하려고 한다. 선수 지식으로는 간단한 Git지식정도. 그럼 하나씩 설치 해보면서 시작해보자.</p>
+<div id="bookdown-패키지-설치" class="section level2">
+<h2>1. Bookdown 패키지 설치</h2>
+<p>우선 bookdwon 패키지 설치하는것으로 시작하자.</p>
+<pre class="r"><code># install.packages(&quot;bookdown&quot;)
+library(bookdown)</code></pre>
+</div>
+<div id="bookdown-프로젝트-생성" class="section level2">
+<h2>2. Bookdown 프로젝트 생성</h2>
+<p>새로운 프로젝트를 생성하자. bookdown 라이브러리를 설치 하면 프로젝트를 생성할때 bookdown관련 파일을 담고 있는 프로젝트를 생성할 수 있다. 다음그림을 통해 프로젝트를 생성하자.</p>
+<div id="project-생성-과정" class="section level3">
+<h3>2-1. Project 생성 과정</h3>
+<center>
+<img src="/post/2020-08-04-bookdown-publish_files/bookdown_1.PNG" style="width:95.0%" />
+<img src="/post/2020-08-04-bookdown-publish_files/bookdown_2.PNG" style="width:95.0%" />
+</center>
+</div>
+<div id="bookdown-project-생성-화면" class="section level3">
+<h3>2-2. Bookdown Project 생성 화면</h3>
+<p><img src="/post/2020-08-04-bookdown-publish_files/bookdown_3.PNG" style="width:95.0%" /></p>
+</div>
+</div>
+<div id="bookdown-세팅" class="section level2">
+<h2>3. Bookdown 세팅</h2>
+<div id="bookdown.yml-파일-수정" class="section level3">
+<h3>3-1. <code>_bookdown.yml</code> 파일 수정</h3>
+<p>이제 이곳에서 몇가지를 생성해줄 필요가 있다. 우선 <code>_bookdown.yml</code>부터 수정을 해주자. <code>_bookdown.yml</code> 파일안에 다음과 같은 코드를 넣어주자. output_dir:docs.</p>
+<center>
+<img src="/post/2020-08-04-bookdown-publish_files/bookdown_4.PNG" style="width:50.0%" />
+</center>
+</div>
+<div id="rmd-파일-실행" class="section level3">
+<h3>3-2. .Rmd 파일 실행</h3>
+<p>그리고 나서 rmd파일을 한번 실행해주자. 실행을 해주면 알아서 docs파일을 생성하며 그안에 결과값들을 넣어준다. 또한, Rmd파일은 전부 하나씩 실행 해주어야 된다.</p>
+<center>
+<img src="/post/2020-08-04-bookdown-publish_files/bookdown_5.PNG" style="width:40.0%" />
+</center>
+<p>이로서 Rstudio에서 할수 있는 세팅은 모두 해두었다. 앞으로 새로운 작업을 하려고 할때에는 Rmd를 추가/수정 하면서 하나씩 만들면 된다.</p>
+</div>
+</div>
+<div id="github-세팅" class="section level2">
+<h2>4. Github 세팅</h2>
+<p>이제 Github 세팅을 해보자. 전반적인 흐름은 다음과 같다.</p>
+<ul>
+<li>Repository 만들기</li>
+<li>Rstudio에 있는 폴더와 연결</li>
+<li>Setting에서 몇가지 설정 하기</li>
+</ul>
+<div id="git-repository-만들기" class="section level3">
+<h3>4-1. git repository 만들기</h3>
+<p>우선 깃 레포를 생성하자.</p>
+<p><img src="/post/2020-08-04-bookdown-publish_files/bookdown_6.PNG" style="width:95.0%" /></p>
+</div>
+<div id="생성시-유의사항" class="section level3">
+<h3>4-2. 생성시 유의사항</h3>
+<p>생성시 유의사항이 있는데 원격 레포를 생성하는데 있어서 조금이나마 초보자의 시각에서 수월하게 하기 위함이다. Initialize this repository with a README 체크박스는 절대절대 <strong>클릭금지</strong></p>
+<p><img src="/post/2020-08-04-bookdown-publish_files/bookdown_7.PNG" style="width:95.0%" /></p>
+</div>
+<div id="깃-주소-복사" class="section level3">
+<h3>4-3. 깃 주소 복사</h3>
+<p>생성시 나오는 화면중 하나다. 저 주소를 복사 해주자.</p>
+<p><img src="/post/2020-08-04-bookdown-publish_files/bookdown_8.PNG" style="width:95.0%" /></p>
+</div>
+<div id="git-원격-레포-연결" class="section level3">
+<h3>4-4. Git 원격 레포 연결</h3>
+<p>이제 git 커멘드를 통해 연결 해주자. 커멘드에서 다음의 코드를 하나씩 작성해주자. Git remote에 대해서 좀더 알고 싶으면 구글에 다음과 같은 키워드를 적어주자.</p>
+<ul>
+<li>구글 검색: Git 원격 레포</li>
+</ul>
+<pre><code>$ git init
+$ git remote add origin (복사한 깃 Repo 주소)
+$ git remote -v
+$ git add .
+$ git commit -m &quot;bookdown start&quot;
+$ git push origin master</code></pre>
+</div>
+<div id="git-원격-레포-성공-화면" class="section level3">
+<h3>4-5. Git 원격 레포 성공 화면</h3>
+<p><img src="/post/2020-08-04-bookdown-publish_files/bookdown_9.PNG" style="width:95.0%" /></p>
+</div>
+<div id="git-setting" class="section level3">
+<h3>4-6. Git setting</h3>
+<p>정말 중요한 부분중 하나다. Git repository 에서 Setting 탭메뉴를 클릭하고 Github Pages부분으로 드래그 해보자. 빨간색 박스와 같이 설정을 해주도록 하자.</p>
+<ul>
+<li>Branch master</li>
+<li>/docs</li>
+<li>Save 버튼 클릭</li>
+</ul>
+<p><img src="/post/2020-08-04-bookdown-publish_files/bookdown_10.PNG" style="width:95.0%" /></p>
+</div>
+<div id="git-setting-성공-화면" class="section level3">
+<h3>4-7. Git setting 성공 화면</h3>
+<p>Git setting을 해주면 Github pages 부분에 Your Site is ready to be published at (bookdown 링크) 가 나오면 성공이다. 이제 링크를 클릭해보자.</p>
+<p><img src="/post/2020-08-04-bookdown-publish_files/bookdown_11.PNG" style="width:95.0%" /></p>
+</div>
+<div id="error" class="section level3">
+<h3>4-8. 404 Error</h3>
+<p>에러화면. 일부러 넣었다. Github page세팅이 끝나고 바로 링크를 클릭했을때, 나올수 있는 화면중 하나이다. Github page가 가끔 publish하는 속도가 느려서 최대 5분 정도의 시간이 필요할 때도 있다. 그럼에도 일부러 넣었다는것은 이 글을 쓰는건 이미 알고 있는대상이 아닌 한번 관심을 갖고 따라해보는 사람을 대상으로 했기 때문. 나 역시 이 화면이 나와서 무엇이 잘못되었는가 싶어 처음부터 다시 찾아보느라 시간을 많이 쏟아낸 경험이 있어서 굳이 이 부분을 넣었다.</p>
+<p><img src="/post/2020-08-04-bookdown-publish_files/bookdown_12.PNG" style="width:95.0%" /></p>
+</div>
+<div id="success" class="section level3">
+<h3>5. Success</h3>
+<p>이렇게 Bookdown 으로 Git page에 퍼블리쉬 하는방법을 알아보았다. 다음 링크를 클릭해보면 위의 절차대로 생성했던, Bookdown이 생성된다.</p>
+<ul>
+<li><a href="https://unfinishedgod.github.io/bookdown_sample/" class="uri">https://unfinishedgod.github.io/bookdown_sample/</a></li>
+</ul>
+<p><img src="/post/2020-08-04-bookdown-publish_files/bookdown_13.PNG" style="width:95.0%" /></p>
+</div>
+</div>
+<div id="총평" class="section level1">
+<h1>총평</h1>
+<p>Bookdown.org에서 퍼블리쉬 하는 방법이 있나 알아보느라 한주, <br>
+Github page에 퍼블리쉬 하는 방법이 있나 알아보느라 한주, <br>
+다른사람이 github page에 해놓은걸 그대로 복사해서 파악해보느라 한주, <br>
+git 원격 레포를 하는데 알아보느라 한주, <br></p>
+<p>그렇게 많은 시간이 흘러서야 결국 간신히 Bookdown을 퍼블리쉬 하게 되었다. 이제 그동안 보고 싶었던 책들 하나씩 따라해보고, 정리하고 기록하는데에 많은 시간을 또 써야 겠다.</p>
+<hr />
+<p>추가로, 한번씩 따라해보시다가 이해가 안되는부분이 있다거나 어려운 부분이 생기면 댓글을 달아주세요. 한번씩 따라해보고 왜 안됬는지 최대한 설명을 하도록 하겠습니다. 저역시 간신히 우연하게 성공한걸 반복적으로 몇번 하다보니 최소한의 방법만 알고 있어서, 질문을 받고 해결을 하다보면 더 많이 알게 되겠내요.</p>
+<p>감사합니다.</p>
+</div>
