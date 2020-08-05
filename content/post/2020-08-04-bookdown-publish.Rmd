@@ -36,13 +36,13 @@ library(bookdown)
 ### 2-1. Project 생성 과정
 
 <center>
-![](/post/2020-08-04-bookdown-publish_files/bookdown_1.PNG){width=95%}
-![](/post/2020-08-04-bookdown-publish_files/bookdown_2.PNG){width=95%}
+![](/post/2020-08-04-bookdown-publish_files/bookdown_1.PNG){width=100%}
+![](/post/2020-08-04-bookdown-publish_files/bookdown_2.PNG){width=100%}
 </center>
 
 ### 2-2. Bookdown Project 생성 화면
 
-![](/post/2020-08-04-bookdown-publish_files/bookdown_3.PNG){width=95%}
+![](/post/2020-08-04-bookdown-publish_files/bookdown_3.PNG){width=100%}
 
 ## 3. Bookdown 세팅
 
@@ -76,19 +76,19 @@ library(bookdown)
 
 우선 깃 레포를 생성하자.
 
-![](/post/2020-08-04-bookdown-publish_files/bookdown_6.PNG){width=95%}
+![](/post/2020-08-04-bookdown-publish_files/bookdown_6.PNG){width=100%}
 
 ### 4-2. 생성시 유의사항
 
 생성시 유의사항이 있는데 원격 레포를 생성하는데 있어서 조금이나마 초보자의 시각에서 수월하게 하기 위함이다. Initialize this repository with a README 체크박스는 절대절대 **클릭금지**
 
-![](/post/2020-08-04-bookdown-publish_files/bookdown_7.PNG){width=95%}
+![](/post/2020-08-04-bookdown-publish_files/bookdown_7.PNG){width=100%}
 
 ### 4-3. 깃 주소 복사
 
 생성시 나오는 화면중 하나다. 저 주소를 복사 해주자.
 
-![](/post/2020-08-04-bookdown-publish_files/bookdown_8.PNG){width=95%}
+![](/post/2020-08-04-bookdown-publish_files/bookdown_8.PNG){width=100%}
 
 ### 4-4. Git 원격 레포 연결
 
@@ -107,7 +107,7 @@ $ git push origin master
 
 ### 4-5. Git 원격 레포 성공 화면
 
-![](/post/2020-08-04-bookdown-publish_files/bookdown_9.PNG){width=95%}
+![](/post/2020-08-04-bookdown-publish_files/bookdown_9.PNG){width=100%}
 
 ### 4-6. Git setting
 
@@ -117,19 +117,19 @@ $ git push origin master
 - /docs
 - Save 버튼 클릭
 
-![](/post/2020-08-04-bookdown-publish_files/bookdown_10.PNG){width=95%}
+![](/post/2020-08-04-bookdown-publish_files/bookdown_10.PNG){width=100%}
 
 ### 4-7. Git setting 성공 화면
 
 Git setting을 해주면 Github pages 부분에 Your Site is ready to be published at (bookdown 링크) 가 나오면 성공이다. 이제 링크를 클릭해보자.
 
-![](/post/2020-08-04-bookdown-publish_files/bookdown_11.PNG){width=95%}
+![](/post/2020-08-04-bookdown-publish_files/bookdown_11.PNG){width=100%}
 
 ### 4-8. 404 Error
 
 에러화면. 일부러 넣었다. Github page세팅이 끝나고 바로 링크를 클릭했을때, 나올수 있는 화면중 하나이다. Github page가 가끔 publish하는 속도가 느려서 최대 5분 정도의 시간이 필요할 때도 있다. 그럼에도 일부러 넣었다는것은 이 글을 쓰는건 이미 알고 있는대상이 아닌 한번 관심을 갖고 따라해보는 사람을 대상으로 했기 때문. 나 역시 이 화면이 나와서 무엇이 잘못되었는가 싶어 처음부터 다시 찾아보느라 시간을 많이 쏟아낸 경험이 있어서 굳이 이 부분을 넣었다.
 
-![](/post/2020-08-04-bookdown-publish_files/bookdown_12.PNG){width=95%}
+![](/post/2020-08-04-bookdown-publish_files/bookdown_12.PNG){width=100%}
 
 ### 5. Success
 
@@ -137,7 +137,7 @@ Git setting을 해주면 Github pages 부분에 Your Site is ready to be publish
 
 - https://unfinishedgod.github.io/bookdown_sample/
 
-![](/post/2020-08-04-bookdown-publish_files/bookdown_13.PNG){width=95%}
+![](/post/2020-08-04-bookdown-publish_files/bookdown_13.PNG){width=100%}
 
 # 총평
 
