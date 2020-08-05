@@ -46,6 +46,8 @@ library(bookdown)
 
 ## 3. Bookdown 세팅
 
+첫번째 세팅은 Rstudio에서 진행한다. Bookdown의 모든 환경은 Rstudio에서 진행되기 때문에 설치를 해주자.
+
 ### 3-1. `_bookdown.yml` 파일 수정
 
 이제 이곳에서 몇가지를 생성해줄 필요가 있다. 우선 `_bookdown.yml`부터 수정을 해주자. `_bookdown.yml` 파일안에 다음과 같은 코드를 넣어주자. output_dir:docs. 

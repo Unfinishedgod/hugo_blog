@@ -10,6 +10,7 @@ tags:
   - bookdown
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <center>
@@ -25,6 +26,7 @@ tags:
 <p>우선 bookdwon 패키지 설치하는것으로 시작하자.</p>
 <pre class="r"><code># install.packages(&quot;bookdown&quot;)
 library(bookdown)</code></pre>
+<pre><code>## Warning: 패키지 &#39;bookdown&#39;는 R 버전 4.0.2에서 작성되었습니다</code></pre>
 </div>
 <div id="bookdown-프로젝트-생성" class="section level2">
 <h2>2. Bookdown 프로젝트 생성</h2>
@@ -43,6 +45,7 @@ library(bookdown)</code></pre>
 </div>
 <div id="bookdown-세팅" class="section level2">
 <h2>3. Bookdown 세팅</h2>
+<p>첫번째 세팅은 Rstudio에서 진행한다. Bookdown의 모든 환경은 Rstudio에서 진행되기 때문에 설치를 해주자.</p>
 <div id="bookdown.yml-파일-수정" class="section level3">
 <h3>3-1. <code>_bookdown.yml</code> 파일 수정</h3>
 <p>이제 이곳에서 몇가지를 생성해줄 필요가 있다. 우선 <code>_bookdown.yml</code>부터 수정을 해주자. <code>_bookdown.yml</code> 파일안에 다음과 같은 코드를 넣어주자. output_dir:docs.</p>
