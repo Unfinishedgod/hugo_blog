@@ -9,25 +9,64 @@ tags:
   - git
 ---
 
-
+<center>
 ![](/post/2020-08-15-git-fork-sync_files/git_main.PNG){width=90%}
+</center>
 
 Gti으로 협업을 해보자. 
 
+<center>
 ![](/post/2020-08-15-git-fork-sync_files/git_1.PNG){width=30%}
+</center>
 
+<center>
 ![](/post/2020-08-15-git-fork-sync_files/git_2.PNG){width=60%}
+</center>
+
+<center>
 ![](/post/2020-08-15-git-fork-sync_files/git_3.PNG){width=60%}
+</center>
+
+<center>
 ![](/post/2020-08-15-git-fork-sync_files/git_4.PNG){width=60%}
+</center>
+
+<center>
 ![](/post/2020-08-15-git-fork-sync_files/git_5.PNG){width=60%}
+</center>
+
+<center>
 ![](/post/2020-08-15-git-fork-sync_files/git_6.PNG){width=60%}
+</center>
+
+<center>
 ![](/post/2020-08-15-git-fork-sync_files/git_7.PNG){width=60%}
+</center>
+
+
+<center>
 ![](/post/2020-08-15-git-fork-sync_files/git_8.PNG){width=40%}
+</center>
+
+<center>
 ![](/post/2020-08-15-git-fork-sync_files/git_9.PNG){width=40%}
+</center>
+
+<center>
 ![](/post/2020-08-15-git-fork-sync_files/git_10.PNG){width=40%}
+</center>
+
+<center>
 ![](/post/2020-08-15-git-fork-sync_files/git_11.PNG){width=40%}
+</center>
+
+<center>
 ![](/post/2020-08-15-git-fork-sync_files/git_12.PNG){width=60%}
+</center>
+
+<center>
 ![](/post/2020-08-15-git-fork-sync_files/git_13.PNG){width=100%}
+</center>
 
 
 
