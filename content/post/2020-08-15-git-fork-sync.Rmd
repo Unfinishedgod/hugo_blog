@@ -13,7 +13,7 @@ tags:
 ![](/post/2020-08-15-git-fork-sync_files/git_main.PNG){width=90%}
 </center>
 
-Gti으로 협업을 해보자. 
+Gti으로 협업을 해보자. 하나의 작업 공간에 여러명이 작업 할때 좋은 협업 시스템으로, 아직 **왜** 하는지 **깊게** 파악은 못했다. 그렇지만 하면 좋
 
 <center>
 ![](/post/2020-08-15-git-fork-sync_files/git_1.PNG){width=30%}
