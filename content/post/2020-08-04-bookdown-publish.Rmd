@@ -11,7 +11,7 @@ tags:
 ---
 
 <center>
-![](/post/2020-08-04-bookdown-publish_files/logo.png){width=30%}
+![](/post/2020-08-04-bookdown-publish_files/logo.png){width=20%}
 </center>
 
 Bookdown에 대해 알아보려 한다. 그동안 많이 Bookdown으로 잘 만들어진 Webbook를 보다가 넘어가곤 했는데, 책을 보면서 필사와 함께 정리를 하고 싶은 생각에 시작하게 되었다. 책의 많은 내용들을 한번씩 따라 해보고 정리를 하기에 블로그는 중,단편적인 글을 써야 하는 어려움이 있기 때문이다. Bookdown의 공식 가이드는 다음과 같다. 
