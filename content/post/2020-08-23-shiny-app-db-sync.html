@@ -1,0 +1,181 @@
+---
+title: "R shiny와 DB를 동기화 해보자(Sqlite)"
+author: 최의용
+date: '2020-08-23'
+slug: "R shiny와 DB를 동기화 해보자(Sqlite)"
+categories:
+  - R
+  - Shiny
+tags:
+  - r
+  - Shiny
+  - DB
+  - sync
+---
+
+
+
+<p align="center">
+<img src="https://www.libraries.rutgers.edu/sites/default/files/styles/resize_to_300px_width/public/events/2019/09/shiny_0.png?itok=bUJsgPLL" width="200" height="200"><br>
+<b>출처: <a href="https://roh.engineering/post/shiny-in-production-app-and-database-syncing/">Shiny in Production: App and Database Syncing</a></b><br>
+</p>
+<p>페이스북을 들여다보다가 <strong>Shiny in Production: App and Database Syncing</strong>라는 제목의 R-bloggers의 글이 눈에 띄었다. 마침 요즘 Shiny도 조금씩 건드려 보고 있던 와중에 이게 무언가 하고 클릭을 해보니 꽤 괜찮은 내용이길래 한번 정리를 해보려 한다. R shiny와 DB를 동기화 하는 내용인데, 정리 하기전에 이 글의 원저자를 소개 하려고 한다. R-bloggers에서 찾았지만 이글의 원 저자는 Thomas Roh라는 사람이고 원문과 R-bloggers의 글을 같이 소개 한다.</p>
+<ul>
+<li>R-bloggers: <a href="https://www.r-bloggers.com/shiny-in-production-app-and-database-syncing/">Shiny in Production: App and Database Syncing</a></li>
+<li>원문: <a href="https://roh.engineering/post/shiny-in-production-app-and-database-syncing/">Shiny in Production: App and Database Syncing</a></li>
+</ul>
+<div id="db-part-db-table-생성" class="section level3">
+<h3>[DB Part] DB &amp; Table 생성</h3>
+<p>우선 Shiny에 DB를 연결하기위해 다음 세개의 패키지를 불러오자. 그리고 나서 DB를 생성 하려고 한다. test_sqlite.sqlite라는 이름으로 생성 해주고 mytable이라는 이름으로 Table을 생성 해주었다. 먼저번에 Sqlite에 대해 포스팅을 한 적이 있는데 다음을 참고 하도록 하자.</p>
+<ul>
+<li><a href="https://unfinishedgod.netlify.app/2020/07/24/r%EC%97%90%EC%84%9C-db-%EC%82%AC%EC%9A%A9sqlite/">R에서 DB 사용(Sqlite)</a></li>
+</ul>
+<pre class="r"><code>library(shiny)
+library(RSQLite)
+library(DBI)
+con &lt;- dbConnect(SQLite(), 
+                 dbname = &quot;test_sqlte.sqlite&quot;)
+
+dbExecute(con, &#39;CREATE TABLE mytable (col1 int, col2 varchar(10));&#39;)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>dbListTables(con)</code></pre>
+<pre><code>## [1] &quot;mytable&quot;</code></pre>
+</div>
+<div id="db-part-데이터-삽입" class="section level3">
+<h3>[DB Part] 데이터 삽입</h3>
+<p>Test를 위해 우선 데이터를 넣어주자. 컬럼 두개에 각각 1과 ’a’를 넣어 주었다.</p>
+<pre class="r"><code>dbExecute(con, &#39;INSERT INTO mytable ([col1], [col2]) VALUES (1, &quot;a&quot;);&quot;&#39;)</code></pre>
+<pre><code>## [1] 1</code></pre>
+<p>확인해보면 다음과 같이 나오게 된다.</p>
+<pre class="r"><code>dbGetQuery(con, &#39;SELECT col1, col2 FROM mytable&#39;)</code></pre>
+<pre><code>##   col1 col2
+## 1    1    a</code></pre>
+</div>
+<div id="r-shiny-part-shiny에서-데이터-불러오기" class="section level3">
+<h3>[R Shiny Part] Shiny에서 데이터 불러오기</h3>
+<p>Shiny를 하면서 처음에 <strong>가장</strong>어려웠던 부분중 하나가 R이랑 비교했을때 객체를 다루는 방법이 다르다는 점이었다. R과 다르게 Shiny에서는 <code>reactive({})</code>안에 감싸서 객체를 만들어 준다. (아직은 이렇게만 알고만 있다.) 이는 Shiny App에서 <code>dbGetQuery(con, 'SELECT col1, col2 from mytable')</code>를 사용해 mytableinshiny를 객체로 지정 해주는걸 의미한다.</p>
+<pre><code>mytableinshiny &lt;- reactive({
+  dbGetQuery(con, &#39;SELECT col1, col2 from mytable&#39;)
+})
+mytableinshiny()</code></pre>
+<p><code>mytableinshiny()</code>를 실행 시킨 결과는 다음과 같다.</p>
+<pre><code>##   col1 col2
+## 1    1    b</code></pre>
+</div>
+<div id="r-shiny-part-db-input-환경-만들기" class="section level3">
+<h3>[R Shiny Part] DB Input 환경 만들기</h3>
+<p>이제 Shiny에서 DB를 생성했으니, Application환경에서 DB에 Input할수있는 코드를 구현해보자. Shiny에서는 <code>sqlInterpolate</code>함수라는게 있어서 이를 사용하면 된다. <code>sqlInterpolate</code>함수에 쿼리문과, input코드를 넣어주자. input코드는 컬럼1과 컬럼2각각 준비 한다.</p>
+<pre class="r"><code>observeEvent(input$writetodb, {
+  sql &lt;- sqlInterpolate(con, &#39;INSERT INTO mytable ([col1], [col2]) VALUES (col1, ?col2);&quot;&#39;,
+                        col1 = input$col1, col2 = input$col2)
+  dbExecute(con, sql)
+})</code></pre>
+</div>
+<div id="r-shiny-part-data.frame-업데이트-구현" class="section level3">
+<h3>[R Shiny Part] Data.frame 업데이트 구현</h3>
+<p>이제 Input으로 추가된 DB가 Data.frame에 구현 되도록 코드를 설정 해주자. 너무 어려운 개념인데, 이러한 것들 하나하나가 웹 개발에서는 익숙하다고 한다. 코드의 자세한 설명은 원문만 남기고 넘어가자.</p>
+<p>After the database insertion, we need a way to inform shiny to update the reactive data.frame. We can use a reactive trigger to “push” a button that lets shiny know that the database has changed and it should re-execute the SELECT query.</p>
+<pre class="r"><code>makereactivetrigger &lt;- function() {
+  rv &lt;- reactiveValues(a = 0)
+  list(
+    depend = function() {
+      rv$a
+      invisible()
+    },
+    trigger = function() {
+      rv$a &lt;- isolate(rv$a + 1)
+    }
+  )
+}
+dbtrigger &lt;- makereactivetrigger()</code></pre>
+</div>
+<div id="r-shiny-part-데이터-insert후-shiny에-전달" class="section level3">
+<h3>[R Shiny Part] 데이터 Insert후 Shiny에 전달</h3>
+<p>이번에도 원문과 같이 설명한다. 지금까지 R Shiny Part에 사용했던 코드에 trigger개념을 추가하여 확장한 코드이다. 이 반응형 trigger를 사용하여 버튼을 통해 데이터가 변경 되고, 다시 SELECT문을 사용해 Data.frame를 표현 하게 된다.</p>
+<p>The trigger is now an object that has a couple of functions to pass messages around. We need to set the reactive value to re-execute so add the depend function and after the database interaction executes we add the trigger function. Also, it’s good practice to use sqlInterpolate to help prevent sql injection attacks.</p>
+<pre class="r"><code>mytableinshiny &lt;- reactive({
+  dbtrigger$depend()
+  dbGetQuery(con, &#39;SELECT col1, col2 from mytable&#39;)
+})
+
+observeEvent(input$writetodb, {
+  sql &lt;- sqlInterpolate(con, &#39;INSERT INTO mytable ([col1], [col2]) VALUES (?col1, ?col2)&#39;,
+                        col1 = input$col1, col2 = input$col2)
+  dbExecute(con, sql)
+  dbtrigger$trigger()
+})</code></pre>
+</div>
+<div id="최종-코드" class="section level1">
+<h1>최종 코드</h1>
+<p>지금껏 DB파트와 Shiny파트, 그리고 Shiny에서 trigger를 사용해 Shiny App의 부분을 알아보았다. 이 코드들을 다 합쳐서, Shiny에서 DB와 연동 하는 코드가 다음과 같다. 이를 Shiny 실행하기 위해서는 간단하게 app.R이라고 명명된 R파일에서 실행을 해주면 된다.</p>
+<pre><code>library(shiny)
+library(RSQLite)
+library(DBI)
+makereactivetrigger &lt;- function() {
+    rv &lt;- reactiveValues(a = 0)
+    list(
+        depend = function() {
+            rv$a
+            invisible()
+        },
+        trigger = function() {
+            rv$a &lt;- isolate(rv$a + 1)
+        }
+    )
+}
+dbtrigger &lt;- makereactivetrigger()
+con &lt;- dbConnect(RSQLite::SQLite(), &quot;:memory:&quot;)
+dbExecute(con, &#39;CREATE TABLE mytable (col1 int, col2 varchar(10));&#39;)
+ui &lt;- fluidPage(
+    numericInput(&#39;col1&#39;, &#39;col1&#39;, value = 1L, step = 1L),
+    textInput(&#39;col2&#39;, &#39;col2&#39;, value = &#39;a&#39;),
+    actionButton(&#39;writetodb&#39;, &#39;Save&#39;),
+    tableOutput(&#39;dbtable&#39;)
+)
+server &lt;- function(input, output) {
+    mytableinshiny &lt;- reactive({
+        dbtrigger$depend()
+        dbGetQuery(con, &#39;SELECT col1, col2 from mytable&#39;)
+    })
+    observeEvent(input$writetodb, {
+        sql &lt;- sqlInterpolate(con, &#39;INSERT INTO mytable ([col1], [col2]) VALUES (?col1, ?col2)&#39;,
+                              col1 = input$col1, col2 = input$col2)
+        dbExecute(con, sql)
+        dbtrigger$trigger()
+    })
+    output$dbtable &lt;- renderTable({
+        mytableinshiny()
+    })
+}
+shinyApp(ui = ui, server = server)</code></pre>
+<div id="shiny-실행-결과" class="section level2">
+<h2>Shiny 실행 결과</h2>
+<p>위 코드를 실행한 Shiny 실행 결과를 보도록 하자.</p>
+<div id="main" class="section level3">
+<h3>Main</h3>
+<p>Shiny의 메인 화면이다. 컬럼 두개가 존재하고, 각각 1, ’a’로 지정된 Data.frame가 보인다. 이곳에서 하나씩 입력하여 Save버튼을 클릭해보자. Shiny에서 입력한 결과가 DB에 잘 저장이 되었는지 확인 하는 과정이다.</p>
+<center>
+<img src="/post/2020-08-23-shiny-app-db-sync_files/shiny_db.PNG" style="width:50.0%" />
+</center>
+</div>
+<div id="sqlite생성-확인" class="section level3">
+<h3>Sqlite생성 확인</h3>
+<p>우선 Sqlite DB가 생성된것을 확인할 수 있었다. 이제 실제 DB에도 잘 적용되었는지 확인해보도록 하자.</p>
+<center>
+<img src="/post/2020-08-23-shiny-app-db-sync_files/shiny_db_1.PNG" style="width:50.0%" />
+</center>
+</div>
+<div id="table-확인" class="section level3">
+<h3>Table 확인</h3>
+<p>mytable Table를 확인해보자. Shiny App에서 입력했던 데이터가 여기 DB에 그대로 잘 적용된 것을 확인할수 있다.</p>
+<center>
+<img src="/post/2020-08-23-shiny-app-db-sync_files/shiny_db_2.PNG" style="width:50.0%" />
+</center>
+<hr />
+</div>
+</div>
+</div>
+<div id="총평" class="section level1">
+<h1>총평</h1>
+<p>이번에는 R Shiny와 DB를 동기화 하는 블로그를 써보았다. 단순히 R코드에 익숙해져있다가 Shiny를 하면서 어려움이 많았는데, 추가로 DB를 연동하는것 까지 알게 되었다. 처음에는 DB연동이 막연하게 <strong>그냥</strong> 되겠지 라고 생각만 했다면 이번 계기로 웹개발이 이렇게 복잡?하구나 라는것도 알게 되었다.</p>
+</div>
