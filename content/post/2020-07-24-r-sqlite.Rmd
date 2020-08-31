@@ -90,6 +90,7 @@ dbSendQuery(con, "CREATE TABLE iris_db (
             Species TEXT
             )")
 ```
+
 ## 테이블 확인
 
 DB가 잘 생성 되었는지 확인해보자. dbExistsTable(con, "db 이름") 의 기본 형식을 띄며 TRUE/FALSE로 확인이 가능하다.
@@ -97,6 +98,7 @@ DB가 잘 생성 되었는지 확인해보자. dbExistsTable(con, "db 이름") �
 ```{r}
 dbExistsTable(con, "iris_db")
 ```
+
 ## 테이블 리스트 확인
 두번째 방법으로는 테이블의 리스트를 확인 해보는것이다. dbListTables()를 통해 모든 테이블리스트 조회가 가능하다.
 
@@ -145,6 +147,13 @@ dbGetQuery(con, "SELECT * FROM iris_db_2") %>%
 dbRemoveTable(con, "iris_db")
 dbRemoveTable(con, "iris_db_2")
 ```
+
+## 연결 종료
+
+```{r}
+dbDisconnect(con)
+```
+
 
 ---
 
