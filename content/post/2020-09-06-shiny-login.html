@@ -1,0 +1,66 @@
+---
+title: "Shiny웹앱에 로그인 기능 넣기"
+author: 최의용
+date: '2020-09-06'
+slug: "Shiny웹앱에 로그인 기능 넣기"
+categories:
+  - R
+tags:
+  - R
+  - 샤이니
+  - shiny
+---
+
+
+
+<center>
+<img src="/post/2020-09-06-shiny-login_files/shiny_login.PNG" style="width:40.0%" />
+</center>
+<p>Shiny웹앱에 로그인 기능을 넣어보자. 샤이니 관련해서 이것저것 찾아보던 도중 shinymanager라는 패키지와, jinseob2kim님의 블로그를 알게 되었다. 정말 우연하게 찾게 되었으며, 다행히도 개념과 코드는 간단하다. 이번 글에서의 핵심은 shinymanager라는 패키지와 secure_app(), secure_server()라는 함수라고 볼수 있겠다. 최종적으로 결과물의 링크는 다음과 같다.</p>
+<ul>
+<li><a href="https://shjj08.shinyapps.io/shiny_login/">shiny login test</a>
+<ul>
+<li>Username: shiny</li>
+<li>Password: 1234</li>
+</ul></li>
+</ul>
+<div id="global.r" class="section level2">
+<h2>global.R</h2>
+<p>우선 shiny, shinymanager패키지를 불러와주자. 그리고 username, password를 구성하는 data.frame를 만들어 준다. 이곳에서는 user = shiny, password = 1234로 설정 해주었다. 그리고 이를 credentials라 하도록 하겠다.</p>
+<pre><code>library(shiny)
+library(shinymanager)
+
+credentials &lt;- data.frame(
+  user = c(&quot;shiny&quot;),
+  password = c(&quot;1234&quot;), stringsAsFactors = FALSE)</code></pre>
+</div>
+<div id="ui.r" class="section level2">
+<h2>ui.R</h2>
+<p>ui쪽에서 추가된점이 있다면 기본 ui에 secure_app(ui)라고 한번 더 ui를 감싸 준다.</p>
+<pre><code>ui &lt;- fluidPage(
+  tags$h2(&quot;My secure application&quot;),
+  verbatimTextOutput(&quot;auth_output&quot;)
+)
+
+ui &lt;- secure_app(ui)</code></pre>
+</div>
+<div id="server.r" class="section level2">
+<h2>server.R</h2>
+<p>global.R에서 지정해준 credentialsfmf secure_server()함수를 사용해 다음과 같은 코드를 하나 넣어 주자. 간단하게도 이것으로 끝.</p>
+<pre><code>server &lt;- function(input, output, session) {
+  res_auth &lt;- secure_server(check_credentials = check_credentials(credentials))
+  
+}</code></pre>
+</div>
+<div id="총평" class="section level1">
+<h1>총평</h1>
+<p>shiny에 로그인 기능이 존재하는지는 생각지도 못했다. 여기서는 아주 간단하게 최소한의 로그인 기능만 소개 했으며 다음에 나오는 shinymanager에 대한 공식 패키지 링크에서 자세한 사항을 확인 할 수 있다.</p>
+<hr />
+</div>
+<div id="참고" class="section level1">
+<h1>참고</h1>
+<ul>
+<li>shinymanager: <a href="https://datastorm-open.github.io/shinymanager/">shinymanager</a></li>
+<li>jinseob2kim님의 블로그: <a href="https://jinseob2kim.github.io/LectureRpackage/shinymanager/#1">jinseob2kim.github.io</a></li>
+</ul>
+</div>
