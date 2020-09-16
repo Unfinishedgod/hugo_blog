@@ -1,0 +1,69 @@
+---
+title: "Shiny 데이터를 자동으로 갱신 시켜보자"
+author: 최의용
+date: '2020-09-16'
+slug: "Shiny 데이터를 자동으로 갱신 시켜보자"
+categories:
+  - R
+tags:
+  - R
+  - shiny
+  - 샤이니
+  - rshiny
+---
+
+
+
+<p align="center">
+<img src="https://www.libraries.rutgers.edu/sites/default/files/styles/resize_to_300px_width/public/events/2019/09/shiny_0.png?itok=bUJsgPLL" width="200" height="200"><br>
+<b>출처: <a href="https://shiny.rstudio.com/reference/shiny/0.14/reactiveTimer.html">Shiny reactive Timer</a></b><br>
+</p>
+<p>Shiny에 데이터를 자동으로 갱신하는 법을 알아보자. 최근에 Shiny를 하게 되면서 필요한 기능중 하나. 어떻게 데이터를 자동으로 갱신 시켜서 샤이니에 띄울 것인가? 가장 단순하게 생각을 하자면 갱신 된 데이터를 가지고 Shiny를 다시 실행 시키면 된다. 그러나 Shiny를 담고 있는 코드가 많을때는 이보단 필요한 부분만 갱신을 할 수 있도록 하는기능이 있었으면 했는데, 그 기능이 Shiny에서 reactivetimer()라 할 수 있겠다.</p>
+<div id="global.r" class="section level2">
+<h2>global.R</h2>
+<p>global.R에는 <code>if(interactive())</code>함수를 통해 그 안에 ui.R, server.R를 감싸주도록 하자.</p>
+<pre><code>library(shiny)
+
+if (interactive()) {
+  source(&quot;./ui.R&quot;, local = TRUE)  
+  source(&quot;./server.R&quot;, local = TRUE)  
+}
+</code></pre>
+</div>
+<div id="ui.r" class="section level2">
+<h2>ui.R</h2>
+<p>ui.R을 특별할게 없다. text로 현재 시간을 표시 해주기 위해서 단지 <code>textOutput()</code>함수만 넣어주자.</p>
+<pre><code>ui &lt;- fluidPage(
+  textOutput(&quot;time&quot;)
+)</code></pre>
+</div>
+<div id="server.r" class="section level2">
+<h2>server.R</h2>
+<p>reactive Timer를 사용하기 위해 이부분이 가장 중요하다. 하나씩 알아보자.</p>
+<ul>
+<li>우선 <code>reactiveTimer()</code>설정을 해주어야 한다. 1000당 1초로 이번에는 2초로 설정 해주고 이를 autoInvalidate로 지정 해주었다.</li>
+<li>그리고 <code>observe({})</code> 안에 <code>autoInvalidate()</code>를 넣어주어, 내부에서 로그를 확인할 수 있게 해주자.</li>
+<li>마지막으로 <code>output$timer</code>안에 <code>autoInvalidate()</code>함수를 넣어 주자. 이는 앞에서 앞에서 지정해준 autoInvalidate가 <code>output$timer</code>안에서 2초에 한번씩 적용을 하게끔 도와 준다.</li>
+</ul>
+<pre><code>server &lt;- function(input, output) {
+  
+  autoInvalidate &lt;- reactiveTimer(2 * 1000)
+  
+  observe({
+    autoInvalidate()
+  })
+  
+  output$time &lt;- renderText({
+    autoInvalidate()
+    current_timer &lt;- paste0(&quot;현재 시각은:&quot;,Sys.time(),&quot;&quot;)
+  })
+}</code></pre>
+<p>그리고 나서 최종적으로 실행을 해주면 다음과 같이 2초마다 현재 시각이 바뀌는것을 볼 수 있다.</p>
+<ul>
+<li><a href="https://shjj08.shinyapps.io/shiny_autoInvalidate/">Shiny reactive example</a></li>
+</ul>
+</div>
+<div id="총평" class="section level1">
+<h1>총평</h1>
+<p>개념을 찾는게 가장 어려웠다. reactive라는 개념을 미리 알았다면, 더 빠르게 알았을 기능. 단순하게 샤이니 자동, 샤이니 갱신, shiny auto~ 어쩌구 이렇게만 검색 하다보니 이렇게 오래 걸렸으나, 이 기능은 내가 생각하기에 앞으로도 자주 쓸 기능이라 이번에도 기억용으로 남겨 두려고 한다. 또한, 적당히 재미있는 주제로 shiny를 사용한 대시보드를 하나 만들어 보려고 하는데, 그때도 다시 한번 소개를 해보려 한다.</p>
+</div>
