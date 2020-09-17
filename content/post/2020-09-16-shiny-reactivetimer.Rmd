@@ -36,7 +36,7 @@ if (interactive()) {
 
 ## ui.R
 
-ui.R을 특별할게 없다. text로 현재 시간을 표시 해주기 위해서 단지 `textOutput()`함수만 넣어주자.
+ui.R은 특별할게 없다. text로 현재 시간을 표시 해주기 위해서 단지 `textOutput()`함수만 넣어주자.
 
 ```
 ui <- fluidPage(
