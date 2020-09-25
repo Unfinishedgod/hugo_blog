@@ -14,10 +14,11 @@ tags:
 ![](/post/2020-09-25-shiny-deploy_files/shiny_docker.PNG){width=80%}
 </center>
 
-Shiny 앱을 로컬에서만 쓸게 아니라 웹에 띄워보자. 이를 위해서는 Docker를 이용하고 Shiny server를 만들어야 하는데 이번에는 이 두가지 글을 쓰려고 한다. Shiny DB 연동, Shiny 데이터 자동 갱신에 대해 글을 썼으며, 최종적으로는 이를 이용해 웹에 Shiny Dashboard를 한번 만들어 볼 계획이다. <br>
+Shiny 앱을 로컬에서만 쓸게 아니라 웹에 띄워보자. 이를 위해서는 Docker를 이용하고 Shiny server를 만들어야 하는데 이번에는 이 두가지 글을 쓰려고 한다. Shiny DB 연동, Shiny 데이터 자동 갱신에 대해 글을 썼으며, 최종적으로는 이를 이용해 웹에 Shiny Dashboard를 한번 만들어 볼 계획이다. 이번에 만들어 웹에 띄운 shiny는 다음과 같다.
+
+- [Shiny Docker Test](http://54.180.164.30:3838/)
+
  최근에 Azure와 CI/CD를 사용해 Shiny를 띄우는걸 봤다. 그리고 Github에는 CI/CD가 아니라 Github action이라고 있으며, Azure가 아니라 Aws에도 비슷한 서비스를 하는것들이 있다. 그래서 이 포스팅이 끝나면 바로 Github action과 Aws같이 해서 블로깅을 해보려 한다. 추가로 aws에 내가 설정을 해주어서 ec2를 시간대별로 껐다 켰다 하는 기능이 있어서 이부분도 차차 적을 계획이다. 그럼 이제 하나씩 알아보도록 하자. 
-
-
 
 # Ec2 환경 
  현재 Aws ec2환경은 다음과 같다. 개인 wsl을 쓰기가 애매한게, 컴퓨터를 항상 켜둘수도 없고, 개인 ip를 노출 시킬수도 없고, 그렇다고 url문제를 해결한게 아니라 ec2를 사용한다.
@@ -165,9 +166,6 @@ server <- function(input, output, session) {
   
 }
 
-
-
-
 function(input, output, session) {
   
   # Combine the selected variables into a new data frame
@@ -265,6 +263,27 @@ $ docker run -p 3838:3838 shiny_flow
 생성된 앱을 확인 하기 위해서는 앱에 '{host}:3838'을 입력해주면 된다. 이번에 ec2를 통해 만들어 둔건 다음과 같다. **서버 비용 때문에 언제 사라질지 모르며, 맨 처음에 썼던 것처럼, 시간에 따라 ec2를 키고 꺼두어서 필요한 시간에만 열어둘수도 있다.**
 
 - [Shiny Docker Test](http://54.180.164.30:3838/)
+
+# CONTAINER 종료
+
+서버를 내려야할 필요가 있다. 그럴때는 다음의 코드를 사용한다. 그럼 다음과 같은 메시지가 나오는걸 확인할 수 있다.
+
+```
+# docker container list
+
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+{CONTAINER ID}        shiny_flow          "/bin/sh -c 'R -e 's…"   4 minutes ago       Up 4 minutes        0.0.0.0:3838->3838/tcp   intelligent_mirzakhani
+```
+
+이제 이곳에서 알아야할 정보가 'CONTAINER ID' 또는 'NAME'인데 다음의 코드를 통해 컨테이너를 종료 해주자. 
+
+ - docker container stop {CONTAINER ID}
+ - docker container stop {NAME}
+
+```
+$  docker container stop {NAME}
+```
+
  
 # 총평
  
