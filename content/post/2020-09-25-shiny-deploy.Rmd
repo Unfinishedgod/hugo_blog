@@ -1,0 +1,277 @@
+---
+title: "Docker를 이용해 Shiny 웹에 띄우기"
+author: 최의용
+date: '2020-09-25'
+slug: "Docker를 이용해 Shiny 웹에 띄우기"
+categories:
+  - R
+tags:
+  - R
+  - shiny
+---
+
+<center>
+![](/post/2020-09-25-shiny-deploy_files/shiny_docker.PNG){width=80%}
+</center>
+
+Shiny 앱을 로컬에서만 쓸게 아니라 웹에 띄워보자. 이를 위해서는 Docker를 이용하고 Shiny server를 만들어야 하는데 이번에는 이 두가지 글을 쓰려고 한다. Shiny DB 연동, Shiny 데이터 자동 갱신에 대해 글을 썼으며, 최종적으로는 이를 이용해 웹에 Shiny Dashboard를 한번 만들어 볼 계획이다. <br>
+ 최근에 Azure와 CI/CD를 사용해 Shiny를 띄우는걸 봤다. 그리고 Github에는 CI/CD가 아니라 Github action이라고 있으며, Azure가 아니라 Aws에도 비슷한 서비스를 하는것들이 있다. 그래서 이 포스팅이 끝나면 바로 Github action과 Aws같이 해서 블로깅을 해보려 한다. 추가로 aws에 내가 설정을 해주어서 ec2를 시간대별로 껐다 켰다 하는 기능이 있어서 이부분도 차차 적을 계획이다. 그럼 이제 하나씩 알아보도록 하자. 
+
+
+
+# Ec2 환경 
+ 현재 Aws ec2환경은 다음과 같다. 개인 wsl을 쓰기가 애매한게, 컴퓨터를 항상 켜둘수도 없고, 개인 ip를 노출 시킬수도 없고, 그렇다고 url문제를 해결한게 아니라 ec2를 사용한다.
+ 
+ - 운영체제: Amazon Linux AMI
+ - 인스턴스 유형: t2.large
+ - Port 범위
+    - 22
+    - 8787 (Rstudio server)
+    - 3838 (Shiny server)
+
+
+ 
+# Docker
+
+우선 Docker를 사용해 환경을 만들어 주자. Docker를 설치 하고 사용자를 추가 하는 과정이며 이곳에서는 Shiny를 실행 하는 최소한의 기능만 담았으며, 자새한 사항에 대해서는 다음의 링크를 확인하자.
+
+- 참고: [AWS에서 EC2 인스턴스에 Docker 설치하기](https://megazonedsg.github.io/1-Make-Docker/)
+
+### Docker 설치
+
+우선 도커를 설치 해주자. 먼저 yum upgrade를 해주고 다음의 코드를 통해 docker를 설치 해준다.
+
+```
+$ sudo yum -y upgrade
+$ sudo yum -y install docker
+```
+
+### 설치 확인
+
+설치가 완료 되었으면 다음의 코드를 통해 설치를 확인 해보자. 다음과 같은 형식의 메시지가 나온사면 설치가 된것.
+
+```
+$ docker -v
+
+Docker version 19.03.6-ce, build 369ce74
+```
+
+### Docker 시작
+
+이제 Docker service를 시작 하자.
+
+```
+sudo service docker start
+```
+
+### 사용자 추가
+
+docker에 사용자를 추가 하자. 다음의 코드에서 `{username}` 부분에 넣어 주면 된다.
+
+```
+sudo usermod -aG docker {username}
+```
+
+이렇게 Docker를 설치 하고 사용자를 추가 해주어서, 최소한의 환경을 구축 시켜두었다. 더 자세히 Docker를 알기 위해선 위 링크를 참고 하자.
+
+# Shiny Server 
+
+이제 Shiny Server를 설치 하자. 이미 잘 만들어져 있는 도커 컨테이너를 가져올건데, 이곳에는 R, Shiny, tidyverse가 절치 되어 있다. 해당 링크는 다음과 같다.
+
+- [Docker for shiny server](https://github.com/rocker-org/shiny)
+
+### Pull rocker/shiny-verse
+
+Docker for shiny server에 나온것처럼 다음의 코드를 통해 Shiny docker container를 그대로 가져 오면 된다.
+
+```
+$ docker pull rocker/shiny-verse
+
+```
+
+### Shiny server 확인
+
+<center>
+![](/post/2020-09-25-shiny-deploy_files/confirm_shiny_server.PNG){width=80%}
+</center>
+
+잘 가져왔는지 확인을 해보자. 다음의 코드를 치고, 자기의 아이피:3838을 웹에 넣어 주면 된다. 그래서 위와 같은 화면이 나오면 성공. 혹시라도 나오지 않는 경우에 첫번째로 확인 해야 할것은, 3838포트를 열어 두었는지 확인하자.
+
+```
+$ docker run --rm -p 3838:3838 rocker/shiny-verse 
+```
+
+# Shiny app
+
+이제 test를 위해 간단하게 shiny app을 만들어 두자. 코드는 다음과 같다. Shiny가 잘 웹에 올라가는지 확인하는것이 이번 글의 주요 목적이기 때문에 shiny코드에 대한 설명은 생략 한다.
+
+### global.R
+
+```
+if (!require(shiny)) {install.packages("shiny"); library(shiny)}
+
+source("./ui.R", local = TRUE)  
+source("./server.R", local = TRUE)  
+
+
+shinyApp(ui, server)
+```
+
+### ui.R
+
+```
+# k-means only works with numerical variables,
+# so don't give the user the option to select
+# a categorical variable
+vars <- setdiff(names(iris), "Species")
+
+ui <- pageWithSidebar(
+  headerPanel('Shiny Docker Test'),
+  sidebarPanel(
+    selectInput('xcol', 'X Variable', vars),
+    selectInput('ycol', 'Y Variable', vars, selected = vars[[2]]),
+    numericInput('clusters', 'Cluster count', 3, min = 1, max = 9)
+  ),
+  mainPanel(
+    plotOutput('plot1')
+  )
+)
+```
+
+### server.R
+
+```
+server <- function(input, output, session) {
+  
+  # Combine the selected variables into a new data frame
+  selectedData <- reactive({
+    iris[, c(input$xcol, input$ycol)]
+  })
+  
+  clusters <- reactive({
+    kmeans(selectedData(), input$clusters)
+  })
+  
+  output$plot1 <- renderPlot({
+    palette(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3",
+              "#FF7F00", "#FFFF33", "#A65628", "#F781BF", "#999999"))
+    
+    par(mar = c(5.1, 4.1, 0, 1))
+    plot(selectedData(),
+         col = clusters()$cluster,
+         pch = 20, cex = 3)
+    points(clusters()$centers, pch = 4, cex = 4, lwd = 4)
+  })
+  
+}
+
+
+
+
+function(input, output, session) {
+  
+  # Combine the selected variables into a new data frame
+  selectedData <- reactive({
+    iris[, c(input$xcol, input$ycol)]
+  })
+  
+  clusters <- reactive({
+    kmeans(selectedData(), input$clusters)
+  })
+  
+  output$plot1 <- renderPlot({
+    palette(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3",
+              "#FF7F00", "#FFFF33", "#A65628", "#F781BF", "#999999"))
+    
+    par(mar = c(5.1, 4.1, 0, 1))
+    plot(selectedData(),
+         col = clusters()$cluster,
+         pch = 20, cex = 3)
+    points(clusters()$centers, pch = 4, cex = 4, lwd = 4)
+  })
+  
+}
+```
+
+# Dockerfile 만들기
+
+이제 shiny를 실행할 Dockerfile을 만들자. 이 Dockerfile의 경로는 shiny파일(global.R, ui.R, server.R 또는 app.R)과 같아야 한다. touch 명령어로 dockerfile를 만들고 vim편집기로 내부에 들어가주자.
+
+```
+$ touch Dockerfile
+$ vim Dockerfile
+```
+
+### dockerfile 작성
+
+이제 vim편집기로 dockerfile에 들어 왔으니 shiny 실행을 위한 코드를 준비하자.
+
+ - `FROM rocker/shiny-verse:latest`
+    - FROM 명령어를 통해 만들어져 있는 컨테이너의 기본 이미지를 가져오는 역할은 한다.
+ - `RUN apt-get update && apt-get install -y`
+    - RUN은 리눅스에서 커멘드를 실행하라 라는 의미를 담고 있으며, shiny서버에서 기본적으로 작성 되는 코드를 적어 두었다.
+ - `COPY . /`
+    - COPY를 해주어 도커 이미지에다 샤이니 서버에 필요한 것들을 복사 해주는 역할은 한다.
+ - `WORKDIR /`
+    - 
+ - `EXPOSE 3838`
+    - 3838포트를 도커 이미지를 실행 시키려 한다.
+ - `CMD R -e 'shiny::runApp("global.R", port = 3838, host = "0.0.0.0")'`
+    - 마지막으로 이 코드는 Docker에서 global.R을 실행 시켜 shiny를 만들어 주는 역할은 한다.
+
+Dockerfile에 들어가는 최종 코드는 다음과 같다.
+
+```
+FROM rocker/shiny-verse:latest
+
+RUN apt-get update && apt-get install -y
+
+COPY . /
+
+WORKDIR /
+
+EXPOSE 3838
+
+CMD R -e 'shiny::runApp("global.R", port = 3838, host = "0.0.0.0")'
+```
+
+# 실행
+
+### Image 생성
+
+그럼 이제 앱을 실행 해보자. 우선 Dockerfile이 있는 경로로 가주어야 한다. `docker build -t {image name} {dockerfile path}`을 통해 이미지를 생성 한다.
+
+ - {image name}: docker의 이미지 이름을 의미 한다. 이곳에서는 shiny_flow라고 지어 두었다.
+ - {dockerfile path}: 도커파일의 경로. 이미 dockerfile이 있는 경로에 들어와 있으니 '.'으로 해둔다.
+
+```
+$ docker build -t shiny_flow .
+```
+
+### Image 실행
+
+docker 이미지를 생성 했으면 이를 실행 해보자. `docker run -p 3838:3838 {image name}`이 기본 형식이며 `{image name}`은 직전에 만들어두었던 image name이다.
+
+```
+$ docker run -p 3838:3838 shiny_flow
+```
+
+# 생성된 앱 확인
+
+<center>
+![](/post/2020-09-25-shiny-deploy_files/docker_test.PNG){width=70%} 
+</center>
+
+생성된 앱을 확인 하기 위해서는 앱에 '{host}:3838'을 입력해주면 된다. 이번에 ec2를 통해 만들어 둔건 다음과 같다. **서버 비용 때문에 언제 사라질지 모르며, 맨 처음에 썼던 것처럼, 시간에 따라 ec2를 키고 꺼두어서 필요한 시간에만 열어둘수도 있다.**
+
+- [Shiny Docker Test](http://54.180.164.30:3838/)
+ 
+# 총평
+ 
+ 최근에 CI/CD와 클라우드를 이용해 Shiny 띄우는것을 보았다. shiny를 공부하면서 로컬에서 뿐만 아니라 웹에서도 띄워보고 싶어서 알아 보던 도중 이번 포스팅을 먼저 하게 되었다. 겸사겸사 알아보면서 github action이라는 것도 알게 되었고, azure뿐만 아니라 aws에서도 이 비슷한걸 서비스 한다고 하는데, 얼른 따라해보면서 배포 해봐야 겠다.
+
+
+
+
+
+
