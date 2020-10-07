@@ -8,6 +8,9 @@
 {{ if eq .RelPermalink "/" }}
 <title>{{ .Site.Title }}</title>
 
+<meta property="og:image" content="youbaseURL/{{ with .Params.Image }}{{ . }}{{ else }}{{ with .Site.Params.Image }}{{ . }}{{ end }}{{ end }}">
+
+
 <meta property="og:title" content="{{ .Site.Title }}">
 <meta property="og:type" content="website">
 {{ else }}
