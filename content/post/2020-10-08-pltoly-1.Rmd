@@ -170,7 +170,7 @@ sleep %>%
 
 # 추가: ggplot과의 연동
 
-plotly에 대해 추가적으로 알아둘게 있다. ggplot과 연동이 되는것. ggplot의 객체를 가지고 그대로 plotly로 사용이 가능하다. 이때 사용 하는 함수는 `ggplotly()`이며, ggplot의 객체를 미리 만들어 주고 `ggplotly()`안에 감싸 주면 된다.
+plotly에 대해 추가적으로 알아둘게 있다. ggplot과 연동이 되는것. ggplot의 객체를 가지고 그대로 plotly로 사용이 가능하다. 이때 사용 하는 함수는 `ggplotly()`이며, ggplot의 객체를 미리 만들어 주고 `ggplotly()`안에 감싸 주면 된다. 그러나 ggplot의 모든 그래프를 plolty로 바꿔 주지 못하는 한계가 존재 한다.
 
 ### ggplot으로 그린 iris Scatter plot
 
