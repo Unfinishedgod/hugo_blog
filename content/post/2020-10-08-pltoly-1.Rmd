@@ -1,0 +1,200 @@
+---
+title: "[R] 1. 반응형 그래프 plotly 소개"
+author: 최의용
+date: '2020-10-08'
+slug: "[R] 1. 반응형 그래프 plotly 소개"
+categories:
+  - R
+tags:
+  - plotly
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE,  warning = FALSE,fig.align = "center")
+```
+
+```{r echo = FALSE, fig.width=9}
+library(tidyverse)
+library(plotly)
+library(DT)
+
+fig_1 <- iris %>% 
+  plot_ly() %>% 
+  add_trace(x = ~Sepal.Length, y = ~Petal.Length, color = ~Species) %>% 
+  layout(
+    title = "Plotly with R", 
+    showlegend = FALSE
+  )
+
+
+fig_2 <- plot_ly(z = volcano, type = "heatmap")
+
+x <- c(1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012)
+roW <- c(219, 146, 112, 127, 124, 180, 236, 207, 236, 263, 350, 430, 474, 526, 488, 537, 500, 439)
+China <- c(16, 13, 10, 11, 28, 37, 43, 55, 56, 88, 105, 156, 270, 299, 340, 403, 549, 499)
+data <- data.frame(x, roW, China)
+
+fig <- plot_ly(data, x = ~x, y = ~roW, type = 'bar', name = 'Rest of the World',
+        marker = list(color = 'rgb(55, 83, 109)'))
+fig <- fig %>% add_trace(y = ~China, name = 'China', marker = list(color = 'rgb(26, 118, 255)'))
+fig_3 <- fig %>% layout(
+         xaxis = list(
+           title = "",
+           tickfont = list(
+             size = 14,
+             color = 'rgb(107, 107, 107)')),
+         yaxis = list(
+           title = 'USD (millions)',
+           titlefont = list(
+             size = 16,
+             color = 'rgb(107, 107, 107)'),
+           tickfont = list(
+             size = 14,
+             color = 'rgb(107, 107, 107)')),
+         legend = list(x = 0, y = 1, bgcolor = 'rgba(255, 255, 255, 0)', bordercolor = 'rgba(255, 255, 255, 0)'),
+         barmode = 'group', bargap = 0.15, bargroupgap = 0.1) %>% 
+  layout(
+    showlegend = FALSE
+  )
+
+fig_4 <- economics %>% 
+  plot_ly() %>% 
+  add_lines(x = ~date, y = ~unemploy, color = "reds") %>% 
+  layout(
+    showlegend = FALSE
+  )
+
+
+subplot(fig_1, fig_2, fig_3, fig_4,  nrows = 2)
+```
+
+**위의 그래프에 마우스를 갖다 대보자.** 이는 plotly를 사용한 반응형 시각화로, 기존의 시각화보다 더 효율적으로 데이터를 파악할 수 있다. R에는 여러가지의 시각화 도구가 있다. 기본함수인 plot부터 가장 많이 사용되고 있는 ggplot, 그리고 반응형 시각화 도구로는 plotly, highchart, d3.js등등 존재 한다. 이번에는 반응형 시각화 도구인 plotly에 대해 알아보려 한다. plotly를 전부 다루기 보다는 최소한의 접근 방법과, 필요한 팁 정도를 소개 할것이고 공식 문서를 남겨 둘것이다. plotly의 공식 사이트를 가보면 R뿐만 아니라 Python도 지원을 하며, **자세한 사항**은 다음 링크를 참고 하도록 하자. 
+
+- Plotly with R: [Plotly R Open Source Graphing Library](https://plotly.com/r/)
+- Plotly with Python: [Plotly Python Open Source Graphing Library](https://plotly.com/python/)
+
+```{r}
+library(tidyverse)
+library(plotly)
+```
+
+# 1. plotly 기본 문법 (Scatter Chart)
+
+plotly의 기본 문법을 알아보자. iris의 Sepal.Length와 Petal.Length의 데이터를 가지고 Species별로 색을 다르게 표현 해주려고 한다. 이때 특이한점은 ggplot의 `+`로 각각의 option을 추가 해주었던 것이 `%>%`로 표현을 해준다는 점이다. 다음의 코드를 통해 하나씩 확인 해보도록 하자. 첫 시작은 Scatter Chart로 시작을 하고 Line chart와 Bar chart를 차차 진행 하자.
+
+- 1. 우선 plot_ly()를 감싸주도록 한다.
+- 2. 그리고 add_trace()함수를 통해 그 안에 각각의 x,y와 color를 추가 해준다.
+- 3. layout()을 추가 해주고 추가 옵션들을 적어 주자.
+  - 3-1. title은 제목
+  - 3-2. xaxis는 x축 이름
+  - 3-3. yaxis는 y축 이름
+
+```{r}
+iris %>% 
+  plot_ly() %>% 
+  add_trace(x = ~Sepal.Length, y = ~Petal.Length, color = ~Species) %>% 
+  layout(
+    title = "Scatter Chart",
+    xaxis = list(title = "x축 이름"),
+    yaxis = list(title = "y축 이름")
+  )
+```
+
+# 2. Line chart
+
+이번에는 Line chart에 대해 간단히 알아 보자. 데이터는 기본 데이터인 Orange를 사용할 것이고, Orange데이터는 다음과 같다. Orange데이터는 Tree별로 그룹화 되어 있으며 age별 circumference를 확인할 수 있다. 
+
+```{r}
+Orange %>% 
+  datatable(rownames = NULL, options = list(
+    pageLength = 5
+  ))
+```
+
+## Line chart 기본 문법
+
+Line chart는 다음과 같이 그려주도록 하자. Line chart는 add_lines를 사용 해도 되며 더 복잡한 기능에 대해서는 다음 블로그에 남기도록 하겠다.
+
+- 1. 우선 plot_ly()를 감싸주도록 한다.
+- 2. 그리고 add_trace()함수를 통해 그 안에 각각의 x,y와 color를 추가 해준다.
+  - 2-1. 추가로 mode옵션을 주어 "lines"를 추가 해주자.
+- 3. layout()을 추가 해주고 추가 옵션들을 적어 주자.
+  - 3-1. title은 제목
+  - 3-2. xaxis는 x축 이름
+  - 3-3. yaxis는 y축 이름
+
+```{r}
+Orange %>% 
+  plot_ly() %>% 
+  add_trace(x = ~age, y = ~circumference, color = ~Tree, mode = "lines") %>% 
+  layout(
+    title = "Line Chart",
+    xaxis = list(title = "x축 이름"),
+    yaxis = list(title = "y축 이름")
+  )
+```
+
+# 3. Bar chart
+
+이번엔은 Bar chart에 대해 알아 보자. 데이터는 내장데이터인 sleep을 사용할것이고 ID와 extra를 사용할 것이다. 
+
+```{r}
+sleep %>% 
+  datatable(rownames = NULL, options = list(
+    pageLength = 5
+  ))
+```
+
+## Bar chart 기본 문법
+
+Bar chart는 다음과 같이 그려주도록 하자.
+
+- 1. 우선 plot_ly()를 감싸주도록 한다.
+- 2. 그리고 add_trace()함수를 통해 그 안에 각각의 x,y를 추가 해준다.
+  - 2-1. 추가로 mode옵션을 주어 "bar"를 추가 해주자.
+- 3. layout()을 추가 해주고 추가 옵션들을 적어 주자.
+  - 3-1. title은 제목
+  - 3-2. xaxis는 x축 이름
+  - 3-3. yaxis는 y축 이름
+
+```{r}
+sleep %>% 
+  plot_ly() %>% 
+  add_trace(x = ~ID, y = ~extra,  type = "bar") %>% 
+  layout(
+    title = "Bar Chart",
+    xaxis = list(title = "x축 이름"),
+    yaxis = list(title = "y축 이름")
+  )
+```
+
+# 추가: ggplot과의 연동
+
+plotly에 대해 추가적으로 알아둘게 있다. ggplot과 연동이 되는것. ggplot의 객체를 가지고 그대로 plotly로 사용이 가능하다. 이때 사용 하는 함수는 `ggplotly()`이며, ggplot의 객체를 미리 만들어 주고 `ggplotly()`안에 감싸 주면 된다.
+
+### ggplot으로 그린 iris Scatter plot
+
+iris 데이터를 가지고 ggplot을 만들고 이를 p_1이라 지정 해주자. 그리고 이를 시각화 하면 다음과 같다.
+
+```{r}
+p_1 <- iris %>% 
+  ggplot(aes(x = Sepal.Length, y = Petal.Length, color = Species)) +
+  geom_point() +
+  labs(title = "ggplot with plotly") + 
+  theme_bw()
+
+p_1
+```
+
+### ggplotly를 사용해 ggplot을 plotly로 바꾼 그래프
+
+이제 ggplot으로 시각화 해둔 객체 p_1을 `ggplotly()`로 감싸주어 plotly화 시켜줄수 있다. 마우스를 갖다 대보면 각각의 데이터를 Interactive하게 확인할 수 있다.
+
+```{r}
+ggplotly(p_1)
+```
+
+
+# 총평
+
+이번에는 plotly에 대해 알아 보았다. 막상 쓰려고 보니 생각했던 것보다 더 많은 것들을 쓰지 않으면 안쓰니 못한 상태가 되지 않을까 싶다. 이번에는 plotly라는것을 소개 했고, 가장 간단한 Scatter, Line, Bar Chart를 **아주 간략하게만** 소개하게 되었다. 다음 블로그에서는 각각을 좀 더 심화 시켜서 소개 할것이고, plotly옵션의 추가 기능을 소개 하려 한다.
