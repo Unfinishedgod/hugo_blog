@@ -13,7 +13,7 @@ tags:
 knitr::opts_chunk$set(echo = TRUE, message = FALSE,  warning = FALSE,fig.align = "center", fig.width=9)
 ```
 
-```{r echo = FALSE, message=FALSE , fig.width=10}
+```{r echo = FALSE, message=FALSE , fig.width=9}
 library(tidyverse)
 library(plotly)
 library(DT)
@@ -208,7 +208,9 @@ subplot(
   nrows = 2)
 ```
 
-이번에는 plotly의 Line chart에 대해 알아 보자. 지난 블로그에서는 가볍게 소개를 했다면 이번에는 Line chart에 대해 알아보고 몇가지 옵션들을 추가로 알아보려 한다.
+이번에는 plotly의 Line chart에 대해 알아 보자. 지난 블로그에서는 가볍게 소개를 했다면 이번에는 Line chart에 대해 알아보고 몇가지 옵션들을 추가로 알아보려 한다. 이글의 전반적인 출처는 다음과 같다.
+
+- Plotly: [Line Plots in R](https://plotly.com/r/line-charts/)
 
 
 # 1. 기본 Chart
