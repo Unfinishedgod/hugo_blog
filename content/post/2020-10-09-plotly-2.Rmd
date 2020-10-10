@@ -1,8 +1,8 @@
 ---
-title: "[R] 2. Pltoly와 Line chart"
+title: "[R] 2. Plotly와 Line chart"
 author: 최의용
 date: '2020-10-09'
-slug: "[R] 2. Pltoly와 Line chart"
+slug: "[R] 2. Plotly와 Line chart"
 categories:
   - R
 tags:
@@ -178,7 +178,7 @@ fig_4 <- df %>%
             y = ~c(MSFT.Adjusted[1], MSFT.Adjusted[251], MSFT.Adjusted[which.max(MSFT.Adjusted)]), 
             type = "scatter", mode="makers",  marker = list(size = 10, color = "blue")) %>% 
   layout(
-    title = "Pltoly와 Line chart", 
+    title = "Plotly와 Line chart", 
     xaxis = list(showgrid = FALSE),
     yaxis = list(title = "", showgrid = FALSE),
     showlegend = FALSE,
@@ -795,4 +795,4 @@ df %>%
 
 # 총평
 
-이번에는 Plotly의 Line Chart를 자세하게 알아 보았다. Pltoly를 효과적으로 사용하기 위해서는 아직 더 알아야 할 것을이 많으며, 다음 Bar Chart를 소개하면서 추가적으로 소개 하고 Plotly의 전반적인 블로깅은 마무리 하도록 해야 겠다.
+이번에는 Plotly의 Line Chart를 자세하게 알아 보았다. Plotly를 효과적으로 사용하기 위해서는 아직 더 알아야 할 것을이 많으며, 다음 Bar Chart를 소개하면서 추가적으로 소개 하고 Plotly의 전반적인 블로깅은 마무리 하도록 해야 겠다.
