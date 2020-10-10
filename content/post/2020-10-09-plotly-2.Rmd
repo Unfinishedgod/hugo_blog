@@ -1,0 +1,796 @@
+---
+title: "[R] 2. Pltoly와 Line chart"
+author: 최의용
+date: '2020-10-09'
+slug: "[R] 2. Pltoly와 Line chart"
+categories:
+  - R
+tags:
+  - plotly
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE,  warning = FALSE,fig.align = "center", fig.width=9)
+```
+
+```{r echo = FALSE, message=FALSE , fig.width=10}
+library(tidyverse)
+library(plotly)
+library(DT)
+
+
+fig_1 <- Orange %>% 
+  plot_ly() %>% 
+  add_trace(x = ~age, y = ~circumference, color = ~Tree, mode = "lines") %>% 
+  layout(
+    title = "Line Chart",
+    xaxis = list(title = "x축 이름"),
+    yaxis = list(title = "y축 이름")
+  )
+
+fig_2 <- Orange %>% 
+  spread(key = Tree, value = circumference) %>% 
+  plot_ly() %>% 
+  add_trace(x = ~age, y = ~`1`, type = "scatter", name = "1 - width(4)",  mode = "lines",
+            line = list(width = 4)) %>% 
+  add_trace(x = ~age, y = ~`2`, type = "scatter", name = "2 - dash",  mode = "lines", 
+            line = list(dash = "dash")) %>% 
+  add_trace(x = ~age, y = ~`3`, type = "scatter", name = "3 - dot",  mode = "lines", 
+            line = list(dash = "dot")) %>% 
+  add_trace(x = ~age, y = ~`4`, type = "scatter", name = "4 - spline",  mode = "lines", 
+            line = list(shape = "spline")) %>% 
+  add_trace(x = ~age, y = ~`5`, type = "scatter", name = "5 - color(black)",  mode = "lines", 
+            line = list(color = "black")) %>% 
+  layout(
+    legend=list(orientation = 'h', y=1.1, x=0.7)
+  )
+
+
+library(quantmod)
+getSymbols(Symbols = c("AAPL", "MSFT"), from = '2018-01-01', to = '2019-01-01')
+
+df <- data.frame(Date = index(AAPL), AAPL[,6], MSFT[,6])
+
+fig_3 <- df %>% 
+  plot_ly() %>% 
+  add_trace(x = ~Date, y = ~AAPL.Adjusted, name = "Apple", type = "scatter",  mode = "lines") %>% 
+  add_trace(x = ~Date, y = ~MSFT.Adjusted, name = "Microsoft", type = "scatter",  mode = "lines") %>% 
+  layout(
+    title = "",
+    xaxis = list(
+      rangeselector = list(
+        buttons = list(
+          list(
+            count = 3,
+            label = "3 mo",
+            step = "month",
+            stepmode = "backward"),
+          list(
+            count = 6,
+            label = "6 mo",
+            step = "month",
+            stepmode = "backward"),
+          list(
+            count = 1,
+            label = "1 yr",
+            step = "year",
+            stepmode = "backward"),
+          list(
+            count = 1,
+            label = "YTD",
+            step = "year",
+            stepmode = "todate"),
+          list(step = "all"))),
+      rangeslider = list(type = "date")),
+    yaxis = list(title = "Price"))
+
+
+apple_head <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[1],
+  y = df$AAPL.Adjusted[1],
+  xanchor = 'right',
+  yanchor = 'middle',
+  text = ~paste("Apple \n", Date[1] ,'\n', round(AAPL.Adjusted[1],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+apple_tail <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[251],
+  y = df$AAPL.Adjusted[251],
+  xanchor = 'left',
+  yanchor = 'middle',
+  text = ~paste("Apple \n", Date[251] ,'\n', round(AAPL.Adjusted[251],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+apple_max <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[which.max(df$AAPL.Adjusted)],
+  y = df$AAPL.Adjusted[which.max(df$AAPL.Adjusted)],
+  xanchor = 'middle',
+  yanchor = 'bottom',
+  text = ~paste("Apple Max \n", Date[which.max(df$AAPL.Adjusted)] ,'\n', round(AAPL.Adjusted[which.max(df$AAPL.Adjusted)],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+microsoft_head <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[1],
+  y = df$MSFT.Adjusted[1],
+  xanchor = 'right',
+  yanchor = 'middle',
+  text = ~paste("Microsoft \n", Date[1] ,'\n', round(MSFT.Adjusted[1],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+microsoft_tail <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[251],
+  y = df$MSFT.Adjusted[251],
+  xanchor = 'left',
+  yanchor = 'middle',
+  text = ~paste("Microsoft \n", Date[251] ,'\n', round(MSFT.Adjusted[251],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+microsoft_max <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[which.max(df$MSFT.Adjusted)],
+  y = df$MSFT.Adjusted[which.max(df$MSFT.Adjusted)],
+  xanchor = 'middle',
+  yanchor = 'bottom',
+  text = ~paste("Microsoft Max \n", Date[which.max(df$MSFT.Adjusted)] ,'\n', round(MSFT.Adjusted[which.max(df$MSFT.Adjusted)],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+
+
+fig_4 <- df %>% 
+  plot_ly() %>% 
+  add_trace(x = ~Date, y = ~AAPL.Adjusted, name = "Apple", 
+            type = "scatter",  mode = "lines", line = list(width = 1, color = "red")) %>% 
+  add_trace(x = ~Date, y = ~MSFT.Adjusted, name = "Microsoft", 
+            type = "scatter",  mode = "lines", line = list(width = 1, color = "blue")) %>% 
+  add_trace(x = ~c(Date[1], Date[251], Date[which.max(AAPL.Adjusted)]), 
+            y = ~c(AAPL.Adjusted[1], AAPL.Adjusted[251], AAPL.Adjusted[which.max(AAPL.Adjusted)]), 
+            type = "scatter", mode="makers", marker = list(size = 10, color = "red")) %>% 
+  add_trace(x = ~c(Date[1], Date[251], Date[which.max(MSFT.Adjusted)]), 
+            y = ~c(MSFT.Adjusted[1], MSFT.Adjusted[251], MSFT.Adjusted[which.max(MSFT.Adjusted)]), 
+            type = "scatter", mode="makers",  marker = list(size = 10, color = "blue")) %>% 
+  layout(
+    title = "Pltoly와 Line chart", 
+    xaxis = list(showgrid = FALSE),
+    yaxis = list(title = "", showgrid = FALSE),
+    showlegend = FALSE,
+    annotations = apple_head
+  ) %>% 
+  layout(
+    annotations = apple_tail
+  ) %>% 
+  layout(
+    annotations = apple_max
+  ) %>% 
+  layout(
+    annotations = microsoft_head
+  ) %>% 
+  layout(
+    annotations = microsoft_tail
+  ) %>% 
+  layout(
+    annotations = microsoft_max
+  )
+
+subplot(
+  style(fig_1, showlegend = FALSE), 
+  style(fig_2, showlegend = FALSE),
+  style(fig_3, showlegend = FALSE),
+  fig_4,
+  nrows = 2)
+```
+
+이번에는 plotly의 Line chart에 대해 알아 보자. 지난 블로그에서는 가볍게 소개를 했다면 이번에는 Line chart에 대해 알아보고 몇가지 옵션들을 추가로 알아보려 한다.
+
+
+# 1. 기본 Chart
+
+우선 기본 차트를 보자. Orange 데이터를 사용 했으며, 이를 가지고 변형을 통해 line chart를 바꾸어 주자.
+
+```{r}
+library(tidyverse)
+library(plotly)
+library(DT)
+```
+
+```{r}
+Orange %>% 
+  plot_ly() %>% 
+  add_trace(x = ~age, y = ~circumference, color = ~Tree, mode = "lines") %>% 
+  layout(
+    title = "Line Chart",
+    xaxis = list(title = "x축 이름"),
+    yaxis = list(title = "y축 이름")
+  )
+```
+
+
+# 2. Line별 옵션
+
+## 2-1. 데이터 변형
+
+각 선 별로 옵션값을 지정 해주자. 이를 위해서는 변형을 해야 하는데 Orange 데이터를 spread()함수를 사용하여 1~5까지의 Tree값을 각 컬럼으로 바꿔주자. 그리고 이를 Orange_2라고 지정 해두었다.
+
+```{r}
+Orange_2 <- Orange %>% 
+  spread(key = Tree, value = circumference) 
+
+Orange_2 %>% 
+  datatable(rownames = NULL, options = list(
+    pageLength = 5
+  ))
+```
+
+## 2-1. 라인별 옵션
+
+```{r echo=FALSE}
+Orange_2 %>% 
+  plot_ly() %>% 
+  add_trace(x = ~age, y = ~`1`, type = "scatter", name = "1 - width(4)",  mode = "lines",
+            line = list(width = 4)) %>% 
+  add_trace(x = ~age, y = ~`2`, type = "scatter", name = "2 - dash",  mode = "lines", 
+            line = list(dash = "dash")) %>% 
+  add_trace(x = ~age, y = ~`3`, type = "scatter", name = "3 - dot",  mode = "lines", 
+            line = list(dash = "dot")) %>% 
+  add_trace(x = ~age, y = ~`4`, type = "scatter", name = "4 - spline",  mode = "lines", 
+            line = list(shape = "spline")) %>% 
+  add_trace(x = ~age, y = ~`5`, type = "scatter", name = "5 - color(black)",  mode = "lines", 
+            line = list(color = "black")) %>% 
+  layout(
+    legend=list(orientation = 'h', y=1.1, x=0.7)
+  )
+```
+
+이제 Orange_2 데이터를 가지고 각 선에 옵션을 주도록 하자. 
+
+1. 우선 plot_ly()를 감싸주도록 한다.
+2. 각 컬럼(1~5)번에 대해 각각 add_trace()를 통해 추가 해주어야 한다.
+3. type = "scatter", mode = "lines"로 설정을 해준다.
+4. line = (), 코드를 추가 하여 옵션을 넣어 준다.
+    - 이때 괄호 안에 옵션을 추가 해주었다.
+5. 옵션 내용
+    - 1번은 선의 두께를 4로 지정. (line = list(width = 4))
+    - 2번은 선의 형태를 dash로 지정. (line = list(dash = "dash"))
+    - 3번은 선의 형태를 dot로 지정. (line = list(dash = "dot"))
+    - 4번은 선을 굴곡지게 변경 (line = list(shape = "spline"))
+    - 5번은 선의 색을 검은색으로 지정 (line = list(color = "black"))
+6. layout()은 Chart의 전반부의 옵션을 지정해주는 역할을 한다.
+    - 범례(legend)를 가로로 변경하고,  x,y에 위치를 설정해주었다.
+
+```{r eval=FALSE}
+Orange_2 %>% 
+  plot_ly() %>% 
+  add_trace(x = ~age, y = ~`1`, type = "scatter", name = "1 - width(4)",  mode = "lines",
+            line = list(width = 4)) %>% 
+  add_trace(x = ~age, y = ~`2`, type = "scatter", name = "2 - dash",  mode = "lines", 
+            line = list(dash = "dash")) %>% 
+  add_trace(x = ~age, y = ~`3`, type = "scatter", name = "3 - dot",  mode = "lines", 
+            line = list(dash = "dot")) %>% 
+  add_trace(x = ~age, y = ~`4`, type = "scatter", name = "4 - spline",  mode = "lines", 
+            line = list(shape = "spline")) %>% 
+  add_trace(x = ~age, y = ~`5`, type = "scatter", name = "5 - color(black)",  mode = "lines", 
+            line = list(color = "black")) %>% 
+  layout(
+    legend=list(orientation = 'h', y=1.1, x=0.7)
+  )
+```
+
+# 3. Time Series in R
+
+다음은 날짜를 갖고 있는 데이터에 대해 알아보자. 보통 주식차트에서 자주 사용되곤 하는데, 날짜를 x축으로 갖고 있는 데이터라면 주식이 아니더라도 사용했을때 효과적로 사용할 수 있다. 우선 데이터를 준비 하자. Apple과, Microsoft의 2018-01-01 ~ 2019-01-01의 주식을 나타내는 데이터이다. 
+
+```{r}
+library(quantmod)
+getSymbols(Symbols = c("AAPL", "MSFT"), from = '2018-01-01', to = '2019-01-01')
+
+df <- data.frame(Date = index(AAPL), AAPL[,6], MSFT[,6])
+
+df %>% 
+  datatable(rownames = NULL, options = list(
+    pageLength = 5
+  ))
+```
+
+
+## 3-1. Plotly Time Series Line Chart
+
+```{r echo=FALSE}
+df %>% 
+  plot_ly() %>% 
+  add_trace(x = ~Date, y = ~AAPL.Adjusted, name = "Apple", type = "scatter",  mode = "lines") %>% 
+  add_trace(x = ~Date, y = ~MSFT.Adjusted, name = "Microsoft", type = "scatter",  mode = "lines") %>% 
+  layout(
+    title = "Apple과 Microsoft 주식 비교",
+    xaxis = list(
+      rangeselector = list(
+        buttons = list(
+          list(
+            count = 3,
+            label = "3 mo",
+            step = "month",
+            stepmode = "backward"),
+          list(
+            count = 6,
+            label = "6 mo",
+            step = "month",
+            stepmode = "backward"),
+          list(
+            count = 1,
+            label = "1 yr",
+            step = "year",
+            stepmode = "backward"),
+          list(
+            count = 1,
+            label = "YTD",
+            step = "year",
+            stepmode = "todate"),
+          list(step = "all"))),
+      rangeslider = list(type = "date")),
+    yaxis = list(title = "Price"))
+```
+
+이제 날짜를 갖고 있는 데이터는 어떻게더 효과적으로 표현할수 있느지 알아보자. 데이터를 plot_ly()로 감싸주고, add_trace()에 각각의 옵션은 직전에 했던 방법과 동일하다. 여기서 추가를 해줄 것은 layout 옵션이다. 이 부분에 대해서 더 자세히 알아보는것 보다는 아래의 코드를 그대로 복사 해서 써주는게 더 편하다.
+
+1. layout을 추가 해준다.
+2. xaxis = list()형식으로 추가 해주고 안에 옵션들을 넣어주자.
+    - rangeselector = list()옵션을 넣어주어 범위를 설정할 수 있도록 해준다. 
+    - buttons은 rangeselector = list()의 괄호안에 추가로 넣어 주어 기간을 버튼으로 볼수 있도록 해주자. 
+
+```{r eval=FALSE}
+df %>% 
+  plot_ly() %>% 
+  add_trace(x = ~Date, y = ~AAPL.Adjusted, name = "Apple", type = "scatter",  mode = "lines") %>% 
+  add_trace(x = ~Date, y = ~MSFT.Adjusted, name = "Microsoft", type = "scatter",  mode = "lines") %>% 
+  layout(
+    title = "Apple과 Microsoft 주식 비교",
+    xaxis = list(
+      rangeselector = list(
+        buttons = list(
+          list(
+            count = 3,
+            label = "3 mo",
+            step = "month",
+            stepmode = "backward"),
+          list(
+            count = 6,
+            label = "6 mo",
+            step = "month",
+            stepmode = "backward"),
+          list(
+            count = 1,
+            label = "1 yr",
+            step = "year",
+            stepmode = "backward"),
+          list(
+            count = 1,
+            label = "YTD",
+            step = "year",
+            stepmode = "todate"),
+          list(step = "all"))),
+      rangeslider = list(type = "date")),
+    yaxis = list(title = "Price"))
+```
+
+# 4. 목적 전달형 시각화
+
+```{r echo=FALSE}
+apple_head <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[1],
+  y = df$AAPL.Adjusted[1],
+  xanchor = 'right',
+  yanchor = 'middle',
+  text = ~paste("Apple \n", Date[1] ,'\n', round(AAPL.Adjusted[1],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+apple_tail <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[251],
+  y = df$AAPL.Adjusted[251],
+  xanchor = 'left',
+  yanchor = 'middle',
+  text = ~paste("Apple \n", Date[251] ,'\n', round(AAPL.Adjusted[251],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+apple_max <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[which.max(df$AAPL.Adjusted)],
+  y = df$AAPL.Adjusted[which.max(df$AAPL.Adjusted)],
+  xanchor = 'middle',
+  yanchor = 'bottom',
+  text = ~paste("Apple Max \n", Date[which.max(df$AAPL.Adjusted)] ,'\n', round(AAPL.Adjusted[which.max(df$AAPL.Adjusted)],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+microsoft_head <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[1],
+  y = df$MSFT.Adjusted[1],
+  xanchor = 'right',
+  yanchor = 'middle',
+  text = ~paste("Microsoft \n", Date[1] ,'\n', round(MSFT.Adjusted[1],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+microsoft_tail <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[251],
+  y = df$MSFT.Adjusted[251],
+  xanchor = 'left',
+  yanchor = 'middle',
+  text = ~paste("Microsoft \n", Date[251] ,'\n', round(MSFT.Adjusted[251],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+microsoft_max <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[which.max(df$MSFT.Adjusted)],
+  y = df$MSFT.Adjusted[which.max(df$MSFT.Adjusted)],
+  xanchor = 'middle',
+  yanchor = 'bottom',
+  text = ~paste("Microsoft Max \n", Date[which.max(df$MSFT.Adjusted)] ,'\n', round(MSFT.Adjusted[which.max(df$MSFT.Adjusted)],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+
+
+df %>% 
+  plot_ly() %>% 
+  add_trace(x = ~Date, y = ~AAPL.Adjusted, name = "Apple", 
+            type = "scatter",  mode = "lines", line = list(width = 1, color = "red")) %>% 
+  add_trace(x = ~Date, y = ~MSFT.Adjusted, name = "Microsoft", 
+            type = "scatter",  mode = "lines", line = list(width = 1, color = "blue")) %>% 
+  add_trace(x = ~c(Date[1], Date[251], Date[which.max(AAPL.Adjusted)]), 
+            y = ~c(AAPL.Adjusted[1], AAPL.Adjusted[251], AAPL.Adjusted[which.max(AAPL.Adjusted)]), 
+            type = "scatter", mode="makers", marker = list(size = 10, color = "red")) %>% 
+  add_trace(x = ~c(Date[1], Date[251], Date[which.max(MSFT.Adjusted)]), 
+            y = ~c(MSFT.Adjusted[1], MSFT.Adjusted[251], MSFT.Adjusted[which.max(MSFT.Adjusted)]), 
+            type = "scatter", mode="makers",  marker = list(size = 10, color = "blue")) %>% 
+  layout(
+    title = "Apple과 Microsoft 주식 변화", 
+    xaxis = list(showgrid = FALSE),
+    yaxis = list(title = "", showgrid = FALSE),
+    showlegend = FALSE,
+    annotations = apple_head
+  ) %>% 
+  layout(
+    annotations = apple_tail
+  ) %>% 
+  layout(
+    annotations = apple_max
+  ) %>% 
+  layout(
+    annotations = microsoft_head
+  ) %>% 
+  layout(
+    annotations = microsoft_tail
+  ) %>% 
+  layout(
+    annotations = microsoft_max
+  )
+```
+
+
+이번에는 목적 전달을 목표로 하는 시각화를 해보자. 기존의 시각화 역시 목적을 전달하는 목적이 있겠다만, 데이터 자체를 객관적으로 표현하기 때문에 목적을 전달하는데 명확하지 않다. Text옵션과 더불어서 위에서 표현 했던 Apple와 Microsort의 데이터의 특징을 잡아 보자.
+
+### 4-1. Text 표시
+
+우선 Text 표시 세팅을 해주어야한다. 텍스트는 Apple, Microsoft각각 처음부분, 최대값, 마지막 부분을 기준으로 추가 해주었다. 설정 방법은 다음과 같다. 옵션에 대한 설명중 특별한 사항만 소개 하도록 한다.
+
+ - `x = ` : Text데이터의 x좌표의 위치를 표시 한다.
+    - apple_head: `df$Date[1]` (apple의 첫번째 날짜이므로 첫번째에 위치 시킨다)
+    - apple_tail: `df$Date[251]` (apple의 마지막 날짜로, 마지막 인덱스를 주어 위치시킨다.)
+    - apple_max: `df$Date[which.max(df$AAPL.Adjusted)]` (apple 주가의 최대값을 which.max()함수로 찾아 위치 시킨다.)
+ - `y = ` : Text데이터의 y좌표의 위치를 표시 한다.
+    - apple_head: `df$AAPL.Adjusted[1]` (apple의 첫번째 날짜이므로 첫번째에 위치 시킨다)
+    - apple_tail: `df$AAPL.Adjusted[251]` (apple의 마지막 날짜로, 마지막 인덱스를 주어 위치시킨다.)
+    - apple_max: `df$AAPL.Adjusted[which.max(df$AAPL.Adjusted)]` (apple 주가의 최대값을 which.max()함수로 찾아 위치 시킨다.)
+ - `xanchor = `, `yanchor = ` : 좌표를 정햇으면 Text가 어디에 위치 하는지를 나타낸다.
+    - right: 오른쪽에 위치 하는것이 아니라 **점**을 오른쪽에 두겠다는 의미 (즉, 왼쪽에 위치한다.)
+    - left: **점**을 왼쪽에 두겠다는 의미 (즉, 오른쪽에 위치한다.)
+    - meddle: **점**을 가운데 두겠다는 의미 (즉, 중간에 위치한다.)
+    - bottom: **점**을 아래에 두겠다는 의미 (즉, 위에 위치한다.)
+    - top: **점**을 위에 두겠다는 의미 (즉, 아래에 위치한다.)
+
+```{r}
+apple_head <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[1],
+  y = df$AAPL.Adjusted[1],
+  xanchor = 'right',
+  yanchor = 'middle',
+  text = ~paste("Apple \n", Date[1] ,'\n', round(AAPL.Adjusted[1],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+apple_tail <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[251],
+  y = df$AAPL.Adjusted[251],
+  xanchor = 'left',
+  yanchor = 'middle',
+  text = ~paste("Apple \n", Date[251] ,'\n', round(AAPL.Adjusted[251],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+apple_max <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[which.max(df$AAPL.Adjusted)],
+  y = df$AAPL.Adjusted[which.max(df$AAPL.Adjusted)],
+  xanchor = 'middle',
+  yanchor = 'bottom',
+  text = ~paste("Apple Max \n", Date[which.max(df$AAPL.Adjusted)] ,'\n', round(AAPL.Adjusted[which.max(df$AAPL.Adjusted)],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+microsoft_head <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[1],
+  y = df$MSFT.Adjusted[1],
+  xanchor = 'right',
+  yanchor = 'middle',
+  text = ~paste("Microsoft \n", Date[1] ,'\n', round(MSFT.Adjusted[1],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+microsoft_tail <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[251],
+  y = df$MSFT.Adjusted[251],
+  xanchor = 'left',
+  yanchor = 'middle',
+  text = ~paste("Microsoft \n", Date[251] ,'\n', round(MSFT.Adjusted[251],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+microsoft_max <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[which.max(df$MSFT.Adjusted)],
+  y = df$MSFT.Adjusted[which.max(df$MSFT.Adjusted)],
+  xanchor = 'middle',
+  yanchor = 'bottom',
+  text = ~paste("Microsoft Max \n", Date[which.max(df$MSFT.Adjusted)] ,'\n', round(MSFT.Adjusted[which.max(df$MSFT.Adjusted)],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+```
+
+
+### 4-2. Plotly 시각화
+
+Text 옵션을 미리 정해 주었으니 이제 그래프를 그려보자. 우선 선 그래프는 그려놓았으며, 점을 추가 하고 배경을 없애는 과정을 거친 후 텍스트 옵션을 추가 해준다.
+
+#### a) 점 추가
+
+위의 Text옵션과 같이 각각의 점을 추가 해주자. 각각 처음, 마지막, 최대값을 위치 시켜 점을 추가 해주었다.
+
+```
+add_trace(x = ~c(Date[1], Date[251], Date[which.max(AAPL.Adjusted)]), 
+            y = ~c(AAPL.Adjusted[1], AAPL.Adjusted[251], AAPL.Adjusted[which.max(AAPL.Adjusted)]), 
+            type = "scatter", mode="makers", marker = list(size = 10, color = "red")) %>% 
+add_trace(x = ~c(Date[1], Date[251], Date[which.max(MSFT.Adjusted)]), 
+            y = ~c(MSFT.Adjusted[1], MSFT.Adjusted[251], MSFT.Adjusted[which.max(MSFT.Adjusted)]), 
+            type = "scatter", mode="makers",  marker = list(size = 10, color = "blue")) %>% 
+```
+
+
+#### b) 배경 설정
+
+title을 설정 해주고, xaxis,yaxis, showlegend각각 옵션에 아래와 같은 설정을 해주도록 한다.
+
+```
+  layout(
+    title = "Apple과 Microsoft 주식 변화", 
+    xaxis = list(showgrid = FALSE),
+    yaxis = list(title = "", showgrid = FALSE),
+    showlegend = FALSE
+  )
+```
+#### c) Text 옵션 추가
+
+이제 마지막으로 Text옵션을 추가 해주는 단계를 가져주자. 위의 Text 옵션을 만들어 주었으며, 각각 layout를 추가 해준뒤 annotations에 각각 추가 해주면 된다.
+
+```
+  layout(
+    annotations = apple_max
+  ) %>% 
+  layout(
+    annotations = microsoft_head
+  ) %>% 
+  layout(
+    annotations = microsoft_tail
+  ) %>% 
+  layout(
+    annotations = microsoft_max
+  )
+```
+
+#### d) 목적 전달형 시각화의 최종 코드 
+
+4. 목적 전달형 시각화의 최종 코드는 다음과 같다.
+
+```{r eval=FALSE}
+apple_head <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[1],
+  y = df$AAPL.Adjusted[1],
+  xanchor = 'right',
+  yanchor = 'middle',
+  text = ~paste("Apple \n", Date[1] ,'\n', round(AAPL.Adjusted[1],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+apple_tail <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[251],
+  y = df$AAPL.Adjusted[251],
+  xanchor = 'left',
+  yanchor = 'middle',
+  text = ~paste("Apple \n", Date[251] ,'\n', round(AAPL.Adjusted[251],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+apple_max <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[which.max(df$AAPL.Adjusted)],
+  y = df$AAPL.Adjusted[which.max(df$AAPL.Adjusted)],
+  xanchor = 'middle',
+  yanchor = 'bottom',
+  text = ~paste("Apple Max \n", Date[which.max(df$AAPL.Adjusted)] ,'\n', round(AAPL.Adjusted[which.max(df$AAPL.Adjusted)],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+microsoft_head <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[1],
+  y = df$MSFT.Adjusted[1],
+  xanchor = 'right',
+  yanchor = 'middle',
+  text = ~paste("Microsoft \n", Date[1] ,'\n', round(MSFT.Adjusted[1],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+microsoft_tail <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[251],
+  y = df$MSFT.Adjusted[251],
+  xanchor = 'left',
+  yanchor = 'middle',
+  text = ~paste("Microsoft \n", Date[251] ,'\n', round(MSFT.Adjusted[251],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+microsoft_max <- list(
+  xref = 'x',
+  yref = 'y',
+  x = df$Date[which.max(df$MSFT.Adjusted)],
+  y = df$MSFT.Adjusted[which.max(df$MSFT.Adjusted)],
+  xanchor = 'middle',
+  yanchor = 'bottom',
+  text = ~paste("Microsoft Max \n", Date[which.max(df$MSFT.Adjusted)] ,'\n', round(MSFT.Adjusted[which.max(df$MSFT.Adjusted)],3)),
+  font = list(family = 'Arial',
+              size = 16,
+              color = 'rgba(67,67,67,1)'),
+  showarrow = FALSE)
+
+
+df %>% 
+  plot_ly() %>% 
+  add_trace(x = ~Date, y = ~AAPL.Adjusted, name = "Apple", 
+            type = "scatter",  mode = "lines", line = list(width = 1, color = "red")) %>% 
+  add_trace(x = ~Date, y = ~MSFT.Adjusted, name = "Microsoft", 
+            type = "scatter",  mode = "lines", line = list(width = 1, color = "blue")) %>% 
+  add_trace(x = ~c(Date[1], Date[251], Date[which.max(AAPL.Adjusted)]), 
+            y = ~c(AAPL.Adjusted[1], AAPL.Adjusted[251], AAPL.Adjusted[which.max(AAPL.Adjusted)]), 
+            type = "scatter", mode="makers", marker = list(size = 10, color = "red")) %>% 
+  add_trace(x = ~c(Date[1], Date[251], Date[which.max(MSFT.Adjusted)]), 
+            y = ~c(MSFT.Adjusted[1], MSFT.Adjusted[251], MSFT.Adjusted[which.max(MSFT.Adjusted)]), 
+            type = "scatter", mode="makers",  marker = list(size = 10, color = "blue")) %>% 
+  layout(
+    title = "Apple과 Microsoft 주식 변화", 
+    xaxis = list(showgrid = FALSE),
+    yaxis = list(title = "", showgrid = FALSE),
+    showlegend = FALSE
+  ) %>% layout(
+    annotations = apple_head
+  ) %>% layout(
+    annotations = apple_tail
+  ) %>% 
+  layout(
+    annotations = apple_max
+  ) %>% 
+  layout(
+    annotations = microsoft_head
+  ) %>% 
+  layout(
+    annotations = microsoft_tail
+  ) %>% 
+  layout(
+    annotations = microsoft_max
+  )
+```
+
+
+# 총평
+
+이번에는 Plotly의 Line Chart를 자세하게 알아 보았다. Pltoly를 효과적으로 사용하기 위해서는 아직 더 알아야 할 것을이 많으며, 다음 Bar Chart를 소개하면서 추가적으로 소개 하고 Plotly의 전반적인 블로깅은 마무리 하도록 해야 겠다.
