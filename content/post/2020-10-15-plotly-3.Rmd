@@ -1,0 +1,529 @@
+---
+title: "[R] 3. Plotly와 Bar chart"
+author: 최의용
+date: '2020-10-15'
+slug: "[R] 3. Plotly와 Bar chart"
+categories:
+  - R
+tags:
+  - plotly
+  - R
+  - barchart
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE,  warning = FALSE,fig.align = "center", fig.width=9)
+```
+
+```{r echo = FALSE, message=FALSE , fig.width=9}
+library(tidyverse)
+library(plotly)
+library(DT)
+
+df <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv", stringsAsFactors = FALSE)
+
+df <- df %>% 
+  filter(year == 2007) %>% 
+  filter(continent == "Asia") %>% 
+  filter(pop > 30000000)
+
+fig_1 <- df %>% 
+  arrange(pop) %>% 
+  plot_ly() %>% 
+  add_trace(x = ~pop, y = ~country,  name = "인구",
+            text = ~paste0(pop, "명"),
+            hoverinfo = "text",
+            hovertemplate = ~paste0(country, "\n", pop, "명"),
+            textposition = "inside" 
+  ) %>% 
+  layout(
+    title = "2007년 아시아 국가별 인구(3천만 이상)",
+    xaxis = list(title = ""),
+    yaxis = list(title = "",
+                 categoryorder = "array",
+                 categoryarray = ~pop,
+                 size=5)
+  )
+
+fig_2 <- df %>% 
+  arrange(lifeExp) %>% 
+  plot_ly() %>% 
+  add_trace(x = ~lifeExp, y = ~country,  name = "삶의 질",
+            text = ~paste0(lifeExp),
+            hoverinfo = "text",
+            hovertemplate = ~paste0(country, "\n", lifeExp),
+            textposition = "inside" 
+  ) %>% 
+  layout(
+    title = "2007년 아시아 국가별 삶의 질(인구 3천만 이상 기준)",
+    xaxis = list(title = ""),
+    yaxis = list(title = "",
+                 categoryorder = "array",
+                 categoryarray = ~lifeExp,
+                 size=5)
+  )
+
+fig_3 <- df %>% 
+  arrange(gdpPercap) %>% 
+  plot_ly() %>% 
+  add_trace(x = ~gdpPercap, y = ~country, name = "gdpPercap",
+            text = ~paste0(gdpPercap),
+            hoverinfo = "text",
+            hovertemplate = ~paste0(country, "\n", gdpPercap),
+            textposition = "inside" 
+  ) %>% 
+  layout(
+    title = "2007년 아시아 국가별 gdpPercap(인구 3천만 이상 기준)",
+    xaxis = list(title = ""),
+    yaxis = list(title = "",
+                 categoryorder = "array",
+                 categoryarray = ~gdpPercap,
+                 size=5)
+  )
+
+
+subplot(
+  fig_1,fig_2, fig_3, nrows = 1
+  ) %>% 
+  layout(
+    title = "아시아 국가별 항목 (인구 3천만 이상)",
+    legend=list(orientation = 'h', y=1.1, x=0.7)
+    )
+```
+
+plotly에서 Barchart에 대해 알아보자. Bar chart과 더불어 Text에 옵션을 주어 추가하는 방법과, subplot기능을 사용해 한번에 여러개의 chart를 나열하는 방법도 소개 하려고 한다. 각각 기능에 대해 자세한 사항은 다음의 링크를 참고 하자.
+
+- [(Plotly) Bar Chart in R](https://plotly.com/r/bar-charts/)
+- [(Plotly) Text and annotations in R](https://plotly.com/r/text-and-annotations/)
+- [(Plotly) Subplots in R](https://plotly.com/r/subplots/)
+
+# 1. 기본 Bar chart
+
+우선 사용할 데이터를 보자. sleep라고 되어 있는 내장 데이터이며, 아래와 같이 확인 가능하다.
+
+```{r}
+library(tidyverse)
+library(plotly)
+library(DT)
+
+sleep %>% 
+  datatable(rownames = NULL, options = list(
+    pageLength = 5
+  ))
+
+```
+
+간단하게 볼 수 있는 Bar Chart를 보자.
+ 
+ - sleep 데이터에 우선 plot_ly() 함수로 감싸준다.
+ - add_trace()에 각각 x,y 옵션을 넣어주자.
+    - 이때 type = "bar"옵션을 추가 해주어 Bar chart를 만들어 준다.
+
+```{r}
+sleep %>% 
+  plot_ly() %>% 
+  add_trace(x = ~ID, y = ~extra , type = "bar") %>% 
+  layout(
+    title = "Bar Chart",
+    xaxis = list(title = "x축 이름"),
+    yaxis = list(title = "y축 이름")
+  )
+```
+
+# 2. Group별 Bar Chart
+
+sleep는 extra, ID가 각각 group로 나뉘어져 있다. 이를 group별로 나누어서 데이터를 보도록 하자.
+
+```{r echo = FALSE}
+sleep %>% 
+  plot_ly() %>% 
+  add_trace(x = ~ID, y = ~extra, color= ~group,  type = "bar") %>% 
+  layout(
+    title = "Bar Chart",
+    xaxis = list(title = "x축 이름"),
+    yaxis = list(title = "y축 이름")
+  )
+```
+
+ - 위 그래프와 동일하지만, `color = ~group` 옵션을 추가해 확인이 가능하다.
+
+```{r eval = FALSE}
+sleep %>% 
+  plot_ly() %>% 
+  add_trace(x = ~ID, y = ~extra, color= ~group,  type = "bar") %>% 
+  layout(
+    title = "Bar Chart",
+    xaxis = list(title = "x축 이름"),
+    yaxis = list(title = "y축 이름")
+  )
+```
+
+# 3. Stacked Bar Chart
+
+Group을 같은 Bar안에서 구분 짓는 방법이다. 이를 Stacked Bar Chart라고 하며, 사용방법은 다음과 같다.
+
+```{r echo=FALSE}
+sleep %>% 
+  plot_ly() %>% 
+  add_trace(x = ~ID, y = ~extra, color= ~group,  type = "bar") %>% 
+  layout(
+    title = "Bar Chart",
+    xaxis = list(title = "x축 이름"),
+    yaxis = list(title = "y축 이름"),
+    barmode = "stack"
+  )
+```
+
+ - 기존에 group bar chart와 동일하게 시작한다.
+ - layout옵션에 `barmode = "stack"`옵션을 추가 해주어야 한다.
+    - layout(barmode = "stack")
+
+```{r eval = FALSE}
+sleep %>% 
+  plot_ly() %>% 
+  add_trace(x = ~ID, y = ~extra, color= ~group,  type = "bar") %>% 
+  layout(
+    title = "Bar Chart",
+    xaxis = list(title = "x축 이름"),
+    yaxis = list(title = "y축 이름"),
+    barmode = "stack"
+  )
+```
+
+# 4. Text옵션과, xy축 변환
+
+이번에는 Chart에 Text를 달리 표시해주는법과 xy축을 변환 시켜서 그래프를 볼수 있도록 해보자. 위에서 사용했던 sleep보다 더 효율적으로 볼수 있는 데이터를 사용했으며 아래와 같다. 
+
+ - 2007년 아시아에 대한 수치(인구 3천만 기준)
+
+```{r}
+df <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv", stringsAsFactors = FALSE)
+
+df <- df %>% 
+  filter(year == 2007) %>% 
+  filter(continent == "Asia") %>% 
+  filter(pop > 30000000)
+
+
+df %>% 
+  datatable(rownames = NULL, options = list(
+    pageLength = 5
+  ))
+```
+
+## 4-1. Text옵션 추가
+
+다음의 그래프를 보자. Bar chart위에 Text를 추가 해주어서 조금 더 한눈에 그래프를 볼 수 있도록 해두었다.
+
+```{r echo = FALSE}
+df %>% 
+  plot_ly() %>% 
+  add_trace(x = ~country, y = ~pop, text = ~pop,
+            textposition = "outside"
+            ) %>% 
+  layout(
+    title = "2007년 아시아 국가별 인구(3천만 이상)",
+    xaxis = list(title = ""),
+    yaxis = list(title = "")
+  )
+```
+
+그래프에 text를 추가 하는 가장 간단한 방법은 다음과 같다.
+
+ - add_trace()안에 옵션을 추가 해준다.
+    - `text = ~pop`: y가 pop이니 pop를 표시 해줄 수 있도록 하자.
+    - `textposition = "outside"`: text의 위치를 나타낸다. outside옵션을 사용해 밖에 위치하도록 해두었다.
+
+```{r eval = FALSE}
+df %>% 
+  plot_ly() %>% 
+  add_trace(x = ~country, y = ~pop, text = ~pop,
+            textposition = "outside"
+            ) %>% 
+  layout(
+    title = "2007년 아시아 국가별 인구(3천만 이상)",
+    xaxis = list(title = ""),
+    yaxis = list(title = "")
+  )
+```
+
+## 4-2. xy축 변환
+
+계속해서 하나씩 추가 해보자. 직전에 text를 표시한 그래프에서 xy축을 변환 시켜주었다.
+
+```{r echo = FALSE}
+df %>% 
+  plot_ly() %>% 
+  add_trace(x = ~pop, y = ~country, 
+            text = ~pop,
+            textposition = "outside" 
+  ) %>% 
+  layout(
+    title = "2007년 아시아 국가별 인구(3천만 이상)",
+    xaxis = list(title = ""),
+    yaxis = list(title = "")
+  )
+
+```
+
+방법은 간단한다. x의 위치와, y의 위치를 바꿔주면 된다. 그러나 이는 가독성이 좋은 시각화가 아니다. 순서를 정렬 시켜주어 그래프를 더 이쁘게 바꿔주자.
+
+```{r eval = FALSE}
+df %>% 
+  plot_ly() %>% 
+  add_trace(x = ~pop, y = ~country, 
+            text = ~pop,
+            textposition = "outside" 
+  ) %>% 
+  layout(
+    title = "2007년 아시아 국가별 인구(3천만 이상)",
+    xaxis = list(title = ""),
+    yaxis = list(title = "")
+  )
+
+```
+
+## 4-3. xy축 변환 후 정렬
+
+xy축을 변환 했으면 정렬을 시켜보자. 직전에 보았던 그래프와 달리 데이터의 목적을 효율적으로 시각화가 가능하다. 
+
+```{r echo= FALSE}
+df %>% 
+  arrange(pop) %>% 
+  plot_ly() %>% 
+  add_trace(x = ~pop, y = ~country, 
+            text = ~pop,
+            textposition = "outside" 
+  ) %>% 
+  layout(
+    title = "2007년 아시아 국가별 인구(3천만 이상)",
+    xaxis = list(title = ""),
+    yaxis = list(title = "",
+                 categoryorder = "array",
+                 categoryarray = ~pop,
+                 size=5)
+  )
+```
+
+데이터를 정렬하는 방법은 다음과 같다.
+
+ - 먼저 데이터를 정렬해주자. `arrange(pop)`를 사용해 먼저 데이터 자체를 정렬 시켜 주었다.
+ - yaxis의 옵션을 건드려주자.
+    - `categoryorder = "array"`코드를 사용해 정렬설정을 해준다.
+    - `categoryarray = ~pop`코드를 사용해 정렬할 대상(pop)를 설정 해준다.
+
+```{r eval = FALSE}
+df %>% 
+  arrange(pop) %>% 
+  plot_ly() %>% 
+  add_trace(x = ~pop, y = ~country, 
+            text = ~pop,
+            textposition = "outside" 
+  ) %>% 
+  layout(
+    title = "2007년 아시아 국가별 인구(3천만 이상)",
+    xaxis = list(title = ""),
+    yaxis = list(title = "",
+                 categoryorder = "array",
+                 categoryarray = ~pop,
+                 size=5)
+  )
+```
+
+## 4.4 Text옵션 고급
+
+이번에는 Text를 좀 더 효율적으로 바꿔주어 가독성을 높혀보자. 인구수에 '명'이라고 추가 해주었으며, 마우스를 위치 했을때 형식을 바꿔주었다.
+
+```{r echo=FALSE}
+df %>% 
+  arrange(pop) %>% 
+  plot_ly() %>% 
+  add_trace(x = ~pop, y = ~country, 
+            text = ~paste0(pop, "명"),
+            hoverinfo = "text",
+            hovertemplate = ~paste0(country, "\n", pop, "명"),
+            textposition = "inside" 
+  ) %>% 
+  layout(
+    title = "2007년 아시아 국가별 인구(3천만 이상)",
+    xaxis = list(title = ""),
+    yaxis = list(title = "",
+                 categoryorder = "array",
+                 categoryarray = ~pop,
+                 size=5)
+  )
+```
+
+이를 위해서는 `add_trace()`에 옵션을 추가 해주면된다.
+
+ - `text = ~paste0(pop, "명")`를 사용해 text에 '명'을 추가해준다.
+ - `hoverinfo = "text"`: 마우스를 갖다 대었을때 나오는 텍스트형식을 지정 해주는 옵션이다. 이를 hover라고 한다.
+ - `hovertemplate = ~paste0(country, "\n", pop, "명")`: 다음과 같이 hover템플릿을 지정 해주자. plotly는 기본적으로 html을 지원하는데, paste0()안에 "\n"을 추가 해주어 위에는 국가, 아래는 인구수가 나오도록 해주었다.
+
+```{r eval=FALSE}
+df %>% 
+  arrange(pop) %>% 
+  plot_ly() %>% 
+  add_trace(x = ~pop, y = ~country, 
+            text = ~paste0(pop, "명"),
+            hoverinfo = "text",
+            hovertemplate = ~paste0(country, "\n", pop, "명"),
+            textposition = "inside" 
+  ) %>% 
+  layout(
+    title = "2007년 아시아 국가별 인구(3천만 이상)",
+    xaxis = list(title = ""),
+    yaxis = list(title = "",
+                 categoryorder = "array",
+                 categoryarray = ~pop,
+                 size=5)
+  )
+```
+
+# 5. Subplot
+
+여기까지 Bar Chart에 대해 알아보았다. 이번에는 Subplot에 대해 알아보려 하는데, 이는 그래프를 한번에 여러개를 표시해주는 역할을 한다. subplot기능을 잘 사용하면 한 화면에 여러개의 목적을 전달할 수 있다.
+
+```{r echo=FALSE}
+fig_1 <- df %>% 
+  arrange(pop) %>% 
+  plot_ly() %>% 
+  add_trace(x = ~pop, y = ~country,  name = "인구",
+            text = ~paste0(pop, "명"),
+            hoverinfo = "text",
+            hovertemplate = ~paste0(country, "\n", pop, "명"),
+            textposition = "inside" 
+  ) %>% 
+  layout(
+    title = "2007년 아시아 국가별 인구(3천만 이상)",
+    xaxis = list(title = ""),
+    yaxis = list(title = "",
+                 categoryorder = "array",
+                 categoryarray = ~pop,
+                 size=5)
+  )
+
+fig_2 <- df %>% 
+  arrange(lifeExp) %>% 
+  plot_ly() %>% 
+  add_trace(x = ~lifeExp, y = ~country,  name = "삶의 질",
+            text = ~paste0(lifeExp),
+            hoverinfo = "text",
+            hovertemplate = ~paste0(country, "\n", lifeExp),
+            textposition = "inside" 
+  ) %>% 
+  layout(
+    title = "2007년 아시아 국가별 삶의 질(인구 3천만 이상 기준)",
+    xaxis = list(title = ""),
+    yaxis = list(title = "",
+                 categoryorder = "array",
+                 categoryarray = ~lifeExp,
+                 size=5)
+  )
+
+fig_3 <- df %>% 
+  arrange(gdpPercap) %>% 
+  plot_ly() %>% 
+  add_trace(x = ~gdpPercap, y = ~country, name = "gdpPercap",
+            text = ~paste0(gdpPercap),
+            hoverinfo = "text",
+            hovertemplate = ~paste0(country, "\n", gdpPercap),
+            textposition = "inside" 
+  ) %>% 
+  layout(
+    title = "2007년 아시아 국가별 gdpPercap(인구 3천만 이상 기준)",
+    xaxis = list(title = ""),
+    yaxis = list(title = "",
+                 categoryorder = "array",
+                 categoryarray = ~gdpPercap,
+                 size=5)
+  )
+
+
+subplot(
+  fig_1,fig_2, fig_3, nrows = 1
+  ) %>% 
+  layout(
+    title = "아시아 국가별 항목 (인구 3천만 이상)",
+    legend=list(orientation = 'h', y=1.1, x=0.7)
+    )
+```
+
+방법은 다음과 같다.
+
+ - 각각의 plot을 객체로 만들어준다.
+    - 여기서는 fig_1, fig_2, fig_3로 해주었다.
+ - subplot() 함스를 통해 이를 하나씩 묶어준다.
+    - `subplot(fig_1,fig_2, fig_3, nrows = 1)`이며 이때 nrows로 열의 갯수를 설정 해줄수 있다.
+ - layout() 함수를 사용해 옵션값을 지정해주자.
+    - `title = "아시아 국가별 항목 (인구 3천만 이상)"`: Title 지정
+    - `legend=list(orientation = 'h', y=1.1, x=0.7)`: 범례위치 상단부로 지정
+
+```{r eval=FALSE}
+fig_1 <- df %>% 
+  arrange(pop) %>% 
+  plot_ly() %>% 
+  add_trace(x = ~pop, y = ~country,  name = "인구",
+            text = ~paste0(pop, "명"),
+            hoverinfo = "text",
+            hovertemplate = ~paste0(country, "\n", pop, "명"),
+            textposition = "inside" 
+  ) %>% 
+  layout(
+    title = "2007년 아시아 국가별 인구(3천만 이상)",
+    xaxis = list(title = ""),
+    yaxis = list(title = "",
+                 categoryorder = "array",
+                 categoryarray = ~pop,
+                 size=5)
+  )
+
+fig_2 <- df %>% 
+  arrange(lifeExp) %>% 
+  plot_ly() %>% 
+  add_trace(x = ~lifeExp, y = ~country,  name = "삶의 질",
+            text = ~paste0(lifeExp),
+            hoverinfo = "text",
+            hovertemplate = ~paste0(country, "\n", lifeExp),
+            textposition = "inside" 
+  ) %>% 
+  layout(
+    title = "2007년 아시아 국가별 삶의 질(인구 3천만 이상 기준)",
+    xaxis = list(title = ""),
+    yaxis = list(title = "",
+                 categoryorder = "array",
+                 categoryarray = ~lifeExp,
+                 size=5)
+  )
+
+fig_3 <- df %>% 
+  arrange(gdpPercap) %>% 
+  plot_ly() %>% 
+  add_trace(x = ~gdpPercap, y = ~country, name = "gdpPercap",
+            text = ~paste0(gdpPercap),
+            hoverinfo = "text",
+            hovertemplate = ~paste0(country, "\n", gdpPercap),
+            textposition = "inside" 
+  ) %>% 
+  layout(
+    title = "2007년 아시아 국가별 gdpPercap(인구 3천만 이상 기준)",
+    xaxis = list(title = ""),
+    yaxis = list(title = "",
+                 categoryorder = "array",
+                 categoryarray = ~gdpPercap,
+                 size=5)
+  )
+
+
+subplot(
+  fig_1,fig_2, fig_3, nrows = 1
+  ) %>% 
+  layout(
+    title = "아시아 국가별 항목 (인구 3천만 이상)",
+    legend=list(orientation = 'h', y=1.1, x=0.7)
+    )
+```
+# 총평
+
+이것으로 Plotly에 대해 3개의 블로깅을 모두 마무리 지었다. 가장 많이 쓰이는 Line Chart와, Bar Chart를 소개 하면서 Plotly를 소개 하는게 적정한 방법이라고 생각을 했다. 겸사겸사 Plotly에서 사용하면 좋은 팁들도 같이 적었으며, 이 세가지의 블로그만으로도 어느정도 잘 따라 하면 반응형 시각화를 사용할 수 있을거라고 생각을 한다.
