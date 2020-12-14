@@ -129,6 +129,13 @@ coord
 ```
 
 
+# 질문과 문의
+
+rgdal은 생각보다 간단한 패키지가 아닙니다. 따라하시는데 어려움이 있을수도 있고, 다른 환경에서는 다른 방법으로 설치 해야할 수도 있습니다. 한번씩 따라 하시거나 그런 기회가 있을때 궁금하거나 안되는 부분이 다음 페이스북 그룹에다가 질문 남겨 주세요. 저도 찾아가면서 공부 해보고 답변 드리도록 하겠습니다.
+
+- [Tidyverse Korea](https://www.facebook.com/groups/tidyverse)
+
+
 # 출처
 
 - Rgdal 패키지 설치: [Managing R Packages](https://www.marcc.jhu.edu/managing-r-packages-a-case-study/)
