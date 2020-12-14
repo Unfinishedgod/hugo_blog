@@ -1,0 +1,127 @@
+---
+title: '[R] WSL에서 rgdal 패키지 설치 및 좌표 변환 사용해보기 '
+author: 최의용
+date: '2020-12-14'
+slug: r-wsl에서-rgdal-패키지-설치-및-좌표-변환-사용해보기
+categories:
+  - R
+tags:
+  - r
+  - rgdal
+  - 좌표변환
+  - wsl
+---
+
+
+
+<p>WSL에서 rgdal 패키지를 설치 해보자. rgdal 패키지는 좌표계를 변환하는 패키지로 좌표계에 대한 정보가 무수히 많으니 자세한건 다음을 참고 하자. 단순히 ’rgdal’패키지를 설치 하고 좌표를 변환 하는데 초점을 맞춰보도록 하자.</p>
+<ul>
+<li><a href="https://cran.r-project.org/web/packages/rgdal/rgdal.pdf">Package ‘rgdal’</a></li>
+<li><a href="https://www.slideshare.net/jangbi882/proj4-32605736">Proj4를 이용한 좌표계 변환</a></li>
+<li><a href="https://www.osgeo.kr/17">한국 주요 좌표계 EPSG코드 및 proj4 인자 정리</a></li>
+</ul>
+<div id="rgdal패키지-설치" class="section level1">
+<h1>rgdal패키지 설치</h1>
+<div id="설치-오류" class="section level2">
+<h2>설치 오류</h2>
+<p>wsl에 설치되어있는 R에 <code>library(rgdal)</code>를 실행 했을때 다음의 오류가 생긴다.</p>
+<pre class="r"><code>library(rgdal)</code></pre>
+<pre><code>Error in library(rgdal) : there is no package called ‘rgdal’</code></pre>
+</div>
+<div id="rgdal-패키지-설치" class="section level2">
+<h2>rgdal 패키지 설치</h2>
+<p>구글링을 해서 찾아본 결과 다음의 코드를 실행하면 설치가 완료 된다.</p>
+<pre class="r"><code>install.packages(&#39;https://cran.r-project.org/src/contrib/Archive/rgdal/rgdal_1.3-9.tar.gz&#39;,repos=NULL,type=&quot;source&quot;)</code></pre>
+<pre><code>Installing package into ‘/home/owen/R/x86_64-pc-linux-gnu-library/3.4’
+(as ‘lib’ is unspecified)
+trying URL &#39;https://cran.r-project.org/src/contrib/Archive/rgdal/rgdal_1.3-9.tar.gz&#39;
+Content type &#39;application/x-gzip&#39; length 1668195 bytes (1.6 MB)
+==================================================
+downloaded 1.6 MB
+
+
+.........(중략).........
+
+
+** preparing package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded
+* DONE (rgdal)</code></pre>
+</div>
+<div id="설치-성공" class="section level2">
+<h2>설치 성공</h2>
+<p>위의 패키지를 설치 하면서 실행을 해보면 다음과 같이 성공 메시지가 함께 출력된다.</p>
+<pre class="r"><code>library(rgdal)
+rgdal: version: 1.3-9, (SVN revision 794)
+ Geospatial Data Abstraction Library extensions to R successfully loaded
+ Loaded GDAL runtime: GDAL 2.2.3, released 2017/11/20
+ Path to GDAL shared files: /usr/share/gdal/2.2
+ GDAL binary built with GEOS: TRUE 
+ Loaded PROJ.4 runtime: Rel. 4.9.3, 15 August 2016, [PJ_VERSION: 493]
+ Path to PROJ.4 shared files: (autodetected)
+ Linking to sp version: 1.4-2 </code></pre>
+</div>
+<div id="rgdal을-사용한-좌표-변환" class="section level2">
+<h2>rgdal을 사용한 좌표 변환</h2>
+<p>이번엔 rgdal을 사용한 좌표를 변환 시켜 보자. 이 예시는 다음의 jahyun.koo님의 <a href="https://rpubs.com/KOOJA/coorinatesTransformationExample">Rpubs: R의 좌표계 변환하기</a> 그대로 참고 했음음 알리고 출처에도 남겨 두도록 하겠다.</p>
+<div id="rgdal-패키지-로드" class="section level3">
+<h3>rgdal 패키지 로드</h3>
+<pre class="r"><code>library(rgdal)</code></pre>
+<pre><code>## Loading required package: sp</code></pre>
+<pre><code>## rgdal: version: 1.3-9, (SVN revision 794)
+##  Geospatial Data Abstraction Library extensions to R successfully loaded
+##  Loaded GDAL runtime: GDAL 2.2.3, released 2017/11/20
+##  Path to GDAL shared files: /usr/share/gdal/2.2
+##  GDAL binary built with GEOS: TRUE 
+##  Loaded PROJ.4 runtime: Rel. 4.9.3, 15 August 2016, [PJ_VERSION: 493]
+##  Path to PROJ.4 shared files: (autodetected)
+##  Linking to sp version: 1.4-2</code></pre>
+</div>
+<div id="좌표변환-함수" class="section level3">
+<h3>좌표변환 함수</h3>
+<p>좌표변환 함수를 만들어놓자. convertCoordSystem()라는 함수로 만들어 둘것이며, 다음의 코드를 사용한다.</p>
+<ul>
+<li>parameter ** long : 경도 ** lat : 위도 ** from.crs : 갖고 있는 데이터 좌표계의 proj.4 인자 ** to.crs : 변환할 좌표계의 proj.4 인자</li>
+<li>return ** from.crs 좌표계 좌표를 to.crs 좌표계 좌표로 반환하여 data.frame 형식으로 반환한다.</li>
+</ul>
+<pre class="r"><code>convertCoordSystem &lt;- function(long, lat, from.crs, to.crs){
+  xy &lt;- data.frame(long=long, lat=lat)
+  coordinates(xy) &lt;- ~long+lat
+  
+  from.crs &lt;- CRS(from.crs)
+  from.coordinates &lt;- SpatialPoints(xy, proj4string=from.crs)
+  
+  to.crs &lt;- CRS(to.crs)
+  changed &lt;- as.data.frame(SpatialPoints(spTransform(from.coordinates, to.crs)))
+  names(changed) &lt;- c(&quot;long&quot;, &quot;lat&quot;)
+  
+  return(changed)
+}</code></pre>
+</div>
+<div id="테스트" class="section level3">
+<h3>테스트</h3>
+<pre class="r"><code>coord &lt;- data.frame(utmk.long=c(954677.6, 958869.4), utmk.lat=c(1951583, 1945669))
+from.crs = &quot;+proj=tmerc +lat_0=38 +lon_0=127.5 +k=0.9996 +x_0=1000000 +y_0=2000000 +ellps=GRS80 +units=m +no_defs&quot;
+
+to.crs = &quot;+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs&quot;
+coord &lt;- cbind(coord, convertCoordSystem(coord$utmk.long, coord$utmk.lat, from.crs, to.crs))</code></pre>
+</div>
+<div id="결과" class="section level3">
+<h3>결과</h3>
+<pre class="r"><code>coord</code></pre>
+<pre><code>##   utmk.long utmk.lat     long      lat
+## 1  954677.6  1951583 126.9868 37.56249
+## 2  958869.4  1945669 127.0346 37.50938</code></pre>
+</div>
+</div>
+</div>
+<div id="출처" class="section level1">
+<h1>출처</h1>
+<ul>
+<li>Rgdal 패키지 설치: <a href="https://www.marcc.jhu.edu/managing-r-packages-a-case-study/">Managing R Packages</a></li>
+<li>jahyun.koo님의 Rpubs: <a href="https://rpubs.com/KOOJA/coorinatesTransformationExample">R의 좌표계 변환하기</a></li>
+</ul>
+</div>
