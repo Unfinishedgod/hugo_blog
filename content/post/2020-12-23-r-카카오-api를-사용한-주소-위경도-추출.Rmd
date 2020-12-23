@@ -1,0 +1,67 @@
+---
+title: '[R] 카카오 API를 사용한 주소/위경도 추출'
+author: 최의용
+date: '2020-12-23'
+slug: r-카카오-api를-사용한-주소-위경도-추출
+categories:
+  - R
+tags:
+  - R
+  - API
+  - 주소
+  - 위경도
+---
+
+```{r}
+library(tidyverse)
+library(leaflet)
+library(DT)
+library(httr)
+library(jsonlite)
+library(glue)
+```
+
+
+```{r}
+
+# 지리정보 API를 사용한 위경도에서 주소 추출 함수
+Lat_lon_to_address_fun <- function(long, lat) {
+  data_list <-
+    GET(url = 'https://dapi.kakao.com/v2/local/geo/coord2regioncode.json',
+        # query = list(x = long, y= lat),
+        query = list(x = long, y= lat),
+        add_headers(Authorization = paste0("KakaoAK ", "2ecacbafd523802f293b245103346b06"))) %>%
+    content(as = 'text') %>%
+    fromJSON()
+
+  lon_lat_df <- tibble(
+    long = long,
+    lat = lat,
+    주소 = data_list$documents$address_name,
+    구 = data_list$documents$region_2depth_name,
+    동 = data_list$documents$region_3depth_name
+  ) %>%
+    head(1)
+
+  return(lon_lat_df)
+}
+
+
+# 지리정보 API를 사용한 위경도 추출
+Lat_lon_fun <- function(addr) {
+  data_list <-
+    GET(url = 'https://dapi.kakao.com/v2/local/search/address.json',
+        query = list(query = addr),
+        add_headers(Authorization = paste0("KakaoAK ", "2ecacbafd523802f293b245103346b06"))) %>% 
+    content(as = 'text') %>% 
+    fromJSON()
+  
+  
+  lon_lat_df <- tibble(주소 = addr, 
+                         long = as.numeric(data_list$documents$x), 
+                         lat = as.numeric(data_list$documents$y))
+  
+  return(lon_lat_df)
+}
+```
+
