@@ -1,7 +1,7 @@
 ---
 title: '[R] 카카오 API를 사용한 주소/위경도 추출'
 author: 최의용
-date: '2020-12-23'
+date: '2020-12-26'
 slug: r-카카오-api를-사용한-주소-위경도-추출
 categories:
   - R
@@ -12,15 +12,109 @@ tags:
   - 위경도
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE,  warning = FALSE,fig.align = "center")
+```
+
+카카오 API를 이용해 주소에서 위경도를, 위경도를 통해 주소를 추출해보자. 우선, 카카오에서 제공하는 API를 사용하기 위해 Kakao Developers에서 api키를 발급 받아야 한다. 다음의 주소를 참고 하여 API key를 발급 받자.
+
+ - 카카오 Developer 주소: [Kakao Developers](https://developers.kakao.com/console/app)
+
+이곳에서 사용할 API키는 `REST API 키`를 참고 하도록 하자. 이번에 사용할 API이다.
+
+<center>
+![](/post/2020-12-23-r-카카오-api를-사용한-주소-위경도-추출_files/api.PNG){width=80%}
+</center>
+
+## 1. 카카오 지도 API 문서
+
+이제 카카오 지도 api의 문서를 확인하자. api를 사용하는 디테일한 방법은 생략한다. 
+
+ - [개발 가이드](https://developers.kakao.com/docs/latest/ko/local/dev-guide)
+
 ```{r}
 library(tidyverse)
 library(leaflet)
-library(DT)
 library(httr)
 library(jsonlite)
 library(glue)
 ```
 
+```{r echo=FALSE}
+api_key <- "2ecacbafd523802f293b245103346b06"
+```
+
+### API Key 세팅
+
+우선 다음과 같이 카카오 에서 발급받은 `REST API 키`를 다음과 같이 지정해주도록 하자.
+
+```api_key <- "api key 입력"```
+
+## 2. 지리정보 API를 사용해 주소에서 위경도에서 추출
+
+이제 GET()함수를 통해 다음과 같이 api를 호출 해주자. 주소는 남산을 택했으며 남산의 주소를 검색 결과 "서울 중구 회형동1가"로 나오게 되어 이곳의 위경도를 추출하려고 한다. api문서에서는 다음에 위치 한다.
+ 
+ - [개발가이드 - 주소 검색](https://developers.kakao.com/docs/latest/ko/local/dev-guide#address-coord)
+
+```{r}
+addr <- "서울 중구 회현동1가"
+
+GET(url = 'https://dapi.kakao.com/v2/local/search/address.json',
+    query = list(query = addr),
+    add_headers(Authorization = paste0("KakaoAK ", api_key))) %>% 
+  content(as = 'text') %>% 
+  fromJSON()
+```
+
+### 2-1. 위경도 추출 함수
+
+위 방법은 통해 함수를 생성해주자. 함수를 생성해서, 나중에도 자주 쓸수 있도록 하기 위함이다. GET()함수를 통해 얻은 결과를 data_list로 지정 했으며 이에 대한 결과를 주소와, 위도, 경도를 출력하도록 함수를 생성해두었다.
+
+```{r}
+# 지리정보 API를 사용한 주소에서 위경도 추출
+addr_lat_lon_fun <- function(addr) {
+  data_list <-
+    GET(url = 'https://dapi.kakao.com/v2/local/search/address.json',
+        query = list(query = addr),
+        add_headers(Authorization = paste0("KakaoAK ", api_key))) %>% 
+    content(as = 'text') %>% 
+    fromJSON()
+  
+  
+  lon_lat_df <- tibble(주소 = addr, 
+                         long = as.character(data_list$documents$x), 
+                         lat = as.character(data_list$documents$y))
+  
+  return(lon_lat_df)
+}
+```
+
+이렇게 만든 addr_lat_lon_fun()함수를 통해 남산의 위경도틀 추출하면 다음과 같은 결과가 나오게 된다.
+
+```{r}
+addr_lat_lon_fun("서울 중구 회현동1가")
+```
+
+## 3. 지리정보 API를 사용한 위경도에서 주소 추출 함수
+
+이번에는 역으로 위경도에서 주소를 추출해보자. 직전에 사용한 남산의 위경도를 추출 했으니 이를 그대로 사용하도록 한다.  api문서에서는 다음에 위치 한다.
+ 
+ - [개발가이드- 좌표로 주소 변환하기](https://developers.kakao.com/docs/latest/ko/local/dev-guide#coord-to-address)
+
+```{r}
+long <- 126.981204133005	
+lat <- 37.5555892070291
+
+GET(url = 'https://dapi.kakao.com/v2/local/geo/coord2regioncode.json',
+    query = list(x = long, y= lat),
+    add_headers(Authorization = paste0("KakaoAK ", api_key))) %>%
+  content(as = 'text') %>%
+  fromJSON()
+```
+
+### 3-1. 주소 추출 함수
+
+이번에도 함수를 생성해주자. 함수를 생성해서, 나중에도 자주 쓸수 있도록 하기 위함이다. GET()함수를 통해 얻은 결과를 data_list로 지정 했으며 이에 대한 결과를 위도, 경도, 수도, 구 동을 출력하도록 함수를 생성해두었다.
 
 ```{r}
 
@@ -30,10 +124,10 @@ Lat_lon_to_address_fun <- function(long, lat) {
     GET(url = 'https://dapi.kakao.com/v2/local/geo/coord2regioncode.json',
         # query = list(x = long, y= lat),
         query = list(x = long, y= lat),
-        add_headers(Authorization = paste0("KakaoAK ", "2ecacbafd523802f293b245103346b06"))) %>%
+        add_headers(Authorization = paste0("KakaoAK ", api_key))) %>%
     content(as = 'text') %>%
     fromJSON()
-
+  
   lon_lat_df <- tibble(
     long = long,
     lat = lat,
@@ -42,26 +136,16 @@ Lat_lon_to_address_fun <- function(long, lat) {
     동 = data_list$documents$region_3depth_name
   ) %>%
     head(1)
-
-  return(lon_lat_df)
-}
-
-
-# 지리정보 API를 사용한 위경도 추출
-Lat_lon_fun <- function(addr) {
-  data_list <-
-    GET(url = 'https://dapi.kakao.com/v2/local/search/address.json',
-        query = list(query = addr),
-        add_headers(Authorization = paste0("KakaoAK ", "2ecacbafd523802f293b245103346b06"))) %>% 
-    content(as = 'text') %>% 
-    fromJSON()
-  
-  
-  lon_lat_df <- tibble(주소 = addr, 
-                         long = as.numeric(data_list$documents$x), 
-                         lat = as.numeric(data_list$documents$y))
   
   return(lon_lat_df)
 }
 ```
 
+이렇게 만든 Lat_lon_to_address_fun()함수를 통해 남산의 위경도틀 추출하면 다음과 같은 결과가 나오게 된다.
+
+```{r}
+Lat_lon_to_address_fun(126.981204133005, 37.5555892070291)
+```
+## 총평
+
+최종적으로 카카오 api를 통해 주소에서 위경도를, 위경도에서 주소를 추출하는 방법을 알아보았다. 지난동안 계송 정리를 안해두어서 찾느라 고생을 하긴 했었는데, 이번을 계기로 쉽게 찾을수 있을것 같다.
