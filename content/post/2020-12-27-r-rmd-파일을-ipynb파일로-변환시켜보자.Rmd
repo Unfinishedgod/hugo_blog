@@ -1,0 +1,58 @@
+---
+title: '[R] Rmd 파일을 ipynb파일로 변환시켜보자'
+author: 최의용
+date: '2020-12-27'
+slug: r-rmd-파일을-ipynb파일로-변환시켜보자
+categories:
+  - AWS
+  - R
+tags:
+  - R
+  - Rmd
+  - ipynb
+---
+
+한국의 대이터 분석 경연대회인 Dacon이라는 곳이 있다. Dacon에서의 제출 방식은 현재 `.ipynb`, `태블로`이고 이중 `.ipynb`는 R/Python모두를 지원하고 있다. 그러나, 기존에 R을 쓰는 사람에게서 주피터를 사용하는게 꽤 번거롭기도 하고 이미 `.Rmd`에서 사용하는게 익숙하기도 하다. 그러다 찾아보니 Rmd를 ipynb로 변환 시켜주는 패키지가 있어 이를 소개 하려고 한다. `rmd2jupyter`이라는 패키지이고 이에대한 출처는 다음과 같다. 
+
+ - [`Convert Rmd (rmarkdown) to ipynb (Jupyter notebook)`](https://laptrinhx.com/convert-rmd-rmarkdown-to-ipynb-jupyter-notebook-574451390/)
+
+방법은 매우 간단해서 패키지를 설치 하고 변환 하는데까지 그리 오랜시간이 걸리지 않는다. 이렇게 변환한 파일을 dacon에 업로드 하는것까지 해서 마무리를 지어보려 한다.
+
+
+ 
+# 1. 패키지 설치
+
+우선 다음과 같이 패키지를 설치 해주자. `devtools`패키지가 없으면 `devtools`패키지까지 설치.
+
+```
+devtools::install_github("mkearney/rmd2jupyter")
+library(rmd2jupyter)
+```
+
+# 2. 파일 변환
+
+<center>
+![](/post/2020-12-27-r-rmd-파일을-ipynb파일로-변환시켜보자_files/rmd2jupyter.PNG){width=80%}
+</center>
+
+우선 다음과 같은 `rmd2jupyter_test.Rmd`라는 기본형태의 Rmd를 생성해두었다. 그리고 이를 rmd2jupyter()함수를 통해 실행하면 `rmd2jupyter_test.ipynb`라는 `.ipynb`의 확장자를 가진 새로운 파일이 생성된다.
+
+```
+rmd2jupyter("rmd2jupyter_test.Rmd")
+```
+
+# 3. Dacon 업로드
+
+<center>
+![](/post/2020-12-27-r-rmd-파일을-ipynb파일로-변환시켜보자_files/dacon_upload.PNG){width=90%}
+</center>
+
+이렇게 생성된 `rmd2jupyter_test.ipynb`파일이 데이콘에 정상적인 업로가 되었음을 확인할수 있다.
+
+# 총평 
+
+Dacon에Rmd업로드에 대한 요청에, 아직은 기술적으로 어려움이 있다는 글을 봤었다. 그래서 그동안은 jupyter에서 R을 사용하는 방법을 선택해왔는데, 이번에 rmd에서 ipynb로 변환하는 방법을 알게 되었으니 조금더 접근 하기 좋을거라고 생각해본다.
+
+
+
+

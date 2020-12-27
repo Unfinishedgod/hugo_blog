@@ -1,0 +1,85 @@
+---
+title: '[R] 카카오 API를 사용한 주소/위경도 추출'
+author: 최의용
+date: '2020-12-23'
+slug: r-카카오-api를-사용한-주소-위경도-추출
+categories:
+  - R
+tags:
+  - R
+  - API
+  - 주소
+  - 위경도
+---
+
+
+
+<pre class="r"><code>library(tidyverse)
+library(httr)
+library(jsonlite)
+library(glue)</code></pre>
+<pre class="r"><code>addr &lt;- &quot;서울시&quot;
+# 지리정보 API를 사용한 위경도 추출
+GET(url = &#39;https://dapi.kakao.com/v2/local/search/address.json&#39;,
+    query = list(query = addr),
+    add_headers(Authorization = paste0(&quot;KakaoAK &quot;, &quot;2ecacbafd523802f293b245103346b06&quot;))) %&gt;% 
+  content(as = &#39;text&#39;) %&gt;% 
+  fromJSON()</code></pre>
+<pre><code>## $documents
+##   address.address_name address.b_code address.h_code address.main_address_no
+## 1                 서울     1100000000     1100000000                        
+##   address.mountain_yn address.region_1depth_name address.region_2depth_name
+## 1                   N                       서울                           
+##   address.region_3depth_h_name address.region_3depth_name
+## 1                                                        
+##   address.sub_address_no        address.x       address.y address_name
+## 1                        126.978652258309 37.566826004661         서울
+##   address_type road_address                x               y
+## 1       REGION           NA 126.978652258309 37.566826004661
+## 
+## $meta
+## $meta$is_end
+## [1] TRUE
+## 
+## $meta$pageable_count
+## [1] 1
+## 
+## $meta$total_count
+## [1] 1</code></pre>
+<pre class="r"><code># 지리정보 API를 사용한 위경도 추출
+Lat_lon_fun &lt;- function(addr) {
+  data_list &lt;-
+    GET(url = &#39;https://dapi.kakao.com/v2/local/search/address.json&#39;,
+        query = list(query = addr),
+        add_headers(Authorization = paste0(&quot;KakaoAK &quot;, &quot;2ecacbafd523802f293b245103346b06&quot;))) %&gt;% 
+    content(as = &#39;text&#39;) %&gt;% 
+    fromJSON()
+  
+  
+  lon_lat_df &lt;- tibble(주소 = addr, 
+                         long = as.numeric(data_list$documents$x), 
+                         lat = as.numeric(data_list$documents$y))
+  
+  return(lon_lat_df)
+}</code></pre>
+<pre class="r"><code># 지리정보 API를 사용한 위경도에서 주소 추출 함수
+Lat_lon_to_address_fun &lt;- function(long, lat) {
+  data_list &lt;-
+    GET(url = &#39;https://dapi.kakao.com/v2/local/geo/coord2regioncode.json&#39;,
+        # query = list(x = long, y= lat),
+        query = list(x = long, y= lat),
+        add_headers(Authorization = paste0(&quot;KakaoAK &quot;, &quot;2ecacbafd523802f293b245103346b06&quot;))) %&gt;%
+    content(as = &#39;text&#39;) %&gt;%
+    fromJSON()
+  
+  lon_lat_df &lt;- tibble(
+    long = long,
+    lat = lat,
+    주소 = data_list$documents$address_name,
+    구 = data_list$documents$region_2depth_name,
+    동 = data_list$documents$region_3depth_name
+  ) %&gt;%
+    head(1)
+  
+  return(lon_lat_df)
+}</code></pre>
