@@ -13,14 +13,7 @@ tags:
 ---
 
 ```{r setup, include=FALSE}
-<<<<<<< HEAD
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.align = "center")
-```
-
-```{r}
-library(tidyverse)
-=======
-knitr::opts_chunk$set(echo = TRUE, message = FALSE,  warning = FALSE,fig.align = "center")
 ```
 
 카카오 API를 이용해 주소에서 위경도를, 위경도를 통해 주소를 추출해보자. 우선, 카카오에서 제공하는 API를 사용하기 위해 Kakao Developers에서 api키를 발급 받아야 한다. 다음의 주소를 참고 하여 API key를 발급 받자.
@@ -42,7 +35,6 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE,  warning = FALSE,fig.align =
 ```{r}
 library(tidyverse)
 library(leaflet)
->>>>>>> 94b671aea808db1c048f9dcecfb3b06e0bc22129
 library(httr)
 library(jsonlite)
 library(glue)
@@ -187,8 +179,8 @@ Lat_lon_to_address_fun <- function(long, lat) {
 =======
 ```{r}
 Lat_lon_to_address_fun(126.981204133005, 37.5555892070291)
->>>>>>> 94b671aea808db1c048f9dcecfb3b06e0bc22129
 ```
+
 ## 총평
 
 최종적으로 카카오 api를 통해 주소에서 위경도를, 위경도에서 주소를 추출하는 방법을 알아보았다. 지난동안 계송 정리를 안해두어서 찾느라 고생을 하긴 했었는데, 이번을 계기로 쉽게 찾을수 있을것 같다.
