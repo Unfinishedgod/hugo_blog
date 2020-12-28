@@ -174,9 +174,6 @@ Lat_lon_to_address_fun <- function(long, lat) {
 
 이렇게 만든 Lat_lon_to_address_fun()함수를 통해 남산의 위경도틀 추출하면 다음과 같은 결과가 나오게 된다.
 
-<<<<<<< HEAD
-
-=======
 ```{r}
 Lat_lon_to_address_fun(126.981204133005, 37.5555892070291)
 ```
