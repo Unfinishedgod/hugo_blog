@@ -94,15 +94,17 @@ Titanic > Notebook 메뉴를 보자. 다른사람들이 작업한 결과들을 �
   - Recently Run: 최근에 코드가 실행된 순서대로
 
 <center>
-![](/images/image_file/Kaggle_beginner_guide/kaggle_notebook_guide.png){#id .class width="80%"}
+![](/post/2020-03-22-kaggle-beginner-guide_files/kaggle_filter.PNG){width=100%}
 </center>
+
+
 
 ### **Step 2**
 
 카테고리별로 필터링과 순서를 잘 설정 해놓으면 사람들이 했던 노트북이 나오게 된다. 이는 많은 사람들에게 인정을 받은 노트북이라 잘 참고할 필요가 있다. 이제 이 상위 n개의 노트북을 모두 클릭클릭클릭.
 
 <center>
-![](/images/image_file/Kaggle_beginner_guide/kaggle_notebook_list.png){#id .class width="80%"}
+![](/post/2020-03-22-kaggle-beginner-guide_files/kaggle_click.PNG){width=80%}
 </center>
 
 ### **Step 3**
@@ -110,7 +112,7 @@ Titanic > Notebook 메뉴를 보자. 다른사람들이 작업한 결과들을 �
 클릭해서 다른사람들은 어떻게 접근을 했는지 코드를 보자. 같은 타이타닉 주제로도 코드 형식이나 전개 방법들이 모두 다르다. **이를 모두 꼼꼼하게 공부 해보는게 가장 중요하다.**
 
 <center>
-![](/images/image_file/Kaggle_beginner_guide/kaggle_notebooks.png){#id .class width="80%"}
+![](/images/image_file/Kaggle_beginner_guide/kaggle_notebooks.PNG){#id .class width="80%"}
 </center>
 
 ## **제출**
@@ -122,7 +124,7 @@ Titanic > Notebook 메뉴를 보자. 다른사람들이 작업한 결과들을 �
 - 제출하면 점수가 나오는데 점수가 좋게 나오지 않으면 다시 이전으로 돌아가서 Best score 순서대로 notebook를 보자. 다른사람들은 어떻게 점수를 높혔는지 공부할수 있는 좋은 기회가 된다.
 
 <center>
-![](/images/image_file/Kaggle_beginner_guide/submit_data.png){#id .class width="80%"}
+![](/images/image_file/Kaggle_beginner_guide/submit_data.PNG){#id .class width="80%"}
 </center>
 
 ## **Notebook 작성**
@@ -168,6 +170,7 @@ Commit 버튼을 누르면 다음의 창이 나오게 되는데, 코드의 실�
 <center>
 ![](/images/image_file/Kaggle_beginner_guide/create_notebook_4.PNG){#id .class width="80%"}
 </center>
+
 
 ### **Step 5**
 
