@@ -10,52 +10,88 @@ tags:
   - R
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE,  warning = FALSE,fig.align = "center")
+```
+
+<p align="center">
+<img src="/post/2021-01-09-r을-이용한-퀀트-투자-포트폴리오-만들기-리뷰-1_files/quant_2.jpg" width="200" height="300"><br>
+<b>출처(책): [R을 이용한 퀀트 투자 포트폴리오 만들기](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=262577612)</b><br>
+<b>출처(Web): [R을 이용한 퀀트 투자 포트폴리오 만들기](https://hyunyulhenry.github.io/quant_cookbook/)</b><br>
+<b>Fast campus강의: [R을 활용한 퀀트 전략 구현 올인원 패키지 Online.](https://www.fastcampus.co.kr/data_online_fin/?utm_source=teacher&utm_medium=blog&utm_campaign=data_online_fin&utm_content=posting_2020053&utm_expid=.Zp_J6_qjR5KOvw4Ou4dwBA.0&utm_referrer=https%3A%2F%2Fhyunyulhenry.github.io%2F)</b><br>
+</p>
+
+[R을 이용한 퀀트 투자 포트폴리오]를 따라 해보는 두번째 리뷰. 지난번에 첫번째 리뷰를 하고나서 몇가지가 변하게 되었다. 개정판이 나온것. 기존의 파란색에서 초록색으로 바뀌었으며, 내용이 조금 더 추가가 되었으니 이제는 개정판에 맞추어서 하나씩 따라 써보려 한다. 이번에 작성해보려 하는것은 [네이버금융](https://finance.naver.com/sise/sise_market_sum.nhn)에서 회사들의 시가총액을 가져와 데이터로 구성 하는 부분이다. 책에서는 [CHAPTER 4장의 크롤링 이해하기](https://hyunyulhenry.github.io/quant_cookbook/%ED%81%AC%EB%A1%A4%EB%A7%81-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0.html) 파트이다. 크롤링에 대한 자세한 설명은 위의 CHAPTER 4장을 참고 하면 된다.
+
+## 코스피 시가총액
+
+우선 네이버금융에서 코스피의 시가총액을 가져와 보자. [네이버금융-시가총액](https://finance.naver.com/sise/sise_market_sum.nhn?sosok=0&page=1) 이곳에 있는 시가총액을 가져오려고 한다.
 
 ```{r}
 library(tidyverse)
 library(rvest)
+library(glue)
 
 df_info <- c()
-for(x in 1:32) {
-  print(x)
-  url <- glue("https://finance.naver.com/sise/sise_market_sum.nhn?&page={x}")
+for(x in 1:5) {
   
+  # url생성
+  # glue()함수와 page에 숫자를 붙혀 반복적으로 url을 변경할 예정
+  url <- glue("https://finance.naver.com/sise/sise_market_sum.nhn?sosok=0&page={x}")
+  
+  # 생성된 url에 read_html()함수와, html_table()함수를 통해 Table데이터 수집
   df <- url %>% 
     read_html(encoding = "EUC-KR") %>% 
-    # html_nodes(".box_type_l") %>% 
     html_table(fill = TRUE)
   
+  # 이중에 시가총액에 해당하는 데이터는 두번째 리스트에 있는 데이터이기 때문에 df[[2]]를 선택
   df <- df[[2]] %>% 
     as_tibble() 
+  
   df_info <- rbind(df_info, df)
 }
 
+# 이렇게 생성된 데이터는 df_info라고 정함 
+# N컬럼(기업순위)가 비어있는 데이터는 제거 
+# 토론실 컬럼도 제거
 df_info <- df_info %>% 
-  filter(!is.na(df_info$N))
+  filter(!is.na(df_info$N)) %>% 
+  select(-토론실)
 
-df_info <-  read_csv("dataset/df_ticker_info.csv")
+df_info 
+```
 
+## 코스피 종목 코드
 
+이번에는 코스피의 종복코드를 가져와 보자. 영어로는 ticker라고 한다.
+
+```{r}
 ticker_df <- c()
-for(i in 1:32) {
-  url <- glue("https://finance.naver.com/sise/sise_market_sum.nhn?&page={i}")
+for(i in 1:5) {
   
+  # url생성
+  # glue()함수와 page에 숫자를 붙혀 반복적으로 url을 변경할 예정
+  url <- glue("https://finance.naver.com/sise/sise_market_sum.nhn?sosok=0&page={i}")
+  
+  # 생성된 url에서 read_html(), html_nodes()를 사용해 종목코드(ticker)와 종목명 구성
   ticker_set <- url %>% 
     read_html(encoding = "EUC-KR") %>% 
     html_nodes(".type_2") %>% 
     html_nodes("a") 
   
+  # ticker_name라고 종목명 데이터 선택
   ticker_name <- ticker_set %>% 
     html_text()
   
+  # ticker_code라고 종목 코드 구성
   ticker_code <- ticker_set %>% 
     html_attr("href") %>% 
     str_remove_all("\\D")
   
-  
+  # 생성된 종목명과, 종목코드는 data.frame로 구성
   ticker_df_1 <- data.frame(
-    "醫낅ぉ紐? = ticker_name,
-    "醫낅ぉ肄붾뱶" = ticker_code
+    "종목명" = ticker_name,
+    "종목코드" = ticker_code
   ) 
   
   ticker_df <- rbind(ticker_df, ticker_df_1)
@@ -64,19 +100,36 @@ for(i in 1:32) {
 ticker_df <- ticker_df %>% 
   as_tibble() 
 
-
-ticker_df$醫낅ぉ紐?<- ticker_df$醫낅ぉ紐?%>% as.character()
+ticker_df$종목코드 <- ticker_df$종목코드 %>% as.character()
+ticker_df$종목명 <- ticker_df$종목명 %>% as.character()
 
 ticker_df <- ticker_df %>% 
-  filter(nchar(醫낅ぉ紐? != 0)
+  filter(nchar(종목명) != 0)
 
-
-df_ticker_info <- df_info %>% 
-  left_join(ticker_df) %>% 
-  select(-?좊줎??
-
-df_ticker_info %>% 
-  write_excel_csv("dataset/df_ticker_info.csv")
-
+ticker_df
 ```
 
+## 시가총액과, 종목코드 join
+
+이렇개 생성된 시가총액 데이터와, 종목코드 데이터를 join시켜주자 left_join()함수를 사용했으며 이때 사용한 키값은 `종목명`으로 해두었다.
+
+```{r}
+df_ticker_info <- df_info %>% 
+  left_join(ticker_df) 
+```
+
+```{r}
+df_ticker_info 
+```
+
+
+## 코스닥
+
+코스닥 역시 코스피와 동일한 방법으로 진행 하면 된다. url의 번호만 달라지는데 코스피의 경우 sosok=0이고, 코스닥의 경우 sosok=1로 진행해주면 된다.
+
+- 코스피: https://finance.naver.com/sise/sise_market_sum.nhn?sosok=0&page=1
+- 코스닥: https://finance.naver.com/sise/sise_market_sum.nhn?sosok=1&page=1
+
+# 총평
+
+이렇게 [R을 이용한 퀀트 투자 포트폴리오 만들기]의 두번째 리뷰를 진행하게 되었다. 지난 블로그 이후 한달도 좀 더 지나서 쓴 만큼 속도를 더 내어야 마무리를 지을수 있을거 같은데, 아마 3월 안에는 전부 정리해서 올려보도록 해야 겠다.

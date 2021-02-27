@@ -1,0 +1,164 @@
+---
+title: '[R을 이용한 퀀트 투자 포트폴리오 만들기] 리뷰-2'
+author: 최의용
+date: '2021-02-27'
+slug: r을-이용한-퀀트-투자-포트폴리오-만들기-리뷰-2
+categories:
+  - R
+  - quant
+tags:
+  - R
+---
+
+
+
+<p align="center">
+<img src="/post/2021-01-09-r을-이용한-퀀트-투자-포트폴리오-만들기-리뷰-1_files/quant_2.jpg" width="200" height="300"><br>
+<b>출처(책): <a href="https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=262577612">R을 이용한 퀀트 투자 포트폴리오 만들기</a></b><br>
+<b>출처(Web): <a href="https://hyunyulhenry.github.io/quant_cookbook/">R을 이용한 퀀트 투자 포트폴리오 만들기</a></b><br>
+<b>Fast campus강의: <a href="https://www.fastcampus.co.kr/data_online_fin/?utm_source=teacher&amp;utm_medium=blog&amp;utm_campaign=data_online_fin&amp;utm_content=posting_2020053&amp;utm_expid=.Zp_J6_qjR5KOvw4Ou4dwBA.0&amp;utm_referrer=https%3A%2F%2Fhyunyulhenry.github.io%2F">R을 활용한 퀀트 전략 구현 올인원 패키지 Online.</a></b><br>
+</p>
+<p>[R을 이용한 퀀트 투자 포트폴리오]를 따라 해보는 두번째 리뷰. 지난번에 첫번째 리뷰를 하고나서 몇가지가 변하게 되었다. 개정판이 나온것. 기존의 파란색에서 초록색으로 바뀌었으며, 내용이 조금 더 추가가 되었으니 이제는 개정판에 맞추어서 하나씩 따라 써보려 한다. 이번에 작성해보려 하는것은 <a href="https://finance.naver.com/sise/sise_market_sum.nhn">네이버금융</a>에서 회사들의 시가총액을 가져와 데이터로 구성 하는 부분이다. 책에서는 <a href="https://hyunyulhenry.github.io/quant_cookbook/%ED%81%AC%EB%A1%A4%EB%A7%81-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0.html">CHAPTER 4장의 크롤링 이해하기</a> 파트이다. 크롤링에 대한 자세한 설명은 위의 CHAPTER 4장을 참고 하면 된다.</p>
+<div id="코스피-시가총액" class="section level2">
+<h2>코스피 시가총액</h2>
+<p>우선 네이버금융에서 코스피의 시가총액을 가져와 보자. <a href="https://finance.naver.com/sise/sise_market_sum.nhn?sosok=0&amp;page=1">네이버금융-시가총액</a> 이곳에 있는 시가총액을 가져오려고 한다.</p>
+<pre class="r"><code>library(tidyverse)
+library(rvest)
+library(glue)
+
+df_info &lt;- c()
+for(x in 1:5) {
+  
+  # url생성
+  # glue()함수와 page에 숫자를 붙혀 반복적으로 url을 변경할 예정
+  url &lt;- glue(&quot;https://finance.naver.com/sise/sise_market_sum.nhn?sosok=0&amp;page={x}&quot;)
+  
+  # 생성된 url에 read_html()함수와, html_table()함수를 통해 Table데이터 수집
+  df &lt;- url %&gt;% 
+    read_html(encoding = &quot;EUC-KR&quot;) %&gt;% 
+    html_table(fill = TRUE)
+  
+  # 이중에 시가총액에 해당하는 데이터는 두번째 리스트에 있는 데이터이기 때문에 df[[2]]를 선택
+  df &lt;- df[[2]] %&gt;% 
+    as_tibble() 
+  
+  df_info &lt;- rbind(df_info, df)
+}
+
+# 이렇게 생성된 데이터는 df_info라고 정함 
+# N컬럼(기업순위)가 비어있는 데이터는 제거 
+# 토론실 컬럼도 제거
+df_info &lt;- df_info %&gt;% 
+  filter(!is.na(df_info$N)) %&gt;% 
+  select(-토론실)
+
+df_info </code></pre>
+<pre><code>## # A tibble: 250 x 12
+##        N 종목명 현재가 전일비 등락률 액면가 시가총액 상장주식수 외국인비율
+##    &lt;int&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt;           &lt;dbl&gt;
+##  1     1 삼성전자… 82,500 2,800  -3.28% 100    4,925,0… 5,969,783        54.9
+##  2     2 SK하이닉… 141,5… 7,000  -4.71% 5,000  1,030,1… 728,002          50.7
+##  3     3 NAVER  375,0… 8,000  -2.09% 100    615,988  164,263          57.3
+##  4     4 삼성전자우… 72,800 1,300  -1.75% 100    599,062  822,887          78.8
+##  5     5 LG화학 831,0… 59,000 -6.63% 5,000  586,622  70,592           44.9
+##  6     6 현대차 237,0… 8,000  -3.27% 5,000  506,394  213,668          31.1
+##  7     7 삼성바이오… 750,0… 25,000 -3.23% 2,500  496,238  66,165           10.5
+##  8     8 삼성SDI… 674,0… 30,000 -4.26% 5,000  463,473  68,765           44.0
+##  9     9 카카오 488,0… 3,500  +0.72% 500    432,749  88,678           34.2
+## 10    10 셀트리온… 297,5… 10,500 -3.41% 1,000  401,707  135,028          21.3
+## # … with 240 more rows, and 3 more variables: 거래량 &lt;chr&gt;, PER &lt;chr&gt;,
+## #   ROE &lt;chr&gt;</code></pre>
+</div>
+<div id="코스피-종목-코드" class="section level2">
+<h2>코스피 종목 코드</h2>
+<p>이번에는 코스피의 종복코드를 가져와 보자. 영어로는 ticker라고 한다.</p>
+<pre class="r"><code>ticker_df &lt;- c()
+for(i in 1:5) {
+  
+  # url생성
+  # glue()함수와 page에 숫자를 붙혀 반복적으로 url을 변경할 예정
+  url &lt;- glue(&quot;https://finance.naver.com/sise/sise_market_sum.nhn?sosok=0&amp;page={i}&quot;)
+  
+  # 생성된 url에서 read_html(), html_nodes()를 사용해 종목코드(ticker)와 종목명 구성
+  ticker_set &lt;- url %&gt;% 
+    read_html(encoding = &quot;EUC-KR&quot;) %&gt;% 
+    html_nodes(&quot;.type_2&quot;) %&gt;% 
+    html_nodes(&quot;a&quot;) 
+  
+  # ticker_name라고 종목명 데이터 선택
+  ticker_name &lt;- ticker_set %&gt;% 
+    html_text()
+  
+  # ticker_code라고 종목 코드 구성
+  ticker_code &lt;- ticker_set %&gt;% 
+    html_attr(&quot;href&quot;) %&gt;% 
+    str_remove_all(&quot;\\D&quot;)
+  
+  # 생성된 종목명과, 종목코드는 data.frame로 구성
+  ticker_df_1 &lt;- data.frame(
+    &quot;종목명&quot; = ticker_name,
+    &quot;종목코드&quot; = ticker_code
+  ) 
+  
+  ticker_df &lt;- rbind(ticker_df, ticker_df_1)
+}
+
+ticker_df &lt;- ticker_df %&gt;% 
+  as_tibble() 
+
+ticker_df$종목코드 &lt;- ticker_df$종목코드 %&gt;% as.character()
+ticker_df$종목명 &lt;- ticker_df$종목명 %&gt;% as.character()
+
+ticker_df &lt;- ticker_df %&gt;% 
+  filter(nchar(종목명) != 0)
+
+ticker_df</code></pre>
+<pre><code>## # A tibble: 250 x 2
+##    종목명           종목코드
+##    &lt;chr&gt;            &lt;chr&gt;   
+##  1 삼성전자         005930  
+##  2 SK하이닉스       000660  
+##  3 NAVER            035420  
+##  4 삼성전자우       005935  
+##  5 LG화학           051910  
+##  6 현대차           005380  
+##  7 삼성바이오로직스 207940  
+##  8 삼성SDI          006400  
+##  9 카카오           035720  
+## 10 셀트리온         068270  
+## # … with 240 more rows</code></pre>
+</div>
+<div id="시가총액과-종목코드-join" class="section level2">
+<h2>시가총액과, 종목코드 join</h2>
+<p>이렇개 생성된 시가총액 데이터와, 종목코드 데이터를 join시켜주자 left_join()함수를 사용했으며 이때 사용한 키값은 <code>종목명</code>으로 해두었다.</p>
+<pre class="r"><code>df_ticker_info &lt;- df_info %&gt;% 
+  left_join(ticker_df) </code></pre>
+<pre class="r"><code>df_ticker_info </code></pre>
+<pre><code>## # A tibble: 250 x 13
+##        N 종목명 현재가 전일비 등락률 액면가 시가총액 상장주식수 외국인비율
+##  * &lt;int&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt;           &lt;dbl&gt;
+##  1     1 삼성전자… 82,500 2,800  -3.28% 100    4,925,0… 5,969,783        54.9
+##  2     2 SK하이닉… 141,5… 7,000  -4.71% 5,000  1,030,1… 728,002          50.7
+##  3     3 NAVER  375,0… 8,000  -2.09% 100    615,988  164,263          57.3
+##  4     4 삼성전자우… 72,800 1,300  -1.75% 100    599,062  822,887          78.8
+##  5     5 LG화학 831,0… 59,000 -6.63% 5,000  586,622  70,592           44.9
+##  6     6 현대차 237,0… 8,000  -3.27% 5,000  506,394  213,668          31.1
+##  7     7 삼성바이오… 750,0… 25,000 -3.23% 2,500  496,238  66,165           10.5
+##  8     8 삼성SDI… 674,0… 30,000 -4.26% 5,000  463,473  68,765           44.0
+##  9     9 카카오 488,0… 3,500  +0.72% 500    432,749  88,678           34.2
+## 10    10 셀트리온… 297,5… 10,500 -3.41% 1,000  401,707  135,028          21.3
+## # … with 240 more rows, and 4 more variables: 거래량 &lt;chr&gt;, PER &lt;chr&gt;,
+## #   ROE &lt;chr&gt;, 종목코드 &lt;chr&gt;</code></pre>
+</div>
+<div id="코스닥" class="section level2">
+<h2>코스닥</h2>
+<p>코스닥 역시 코스피와 동일한 방법으로 진행 하면 된다. url의 번호만 달라지는데 코스피의 경우 sosok=0이고, 코스닥의 경우 sosok=1로 진행해주면 된다.</p>
+<ul>
+<li>코스피: <a href="https://finance.naver.com/sise/sise_market_sum.nhn?sosok=0&amp;page=1" class="uri">https://finance.naver.com/sise/sise_market_sum.nhn?sosok=0&amp;page=1</a></li>
+<li>코스닥: <a href="https://finance.naver.com/sise/sise_market_sum.nhn?sosok=1&amp;page=1" class="uri">https://finance.naver.com/sise/sise_market_sum.nhn?sosok=1&amp;page=1</a></li>
+</ul>
+</div>
+<div id="총평" class="section level1">
+<h1>총평</h1>
+<p>이렇게 [R을 이용한 퀀트 투자 포트폴리오 만들기]의 두번째 리뷰를 진행하게 되었다. 지난 블로그 이후 한달도 좀 더 지나서 쓴 만큼 속도를 더 내어야 마무리를 지을수 있을거 같은데, 아마 3월 안에는 전부 정리해서 올려보도록 해야 겠다.</p>
+</div>
