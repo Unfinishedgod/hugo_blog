@@ -1,0 +1,82 @@
+---
+title: '[R을 이용한 퀀트 투자 포트폴리오 만들기] 리뷰-2'
+author: 최의용
+date: '2021-02-27'
+slug: r을-이용한-퀀트-투자-포트폴리오-만들기-리뷰-2
+categories:
+  - R
+  - quant
+tags:
+  - R
+---
+
+
+```{r}
+library(tidyverse)
+library(rvest)
+
+df_info <- c()
+for(x in 1:32) {
+  print(x)
+  url <- glue("https://finance.naver.com/sise/sise_market_sum.nhn?&page={x}")
+  
+  df <- url %>% 
+    read_html(encoding = "EUC-KR") %>% 
+    # html_nodes(".box_type_l") %>% 
+    html_table(fill = TRUE)
+  
+  df <- df[[2]] %>% 
+    as_tibble() 
+  df_info <- rbind(df_info, df)
+}
+
+df_info <- df_info %>% 
+  filter(!is.na(df_info$N))
+
+df_info <-  read_csv("dataset/df_ticker_info.csv")
+
+
+ticker_df <- c()
+for(i in 1:32) {
+  url <- glue("https://finance.naver.com/sise/sise_market_sum.nhn?&page={i}")
+  
+  ticker_set <- url %>% 
+    read_html(encoding = "EUC-KR") %>% 
+    html_nodes(".type_2") %>% 
+    html_nodes("a") 
+  
+  ticker_name <- ticker_set %>% 
+    html_text()
+  
+  ticker_code <- ticker_set %>% 
+    html_attr("href") %>% 
+    str_remove_all("\\D")
+  
+  
+  ticker_df_1 <- data.frame(
+    "醫낅ぉ紐? = ticker_name,
+    "醫낅ぉ肄붾뱶" = ticker_code
+  ) 
+  
+  ticker_df <- rbind(ticker_df, ticker_df_1)
+}
+
+ticker_df <- ticker_df %>% 
+  as_tibble() 
+
+
+ticker_df$醫낅ぉ紐?<- ticker_df$醫낅ぉ紐?%>% as.character()
+
+ticker_df <- ticker_df %>% 
+  filter(nchar(醫낅ぉ紐? != 0)
+
+
+df_ticker_info <- df_info %>% 
+  left_join(ticker_df) %>% 
+  select(-?좊줎??
+
+df_ticker_info %>% 
+  write_excel_csv("dataset/df_ticker_info.csv")
+
+```
+
