@@ -133,10 +133,10 @@ ticker_df</code></pre>
 <p>이렇개 생성된 시가총액 데이터와, 종목코드 데이터를 join시켜주자 left_join()함수를 사용했으며 이때 사용한 키값은 <code>종목명</code>으로 해두었다.</p>
 <pre class="r"><code>df_ticker_info &lt;- df_info %&gt;% 
   left_join(ticker_df) </code></pre>
-<pre class="r"><code>df_ticker_info </code></pre>
+<pre class="r"><code>df_ticker_info</code></pre>
 <pre><code>## # A tibble: 250 x 13
 ##        N 종목명 현재가 전일비 등락률 액면가 시가총액 상장주식수 외국인비율
-##  * &lt;int&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt;           &lt;dbl&gt;
+##    &lt;int&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt;           &lt;dbl&gt;
 ##  1     1 삼성전자… 82,500 2,800  -3.28% 100    4,925,0… 5,969,783        54.9
 ##  2     2 SK하이닉… 141,5… 7,000  -4.71% 5,000  1,030,1… 728,002          50.7
 ##  3     3 NAVER  375,0… 8,000  -2.09% 100    615,988  164,263          57.3
