@@ -25,5 +25,12 @@ Warning in install.packages :
 <div id="해결-코드" class="section level3">
 <h3>해결 코드</h3>
 <p>다음의 코드와 함께 설치를 진행 해보자. <code>install.packages()</code>함수에 dependencies옵션과, INSTALL_opts옵션을 사용하면 xml2설치가 가능하게 된다.</p>
-<pre><code>install.packages(&quot;xml2&quot;, dependencies=TRUE, INSTALL_opts = c(&#39;--no-lock&#39;))</code></pre>
+<pre><code>install.packages(&quot;xml2&quot;, dependencies=TRUE, INSTALL_opts = c(&#39;--no-lock&#39;))
+</code></pre>
+<div id="출처" class="section level4">
+<h4>출처</h4>
+<ul>
+<li><a href="https://itectec.com/ubuntu/ubuntu-permission-denied-while-installing-r-package/" class="uri">https://itectec.com/ubuntu/ubuntu-permission-denied-while-installing-r-package/</a></li>
+</ul>
+</div>
 </div>
