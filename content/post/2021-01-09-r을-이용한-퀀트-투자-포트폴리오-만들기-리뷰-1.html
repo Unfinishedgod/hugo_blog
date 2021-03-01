@@ -1,0 +1,124 @@
+---
+title: '[R을 이용한 퀀트 투자 포트폴리오 만들기] 리뷰-1'
+author: 최의용
+date: '2021-01-09'
+slug: r을-이용한-퀀트-투자-포트폴리오-만들기-리뷰-1
+categories:
+  - R
+  - quant
+tags:
+  - R
+  - quant
+---
+
+
+
+<p align="center">
+<img src="/post/2021-01-09-r을-이용한-퀀트-투자-포트폴리오-만들기-리뷰-1_files/quant_2.jpg" width="200" height="300"><br>
+<b>출처(책): <a href="https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=262577612">R을 이용한 퀀트 투자 포트폴리오 만들기</a></b><br>
+<b>출처(Web): <a href="https://hyunyulhenry.github.io/quant_cookbook/">R을 이용한 퀀트 투자 포트폴리오 만들기</a></b><br>
+<b>Fast campus강의: <a href="https://www.fastcampus.co.kr/data_online_fin/?utm_source=teacher&amp;utm_medium=blog&amp;utm_campaign=data_online_fin&amp;utm_content=posting_20200323&amp;utm_expid=.Zp_J6_qjR5KOvw4Ou4dwBA.0&amp;utm_referrer=https%3A%2F%2Fhyunyulhenry.github.io%2F">R을 활용한 퀀트 전략 구현 올인원 패키지 Online.</a></b><br>
+</p>
+<p>[R을 이용한 퀀트 투자 포트폴리오] 책을 필사해보면서 공부해 보려 한다. 데이터 분석으로 진로를 잡고 공부를 하지만, 점점 도메인의 부재를 많이 느끼게 되었다. 그러다 알게 된것이 [R을 이용한 퀀트 투자 포트폴리오]. 아직도 제대로 알지는 못하지만 R과 금융을 같이 사용하여 방향을 잡아줄 수 있다는 생각에 책을 구매하게 되었다. 이 책을 통해 퀀트에 대한 간략한 이해만 알아두어도 괜찮겠다고 생각하여 하나씩 정리 해보려 한다. 책에도 표시 되어있기도 하지만 이 책은 R의 기초적인 프로그래밍 등의 내용은 생략 되어 있다. 내가 이 책을 통해 정리할 부분은 퀀트의 개념과, 얻고자 하는 것을 기록으로 남기기 위해 정리 하는것이므로 R의 기술적 내용은 많이 빠져 있을수 있다. 이 블로그에 표시 되지 않는 내용을 위해 위의 링크를 통해 남겨두도록 하겠다. 또한, 패스트 캠퍼스에서 온라인 강의도 링크를 남겨두었기 때문에, R도 같이 알고 싶다면 참고 하면 되겠다.</p>
+<div id="퀀트란" class="section level1">
+<h1>퀀트란?</h1>
+<p>’퀀트’란 모형을 기반으로 금융상품의 가격을 산정하거나, 이를 바탕으로 투자를 하는 사람. <br>
+<b>Quant</b>itave(계량, 측정이 가능한)에서 파생되었으며 수학, 컴퓨터, 통계, 물리학 등에 쓰이는 이론을 <b>금융시장</b>에 적용하여 <b>시장 환경을 예측하는 사람</b>, 또는 그런 행외를 총칭한다. <br></p>
+<p>일반적으로 투자자들이 산업과 기업을 분석해 가치를 매기는 정성적인 투자법과는 달리, 퀀트 투자는 수학과 통계를 기반으로 전략을 만들고 이를 바탕으로 투자하는 정량적인 투자법을 의미한다. 퀀트 투자의 흐름은 다음과 같다. 투자에 필요한 주가, 재무제표 등의 데이터를 수집해 정리한 후 필요한 지표를 얻기 위해 가공. 그 후 각종 모형을 이용해 투자 종목을 선택하거나 백테스트를 수행하며, 이를 바탕으로 실제로 투자하고 성과를 평가. 따라서 퀀트 투자는 데이터 과학과 금융의 응용된 사례라고 볼 수 있다.</p>
+</div>
+<div id="quantmod-패키지를" class="section level1">
+<h1>quantmod 패키지를</h1>
+<p>quandl에서 제공하는 데이터 수집 라이브러리 quantmod가 있다. 공식 링크는 다음과 같다.</p>
+<ul>
+<li><a href="https://docs.quandl.com/">Quandl API Documentation</a></li>
+</ul>
+<div id="데이터-수집-해외---테슬라" class="section level3">
+<h3>데이터 수집 (해외 - 테슬라)</h3>
+<p>quantmod패키지와 함께 getSymbols()함수를 알아보자. 2020년 가장 뜨거웠던 주식 테슬라의 ticker와 함께 getSymbols()함수를 사용하면 된다. 테슬라의 ticker인 TSLA을 입력 후, 년도를 2020-01-01 ~ 2020-12-31로 지정을 해주었다. 이 결과 총 6개의 열이 생성되는데, 각각 다음과 같다. 테슬라의 ticker는 구글에 <code>테슬라 ticker</code>로 검색하면 나오게 된다.</p>
+<ul>
+<li>Open: 시가</li>
+<li>High: 고가</li>
+<li>Low: 저가</li>
+<li>Close: 종가</li>
+<li>Volumn: 거래량</li>
+<li>Adjusted: 배당이 반영된 수정주가</li>
+<li>이 중 가장 많이 쓰이는 데이터는 Adjusted인 배당이 반영된 수정주가라고 한다.</li>
+</ul>
+<pre class="r"><code>library(quantmod)
+getSymbols(&#39;TSLA&#39;)</code></pre>
+<pre><code>## [1] &quot;TSLA&quot;</code></pre>
+<pre class="r"><code>df &lt;- getSymbols(&#39;TSLA&#39;,
+                 from = &#39;2020-01-01&#39;, to = &#39;2020-12-31&#39;,
+                 auto.assign = FALSE)
+
+tail(df)</code></pre>
+<pre><code>##            TSLA.Open TSLA.High TSLA.Low TSLA.Close TSLA.Volume TSLA.Adjusted
+## 2020-12-22    648.00    649.88   614.23     640.34    51716000        640.34
+## 2020-12-23    632.20    651.50   622.57     645.98    33173000        645.98
+## 2020-12-24    642.99    666.09   641.00     661.77    22865600        661.77
+## 2020-12-28    674.51    681.40   660.80     663.69    32278600        663.69
+## 2020-12-29    661.00    669.90   655.00     665.99    22910800        665.99
+## 2020-12-30    672.00    696.60   668.36     694.78    42846000        694.78</code></pre>
+</div>
+<div id="데이터-시각화-해외---테슬라" class="section level3">
+<h3>데이터 시각화 (해외 - 테슬라)</h3>
+<p>다음은 chart_Series함수를 사용해 테슬랑의 2020년의 주가를 시계열 그래프로 그려보았다. 올해 엄청 뜨거웠떤 만큼 2020년 초기에 비해 약 6배나 늘어난 모습을 볼 수 있다. 시각화를 하는 방법에는 이 밖에도 ggplot, plotly, highchart패키지에도 있으며, 차차 알아보도록 하자.</p>
+<pre class="r"><code>chart_Series(df)</code></pre>
+<p><img src="/post/2021-01-09-r%EC%9D%84-%EC%9D%B4%EC%9A%A9%ED%95%9C-%ED%80%80%ED%8A%B8-%ED%88%AC%EC%9E%90-%ED%8F%AC%ED%8A%B8%ED%8F%B4%EB%A6%AC%EC%98%A4-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%A6%AC%EB%B7%B0-1_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="데이터-수집-국내---삼성전자" class="section level3">
+<h3>데이터 수집 (국내 - 삼성전자)</h3>
+<p>이번에는 getSymbols()를 이용해 국내의 주가도 다운 받아보도록 하자. 2020년 해외의 경우 테슬라가 핫했다면 국내에서는 언론에서 7만전자, 8만전자, 9만전자를 외칠만큼 핫했기에 삼성전자의 2020년 주가에 대해 알아 보자. 국내의 ticker의 경우 총6 자리 이며, 추가로 구분을 해주어야 하는데 코스피의 경우 <code>티커.KS</code>, 코스닥의 경우 <code>티커.KQ</code>와 같은 형식으로 진행 해주면 된다. 삼성전자의 경우 ticker는 005930이며 코스피 이므로 KS를 같이 적어서 <code>005930.KS</code>와 같이 적어주면 된다.</p>
+<pre class="r"><code>df &lt;- getSymbols(&#39;005930.KS&#39;,
+                 from = &#39;2020-01-01&#39;, to = &#39;2020-12-31&#39;,
+                 auto.assign = FALSE)
+
+tail(df)</code></pre>
+<pre><code>##            005930.KS.Open 005930.KS.High 005930.KS.Low 005930.KS.Close
+## 2020-12-22          72500          73200         72100           72300
+## 2020-12-23          72400          74000         72300           73900
+## 2020-12-24          74100          78800         74000           77800
+## 2020-12-28          79000          80100         78200           78700
+## 2020-12-29          78800          78900         77300           78300
+## 2020-12-30          77400          81300         77300           81000
+##            005930.KS.Volume 005930.KS.Adjusted
+## 2020-12-22         16304910           70525.11
+## 2020-12-23         19411326           72085.84
+## 2020-12-24         32502870           75890.09
+## 2020-12-28         40085044           76768.00
+## 2020-12-29         30339449           78300.00
+## 2020-12-30         29417421           81000.00</code></pre>
+</div>
+<div id="데이터-시각화-국내---삼성전자" class="section level3">
+<h3>데이터 시각화 (국내 - 삼성전자)</h3>
+<p>이번에도 chart_Series()함수를 사용해 시각화 했으며 다음과 같이 표현할 수 있다. 삼성 역시 올해 뜨거웠던 만큼 3월 20일이후 반등 하여 연말에는 8만이 넘은 모습을 볼수 있었다.</p>
+<pre class="r"><code>chart_Series(df)</code></pre>
+<p><img src="/post/2021-01-09-r%EC%9D%84-%EC%9D%B4%EC%9A%A9%ED%95%9C-%ED%80%80%ED%8A%B8-%ED%88%AC%EC%9E%90-%ED%8F%AC%ED%8A%B8%ED%8F%B4%EB%A6%AC%EC%98%A4-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%A6%AC%EB%B7%B0-1_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="데이터-수집-미연방준비은행---fred" class="section level3">
+<h3>데이터 수집 (미연방준비은행 - FRED)</h3>
+<p>이번에는 미국 연방준비은행에서 관리하는 Federal Reserve Economic Data(FRED)의 데이터를 수집해보자. FRED는 미국 및 각국의 중요 경제지표 데이터를 살펴볼 때 가장 많이 참조되는 곳 중 하나이다. 이번에는 미국의 10년물 금리를 다운 받아 보자. 미 국채 10년물 금리에 해당하는 티커인 <code>DGS10</code>을 입력 했으며 데이터 출처에는 src=FRED옵션을 사용해준다.</p>
+<pre class="r"><code>df &lt;- getSymbols(&#39;DGS10&#39;,
+                 src= &#39;FRED&#39;,
+                 auto.assign = FALSE)
+
+tail(df)</code></pre>
+<pre><code>##            DGS10
+## 2021-02-18  1.29
+## 2021-02-19  1.34
+## 2021-02-22  1.37
+## 2021-02-23  1.37
+## 2021-02-24  1.38
+## 2021-02-25  1.54</code></pre>
+</div>
+<div id="데이터-시각화-미연방준비은행---fred" class="section level3">
+<h3>데이터 시각화 (미연방준비은행 - FRED)</h3>
+<p>chart_Series()함수를 통해 바라본 미연방준비 은행의 금리는 다음과 같다.</p>
+<pre class="r"><code>chart_Series(df)</code></pre>
+<p><img src="/post/2021-01-09-r%EC%9D%84-%EC%9D%B4%EC%9A%A9%ED%95%9C-%ED%80%80%ED%8A%B8-%ED%88%AC%EC%9E%90-%ED%8F%AC%ED%8A%B8%ED%8F%B4%EB%A6%AC%EC%98%A4-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EB%A6%AC%EB%B7%B0-1_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="총평" class="section level1">
+<h1>총평</h1>
+<p>이렇게 [R을 이용한 퀀트 투자 포트폴리오 만들기]책의 첫번째 리뷰를 마친다. 이번에는 퀀트의 개념과 quandl패키지를 사용해서 데이터를 수집하고 시각화 하는법에 대해 참고를 많이 하게 되었다.</p>
+</div>

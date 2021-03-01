@@ -1,11 +1,7 @@
 ---
 title: '[R] 카카오 API를 사용한 주소/위경도 추출'
 author: 최의용
-<<<<<<< HEAD
-date: '2020-12-23'
-=======
 date: '2020-12-26'
->>>>>>> 94b671aea808db1c048f9dcecfb3b06e0bc22129
 slug: r-카카오-api를-사용한-주소-위경도-추출
 categories:
   - R
@@ -18,17 +14,6 @@ tags:
 
 
 
-<<<<<<< HEAD
-<pre class="r"><code>library(tidyverse)
-library(httr)
-library(jsonlite)
-library(glue)</code></pre>
-<pre class="r"><code>addr &lt;- &quot;서울시&quot;
-# 지리정보 API를 사용한 위경도 추출
-GET(url = &#39;https://dapi.kakao.com/v2/local/search/address.json&#39;,
-    query = list(query = addr),
-    add_headers(Authorization = paste0(&quot;KakaoAK &quot;, &quot;2ecacbafd523802f293b245103346b06&quot;))) %&gt;% 
-=======
 <p>카카오 API를 이용해 주소에서 위경도를, 위경도를 통해 주소를 추출해보자. 우선, 카카오에서 제공하는 API를 사용하기 위해 Kakao Developers에서 api키를 발급 받아야 한다. 다음의 주소를 참고 하여 API key를 발급 받자.</p>
 <ul>
 <li>카카오 Developer 주소: <a href="https://developers.kakao.com/console/app">Kakao Developers</a></li>
@@ -51,7 +36,7 @@ library(glue)</code></pre>
 <div id="api-key-세팅" class="section level3">
 <h3>API Key 세팅</h3>
 <p>우선 다음과 같이 카카오 에서 발급받은 <code>REST API 키</code>를 다음과 같이 지정해주도록 하자.</p>
-<p><code>api_key &lt;- "api key 입력"</code></p>
+<p><code>api_key &lt;- &quot;api key 입력&quot;</code></p>
 </div>
 </div>
 <div id="지리정보-api를-사용해-주소에서-위경도에서-추출" class="section level2">
@@ -65,22 +50,10 @@ library(glue)</code></pre>
 GET(url = &#39;https://dapi.kakao.com/v2/local/search/address.json&#39;,
     query = list(query = addr),
     add_headers(Authorization = paste0(&quot;KakaoAK &quot;, api_key))) %&gt;% 
->>>>>>> 94b671aea808db1c048f9dcecfb3b06e0bc22129
   content(as = &#39;text&#39;) %&gt;% 
   fromJSON()</code></pre>
 <pre><code>## $documents
 ##   address.address_name address.b_code address.h_code address.main_address_no
-<<<<<<< HEAD
-## 1                 서울     1100000000     1100000000                        
-##   address.mountain_yn address.region_1depth_name address.region_2depth_name
-## 1                   N                       서울                           
-##   address.region_3depth_h_name address.region_3depth_name
-## 1                                                        
-##   address.sub_address_no        address.x       address.y address_name
-## 1                        126.978652258309 37.566826004661         서울
-##   address_type road_address                x               y
-## 1       REGION           NA 126.978652258309 37.566826004661
-=======
 ## 1  서울 중구 회현동1가     1114012100                                       
 ##   address.mountain_yn address.region_1depth_name address.region_2depth_name
 ## 1                   N                       서울                       중구
@@ -90,7 +63,6 @@ GET(url = &#39;https://dapi.kakao.com/v2/local/search/address.json&#39;,
 ## 1                        126.981204133005 37.5555892070291 서울 중구 회현동1가
 ##   address_type road_address                x                y
 ## 1       REGION           NA 126.981204133005 37.5555892070291
->>>>>>> 94b671aea808db1c048f9dcecfb3b06e0bc22129
 ## 
 ## $meta
 ## $meta$is_end
@@ -101,14 +73,6 @@ GET(url = &#39;https://dapi.kakao.com/v2/local/search/address.json&#39;,
 ## 
 ## $meta$total_count
 ## [1] 1</code></pre>
-<<<<<<< HEAD
-<pre class="r"><code># 지리정보 API를 사용한 위경도 추출
-Lat_lon_fun &lt;- function(addr) {
-  data_list &lt;-
-    GET(url = &#39;https://dapi.kakao.com/v2/local/search/address.json&#39;,
-        query = list(query = addr),
-        add_headers(Authorization = paste0(&quot;KakaoAK &quot;, &quot;2ecacbafd523802f293b245103346b06&quot;))) %&gt;% 
-=======
 <div id="위경도-추출-함수" class="section level3">
 <h3>2-1. 위경도 추출 함수</h3>
 <p>위 방법은 통해 함수를 생성해주자. 함수를 생성해서, 나중에도 자주 쓸수 있도록 하기 위함이다. GET()함수를 통해 얻은 결과를 data_list로 지정 했으며 이에 대한 결과를 주소와, 위도, 경도를 출력하도록 함수를 생성해두었다.</p>
@@ -118,19 +82,11 @@ addr_lat_lon_fun &lt;- function(addr) {
     GET(url = &#39;https://dapi.kakao.com/v2/local/search/address.json&#39;,
         query = list(query = addr),
         add_headers(Authorization = paste0(&quot;KakaoAK &quot;, api_key))) %&gt;% 
->>>>>>> 94b671aea808db1c048f9dcecfb3b06e0bc22129
     content(as = &#39;text&#39;) %&gt;% 
     fromJSON()
   
   
   lon_lat_df &lt;- tibble(주소 = addr, 
-<<<<<<< HEAD
-                         long = as.numeric(data_list$documents$x), 
-                         lat = as.numeric(data_list$documents$y))
-  
-  return(lon_lat_df)
-}</code></pre>
-=======
                          long = as.character(data_list$documents$x), 
                          lat = as.character(data_list$documents$y))
   
@@ -173,18 +129,57 @@ GET(url = &#39;https://dapi.kakao.com/v2/local/geo/coord2regioncode.json&#39;,
 <div id="주소-추출-함수" class="section level3">
 <h3>3-1. 주소 추출 함수</h3>
 <p>이번에도 함수를 생성해주자. 함수를 생성해서, 나중에도 자주 쓸수 있도록 하기 위함이다. GET()함수를 통해 얻은 결과를 data_list로 지정 했으며 이에 대한 결과를 위도, 경도, 수도, 구 동을 출력하도록 함수를 생성해두었다.</p>
->>>>>>> 94b671aea808db1c048f9dcecfb3b06e0bc22129
+<pre class="r"><code>addr &lt;- &quot;서울시&quot;
+# 지리정보 API를 사용한 위경도 추출
+GET(url = &#39;https://dapi.kakao.com/v2/local/search/address.json&#39;,
+    query = list(query = addr),
+    add_headers(Authorization = paste0(&quot;KakaoAK &quot;, &quot;2ecacbafd523802f293b245103346b06&quot;))) %&gt;% 
+  content(as = &#39;text&#39;) %&gt;% 
+  fromJSON()</code></pre>
+<pre><code>## $documents
+##   address.address_name address.b_code address.h_code address.main_address_no
+## 1                 서울     1100000000     1100000000                        
+##   address.mountain_yn address.region_1depth_name address.region_2depth_name
+## 1                   N                       서울                           
+##   address.region_3depth_h_name address.region_3depth_name
+## 1                                                        
+##   address.sub_address_no        address.x       address.y address_name
+## 1                        126.978652258309 37.566826004661         서울
+##   address_type road_address                x               y
+## 1       REGION           NA 126.978652258309 37.566826004661
+## 
+## $meta
+## $meta$is_end
+## [1] TRUE
+## 
+## $meta$pageable_count
+## [1] 1
+## 
+## $meta$total_count
+## [1] 1</code></pre>
+<pre class="r"><code># 지리정보 API를 사용한 위경도 추출
+Lat_lon_fun &lt;- function(addr) {
+  data_list &lt;-
+    GET(url = &#39;https://dapi.kakao.com/v2/local/search/address.json&#39;,
+        query = list(query = addr),
+        add_headers(Authorization = paste0(&quot;KakaoAK &quot;, &quot;2ecacbafd523802f293b245103346b06&quot;))) %&gt;% 
+    content(as = &#39;text&#39;) %&gt;% 
+    fromJSON()
+  
+  
+  lon_lat_df &lt;- tibble(주소 = addr, 
+                         long = as.numeric(data_list$documents$x), 
+                         lat = as.numeric(data_list$documents$y))
+  
+  return(lon_lat_df)
+}</code></pre>
 <pre class="r"><code># 지리정보 API를 사용한 위경도에서 주소 추출 함수
 Lat_lon_to_address_fun &lt;- function(long, lat) {
   data_list &lt;-
     GET(url = &#39;https://dapi.kakao.com/v2/local/geo/coord2regioncode.json&#39;,
         # query = list(x = long, y= lat),
         query = list(x = long, y= lat),
-<<<<<<< HEAD
-        add_headers(Authorization = paste0(&quot;KakaoAK &quot;, &quot;2ecacbafd523802f293b245103346b06&quot;))) %&gt;%
-=======
         add_headers(Authorization = paste0(&quot;KakaoAK &quot;, api_key))) %&gt;%
->>>>>>> 94b671aea808db1c048f9dcecfb3b06e0bc22129
     content(as = &#39;text&#39;) %&gt;%
     fromJSON()
   
@@ -199,8 +194,6 @@ Lat_lon_to_address_fun &lt;- function(long, lat) {
   
   return(lon_lat_df)
 }</code></pre>
-<<<<<<< HEAD
-=======
 <p>이렇게 만든 Lat_lon_to_address_fun()함수를 통해 남산의 위경도틀 추출하면 다음과 같은 결과가 나오게 된다.</p>
 <pre class="r"><code>Lat_lon_to_address_fun(126.981204133005, 37.5555892070291)</code></pre>
 <pre><code>## # A tibble: 1 x 5
@@ -213,4 +206,3 @@ Lat_lon_to_address_fun &lt;- function(long, lat) {
 <h2>총평</h2>
 <p>최종적으로 카카오 api를 통해 주소에서 위경도를, 위경도에서 주소를 추출하는 방법을 알아보았다. 지난동안 계송 정리를 안해두어서 찾느라 고생을 하긴 했었는데, 이번을 계기로 쉽게 찾을수 있을것 같다.</p>
 </div>
->>>>>>> 94b671aea808db1c048f9dcecfb3b06e0bc22129
