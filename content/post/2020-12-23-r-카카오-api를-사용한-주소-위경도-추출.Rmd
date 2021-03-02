@@ -16,6 +16,10 @@ tags:
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.align = "center")
 ```
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> e976701067b1c4f1bb3f63d3bf99a881c864b588
 카카오 API를 이용해 주소에서 위경도를, 위경도를 통해 주소를 추출해보자. 우선, 카카오에서 제공하는 API를 사용하기 위해 Kakao Developers에서 api키를 발급 받아야 한다. 다음의 주소를 참고 하여 API key를 발급 받자.
 
  - 카카오 Developer 주소: [Kakao Developers](https://developers.kakao.com/console/app)
@@ -174,6 +178,10 @@ Lat_lon_to_address_fun <- function(long, lat) {
 
 이렇게 만든 Lat_lon_to_address_fun()함수를 통해 남산의 위경도틀 추출하면 다음과 같은 결과가 나오게 된다.
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> e976701067b1c4f1bb3f63d3bf99a881c864b588
 ```{r}
 Lat_lon_to_address_fun(126.981204133005, 37.5555892070291)
 ```

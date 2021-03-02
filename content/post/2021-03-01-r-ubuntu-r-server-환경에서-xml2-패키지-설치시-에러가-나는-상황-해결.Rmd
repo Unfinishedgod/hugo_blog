@@ -1,0 +1,38 @@
+---
+title: '[R] Ubuntu R 환경에서 xml2 패키지 설치시 에러가 나는 상황 해결'
+author: 최의용
+date: '2021-03-01'
+slug: r-ubuntu-r-server-환경에서-xml2-패키지-설치시-에러가-나는-상황-해결
+categories:
+  - R
+tags:
+  - xml2
+  - R
+  - packages
+---
+
+이번에는 Ubuntu의 R에서 `xml2` 패키지 설치시 에러가 나는 상황에 대한 간략한 방법만 담아보려 한다. 그동안 wsl을 사용해오서 R을 새로 설치 하고 여러 패키지를 설치할때마다 간혹 xml2설치 문제로 어려움을 겪은적이 있다. 기존에는 구글링으로 손쉽게 해결을 하였으나 특히 `xml2`패키지의 경우에는 너무 찾는데 오래 걸려서 이번에는 스스로 기록에 남겨놓으려 하는게 주 목적이다.
+
+### 에러 메시지
+
+`xml2`설치시 나오는 주요 에러는 다음과 같다. 특히 00LOCK-xml폴더 관련해서 에러가 생기는데 실제로 찾으려 하면 없는 경우가 있어서 설치가 되질 않는다.
+
+```
+mv: cannot move '/home/owen/R/x86_64-pc-linux-gnu-library/4/00LOCK-xml2/00new/xml2' to '/home/owen/R/x86_64-pc-linux-gnu-library/4/xml2': Permission denied
+ERROR:   moving to final location failed
+Warning in install.packages :
+  installation of package ‘xml2’ had non-zero exit status
+```
+
+### 해결 코드
+
+다음의 코드와 함께 설치를 진행 해보자. `install.packages()`함수에 dependencies옵션과, INSTALL_opts옵션을 사용하면 xml2설치가 가능하게 된다.
+
+```
+install.packages("xml2", dependencies=TRUE, INSTALL_opts = c('--no-lock'))
+
+```
+
+#### 출처
+
+ - https://itectec.com/ubuntu/ubuntu-permission-denied-while-installing-r-package/
