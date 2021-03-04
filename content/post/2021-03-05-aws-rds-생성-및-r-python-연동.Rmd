@@ -141,7 +141,9 @@ RDS가 잘 생성이 되면 해당 DB를 클릭하여 다음의 정보를 확인
 
 RDS 사용을 중지하기 위해서는 다음 그림과 같이 작업 필터에서 중지를 해주면 된다. EC2와 다르게 우클릭으로 작업 실행/중지가 아님.
 
+<center>
 ![](/post/2021-03-05-aws-rds-생성-및-r-python-연동_files/rds_14.PNG){width=80%}
+</center>
 
 # RDS - R/Python 연결
 
