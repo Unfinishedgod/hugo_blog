@@ -1,0 +1,12 @@
+---
+title: '[R을 이용한 퀀트 투자 포트폴리오 만들기] 리뷰-3'
+author: 최의용
+date: '2021-03-15'
+slug: r을-이용한-퀀트-투자-포트폴리오-만들기-리뷰-3
+categories:
+  - R
+  - quant
+tags:
+  - R
+  - quant
+---
