@@ -1,5 +1,5 @@
 ---
-title: '[R을 이용한 퀀트 투자 포트폴리오 만들기] 공부하기-3'
+title: '[R을 이용한 퀀트 투자 포트폴리오 만들기] 공부-3'
 author: 최의용
 date: '2021-03-15'
 slug: r을-이용한-퀀트-투자-포트폴리오-만들기-리뷰-3
@@ -10,3 +10,12 @@ tags:
   - R
   - quant
 ---
+
+<p align="center">
+<img src="/post/2021-01-09-r을-이용한-퀀트-투자-포트폴리오-만들기-리뷰-1_files/quant_2.jpg" width="200" height="300"><br>
+<b>출처(책): [R을 이용한 퀀트 투자 포트폴리오 만들기](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=262577612)</b><br>
+<b>출처(Web): [R을 이용한 퀀트 투자 포트폴리오 만들기](https://hyunyulhenry.github.io/quant_cookbook/)</b><br>
+<b>Fast campus강의: [R을 활용한 퀀트 전략 구현 올인원 패키지 Online.](https://www.fastcampus.co.kr/data_online_fin/?utm_source=teacher&utm_medium=blog&utm_campaign=data_online_fin&utm_content=posting_2020053&utm_expid=.Zp_J6_qjR5KOvw4Ou4dwBA.0&utm_referrer=https%3A%2F%2Fhyunyulhenry.github.io%2F)</b><br>
+</p>
+
+
