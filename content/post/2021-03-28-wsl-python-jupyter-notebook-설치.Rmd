@@ -109,7 +109,7 @@ kill -9 {jupyter notebook 에 대한 PID 번호}
 ```
 
 
-# 총평
+# 총평 
 
 이번에는 wsl에서 python설치 및 jupyter notebook설치에 대한 글을 적어보았다. 글을 작성하다 보니 추가로 cmd에서 wsl을 재부팅 하는 방법이나, nohup, &코드를 사용해 백그라운드에서 실행시키는 방법까지 겸사겸사 기록으로 남겨두게 되었다.
 
