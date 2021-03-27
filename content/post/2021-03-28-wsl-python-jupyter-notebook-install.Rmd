@@ -11,6 +11,8 @@ tags:
   - Jupyter notebook
 ---
 
+![](/post/2021-03-28-wsl-python-jupyter-notebook-install_files/test.PNG){width=10%}
+
 WSL에 Python과 Jupyter notebook를 설치 해보자. wsl은 기본적으로 설치가 되어 있다는 가정을 한 상태에서 python업그레이드와, jupyter notebok를 설치 하는 가이드를 작성 하려고 한다. 우선 wsl에 대한 설치 과정은 다음의 블로그를 참고 하자.
 
  - [미완성의신 - WSL 설치](https://medium.com/@unfinishedgod/wsl%EC%97%90-%EB%8C%80%ED%95%B4-%EC%95%8C%EC%95%84%EB%B3%B4%EC%9E%90-e01eb130bbff)
