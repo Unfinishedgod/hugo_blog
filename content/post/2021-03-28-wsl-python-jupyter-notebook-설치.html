@@ -1,0 +1,86 @@
+---
+title: '[WSL] Python & Jupyter notebook 설치'
+author: 최의용
+date: '2021-03-28'
+slug: wsl-python-jupyter-notebook-설치
+categories:
+  - Python
+  - Jupyter notebook
+tags:
+  - Python
+  - Jupyter notebook
+---
+
+
+
+<p>WSL에 Python과 Jupyter notebook를 설치 해보자. wsl은 기본적으로 설치가 되어 있다는 가정을 한 상태에서 python업그레이드와, jupyter notebok를 설치 하는 가이드를 작성 하려고 한다. 우선 wsl에 대한 설치 과정은 다음의 블로그를 참고 하자.</p>
+<ul>
+<li><a href="https://medium.com/@unfinishedgod/wsl%EC%97%90-%EB%8C%80%ED%95%B4-%EC%95%8C%EC%95%84%EB%B3%B4%EC%9E%90-e01eb130bbff">미완성의신 - WSL 설치</a></li>
+</ul>
+<div id="python-설치" class="section level2">
+<h2>1. Python 설치</h2>
+<div id="python-2---3" class="section level3">
+<h3>1-1. Python 2 -&gt; 3</h3>
+<p>우선 파이썬의 버전을 2.x에서 3.x로 변경을 해보자. 다음의 코드를 하나씩 입력해보자.</p>
+<pre><code>$ sudo apt-get update
+$ sudo apt-get upgrade python3</code></pre>
+</div>
+<div id="python-버전-확인" class="section level3">
+<h3>1-2,. Python 버전 확인</h3>
+<p>위의 코드를 작성하게 되면 다음의 코드로 파이썬이 잘 설치되었는지 확인할 수 있다. 파이썬의 버전이 3.x로 되어 있으면 성공.</p>
+<pre><code>$ python3 --version
+
+Python 3.6.9</code></pre>
+</div>
+</div>
+<div id="pip3-설치" class="section level2">
+<h2>2. pip3 설치</h2>
+<div id="pip3-설치-1" class="section level3">
+<h3>2-1. pip3 설치</h3>
+<p>이제는 pip3을 설치 해주자. “Pip Installs Packages” 또는 “Pip Installs Python” 의 약어로 사용하는 pip는 작성된 패키지의 설치 및 관리를 해주는 프로그램이다. python3에서는 pip3을 사용하므로 다음과 같은 코드를 사용해서 pip3를 설치 해주자.</p>
+<pre><code>$ sudo apt install python3-pip
+</code></pre>
+</div>
+<div id="pip3-설치-확인" class="section level3">
+<h3>2-2. pip3 설치 확인</h3>
+<p>다음의 코드를 통해 pip3의 버전과 함께 설치를 확인한다.</p>
+<pre><code>$ pip3 --version
+
+pip 9.0.1 from /usr/lib/python3/dist-packages (python 3.6)</code></pre>
+</div>
+</div>
+<div id="jupyter-notebook" class="section level2">
+<h2>3. Jupyter notebook</h2>
+<div id="jupyter-notebook-설치" class="section level3">
+<h3>3-1. Jupyter notebook 설치</h3>
+<p>이번에는 pip3코드를 사용해 주피터 노트북을 설치 하자. 다음의 코드를 사용한다. 주피터 노트북을 설치후에는 wsl을 재설치 해야 하는데, 컴퓨터를 재부팅 하거나 또는 cmd를 사용하는 방법이 있다.</p>
+<pre><code>$ pip3 install jupyter</code></pre>
+</div>
+<div id="cmd에서-wsl-재부팅" class="section level3">
+<h3>3-2. cmd에서 wsl 재부팅</h3>
+<p>우선 cmd를 <strong>관리자 권한</strong>으로 실행을 시켜주자. 윈도우 검색창에 cmd를 관리자권한으로 실행 해주면 된다.</p>
+<pre><code># wsl 종료
+net stop LxssManager
+
+# wsl 재시작
+net start LxssManager</code></pre>
+</div>
+<div id="jupyter-notebook-실행" class="section level3">
+<h3>3-3. Jupyter notebook 실행</h3>
+<p>이렇게 Jupyter notebook 설치가 완료 되었으니 다음과 같은 코드를 사용해서 실행을 해주자. 이때 <strong>처음에</strong>, token 값을 알수가 없는데 이는 ctrl+c 를 실행해 token 값을 확인할 수가 있다.</p>
+<pre><code>jupyter notebook</code></pre>
+<div id="tip" class="section level4">
+<h4>tip</h4>
+<p>추가 팁이 있는데 이렇게 주피터 노트북을 실행하면 wsl의 커맨드를 사용할 수가 없다. 다음의 방법을 사용하여 jupyter notebook를 사용하면 백그라운드에서 실행을 도와준다.</p>
+<pre><code>nohup jupyter notebook &amp;</code></pre>
+<p>추가로, 백그라운드에서 실행시에 이를 종료 해야 하는데 아주 간략하게나마 설명을 하자면 다음과 같다.</p>
+<pre><code>ps -ef</code></pre>
+<p>이렇게 코드를 입력시에 jupyter notebook에 대한 PID번호를 확인할 수가 있는데 이 번호를 다음과 같이 입력하면 백그라운드에서 실행중인 jupyter notebook 까지 종료가 가능하다.</p>
+<pre><code>kill -9 {jupyter notebook 에 대한 PID 번호} </code></pre>
+</div>
+</div>
+</div>
+<div id="총평" class="section level1">
+<h1>총평</h1>
+<p>이번에는 wsl에서 python설치 및 jupyter notebook설치에 대한 글을 적어보았다. 글을 작성하다 보니 추가로 cmd에서 wsl을 재부팅 하는 방법이나, nohup, &amp;코드를 사용해 백그라운드에서 실행시키는 방법까지 겸사겸사 기록으로 남겨두게 되었다.</p>
+</div>
