@@ -1,7 +1,7 @@
 ---
 title: '[WSL] Python & Jupyter notebook 설치'
 author: 최의용
-date: '2021-03-28'
+date: '2021-03-26'
 slug: wsl-python-jupyter-notebook-설치
 categories:
   - Python
