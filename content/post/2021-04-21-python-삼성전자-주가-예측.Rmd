@@ -1,0 +1,14 @@
+---
+title: '[Python] 삼성전자 주가 예측'
+author: 최의용
+date: '2021-04-21'
+slug: python-삼성전자-주가-예측
+categories:
+  - Python
+  - fbprophet
+tags:
+  - Python
+  - fbprophet
+---
+
+![](/post/2021-04-21-python-삼성전자-주가-예측_files/samsung_main.PNG){width=100%}
