@@ -17,8 +17,8 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE,  warning = FALSE)
 ```
 
 ```{r echo=FALSE}
-library(reticulate)
-options(reticulate.repl.quiet = TRUE)
+# library(reticulate)
+# options(reticulate.repl.quiet = TRUE)
 ```
 
 
@@ -37,7 +37,7 @@ options(reticulate.repl.quiet = TRUE)
 
 우선 삼성전자 주가의 데이터를 Yahoo Finance모듈에서 불러와보자. yfinance모듈을 사용했으며 사용시 데이터의 시작지점은 2019년 1월 부터 2021년 4월 21일까지로 설정 해주었다.또한, 삼성전자의 Ticker의 경우 구글에 '삼성전자 주가'를 검색후 나오는 코드인 005930에 '.KS'를 추가해주어 '005930.KS'를 넣어 주었다. 이중에서 종가(Close)를 가져와 price라고 지정해주고 분석을 시작해보자.
 
-```{python, echo = TRUE, message = FALSE,  warning = FALSE, results='hide'}
+```
 # %matplotlib inline
 import pandas as pd
 import numpy as np
@@ -62,7 +62,7 @@ samsung_df.index = samsung_df['day']
 samsung_df.set_index('day', inplace=True)
 ```
 
-```{python}
+```
 samsung_df
 ```
 
@@ -71,20 +71,20 @@ samsung_df
 
 우선 삼성전자 주가 데이터를 탐색해보자. 다음 코드로 데이터셋을 살펴보면, 삼성전자 주가 데이터는 총 567개의 행으로 이루어진 것을 알 수 있다. 또한 데이터는 결측값 없이 날짜와 가격에 대한 2개의 피쳐로 구성되어 있다. 추가로 먼저 Train/Test set으로 나눌것인데 마지막 날짜 5일을 제외한 나머지를 Train으로 지정 해주고 마지막 날짜 5일을 Test으로 지정 해주었다.
 
-```{python, echo = TRUE, message = FALSE,  warning = FALSE, results='hide'}
+```
 samsung_train_df = samsung_df[:317]
 ```
 
-```{python}
+```
 samsung_train_df
 ```
 
 
-```{python, echo = TRUE, message = FALSE,  warning = FALSE, results='hide'}
+```
 samsung_test_df = samsung_df[317:]
 ```
 
-```{python}
+```
 samsung_test_df
 ```
 
@@ -172,7 +172,7 @@ plt.show()
 
 
 
-```{python, echo = TRUE, message = FALSE,  warning = FALSE, results='hide'}
+```
 from statsmodels.tsa.arima_model import ARIMA
 import statsmodels.api as sm
 
@@ -181,12 +181,42 @@ model = ARIMA(samsung_train_df.price.values, order = (2,1,2))
 model_fit = model.fit(trend = 'c', full_output = True, disp = True)
 ```
 
-```{python}
+```
+                             ARIMA Model Results                              
+==============================================================================
+Dep. Variable:                    D.y   No. Observations:                  316
+Model:                 ARIMA(2, 1, 2)   Log Likelihood               -2693.889
+Method:                       css-mle   S.D. of innovations           1212.737
+Date:                Thu, 22 Apr 2021   AIC                           5399.777
+Time:                        17:29:26   BIC                           5422.312
+Sample:                             1   HQIC                          5408.780
+                                                                              
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+const         82.0693     68.809      1.193      0.233     -52.794     216.932
+ar.L1.D.y     -1.6290      0.017    -94.440      0.000      -1.663      -1.595
+ar.L2.D.y     -0.9743      0.016    -60.962      0.000      -1.006      -0.943
+ma.L1.D.y      1.6342      0.017     98.141      0.000       1.602       1.667
+ma.L2.D.y      1.0000      0.019     51.919      0.000       0.962       1.038
+                                    Roots                                    
+=============================================================================
+                  Real          Imaginary           Modulus         Frequency
+-----------------------------------------------------------------------------
+AR.1           -0.8360           -0.5723j            1.0131           -0.4045
+AR.2           -0.8360           +0.5723j            1.0131            0.4045
+MA.1           -0.8171           -0.5765j            1.0000           -0.4022
+MA.2           -0.8171           +0.5765j            1.0000            0.4022
+-----------------------------------------------------------------------------
+```
+
+```
 print(model_fit.summary())
 ```
 
 
 ---
+
 #### 잠깐: ARIMA 분석의 파라미터 
 
 위 예제의 분석 결과와는 별개로 order 파라미터 p, d, q는 일반적인 가이드라인이 존재한다. 보통은 p와 q의 합이 2 미만인 경우, 혹은 p와 q의 곱이 0을 포함한 짝수인 경우가 좋은 파라미터의 조합이라고 알려져 있다. 
@@ -209,6 +239,7 @@ fig = model_fit.plot_predict()
 residuals = pd.DataFrame(model_fit.resid)
 residuals.plot(title = "실제값과 예측값의 잔차")
 ```
+
 <center>
 ![](/post/2021-04-21-python-삼성전자-주가-예측_files/samsung_stock_analyisis_12_2.png){width=50%}
 </center>
@@ -222,7 +253,7 @@ residuals.plot(title = "실제값과 예측값의 잔차")
 
 
 
-```{python, echo = TRUE, message = FALSE,  warning = FALSE, results='hide'}
+```
 forecast_data = model_fit.forecast(steps=5)
 
 # 마지막 5일의 예측 데이터 (2021-04-15 ~ 2021-04-19)
@@ -287,7 +318,7 @@ fbprophet 라이브러리를 사용하기 위해서는 데이터 프레임의 �
  - changepoint_prior_scale: 트렌드가 변경되는 문맥을 반영하는 파라미터. 수치가 높을수록 모델은 과적합에 가까워진다. 
  
 
-```{python, echo = TRUE, message = FALSE,  warning = FALSE, results='hide'}
+```
 from fbprophet import Prophet
 
 
@@ -310,7 +341,7 @@ prophet.fit(samsung_train_df)
 그리고 다음코드에서 make_future_dataframe(periods=5, freq='d'), prophet.predict(future_data)를 실행하면 학습 데이터 셋 기반의 5일 단위 예측 데이터를 얻을 수 있다.
 
 
-```{python, echo = TRUE, message = FALSE,  warning = FALSE, results='hide'}
+```
 future_data = prophet.make_future_dataframe(periods = 5, freq = 'd')
 forecast_data = prophet.predict(future_data)
 forecast_data[['ds','yhat', 'yhat_lower', 'yhat_upper']].tail(5)
@@ -382,7 +413,7 @@ plt.title("값 비교")
  Prophet 모델에서 future_data['cap'] = 96000 통해 데이터넷에 상한선을 설정할 수 있다. 다음 코드와 실행 결과는 상한선을 적용할 학습 결과를 시각화 한 것이다.
 
 
-```{python, echo = TRUE, message = FALSE,  warning = FALSE, results='hide'}
+```
 # 상한가 설정
 samsung_train_df['cap'] = 90000
 
@@ -418,7 +449,7 @@ fig = prophet.plot(forecast_data)
 이번에는 모델의 성능을 향상시키는 다른 방법중 하나인 이상치 제거 기법을 살펴보자. 이상치란 평균적인 수치에 비해 지나치게 높거나 낮은 수치의 데이터를 의미한다. fbprophet 모델이 이상치를 제거한 데이터로 학습하려면 이상치에 해당하는 데이터를 None로 설정해주면 된다. 이번에는  63000이 넘는 데이터를 이상치라고 설정 해주었다. 
 
 
-```{python, echo = TRUE, message = FALSE,  warning = FALSE, results='hide'}
+```
 samsung_train_df.loc[samsung_train_df['y'] > 90000, 'y'] = None
 
 # prophet 모델 학습
@@ -446,7 +477,7 @@ fig = prophet.plot(forecast_data)
 ![](/post/2021-04-21-python-삼성전자-주가-예측_files/samsung_stock_analyisis_32_1.png){width=70%}
 </center>
 
-```{python, echo = TRUE, message = FALSE,  warning = FALSE, results='hide'}
+```
 pred_fbprophet_y_1 = forecast_data.yhat.values[-5:]
 ```
 
@@ -460,7 +491,7 @@ pred_fbprophet_y_1 = forecast_data.yhat.values[-5:]
 평균 제곱근 오차(Root Mean Square Error; RMSE)를 의미하는 RMSE를 구해보자.
 
 
-```{python, echo = TRUE, message = FALSE,  warning = FALSE, results='hide'}
+```
 df = pd.DataFrame({'ARIMA 예측값':pred_arima_y,
                    'FBprophet 예측값':  pred_fbprophet_y,
                    'FBprophet 이상치 제거 후(90000) 예측값':pred_fbprophet_y_1,
@@ -468,7 +499,7 @@ df = pd.DataFrame({'ARIMA 예측값':pred_arima_y,
 ```
 
 
-```{python}
+```
 df
 ```
 
@@ -478,7 +509,7 @@ df
 이번에는 모델별 예측한 값들을 비교 해보자. 다음 그림을 통해 확인할 수 있듯 ARIMA모델이 가장 좋은 효과를 보이는걸로 나타났다.
 
 
-```{python, echo = TRUE, message = FALSE,  warning = FALSE, results='hide'}
+```
 from sklearn.metrics import mean_squared_error, r2_score
 from math import sqrt
 
