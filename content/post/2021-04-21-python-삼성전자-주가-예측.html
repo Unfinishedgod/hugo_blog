@@ -11,6 +11,7 @@ tags:
   - fbprophet
 ---
 
+<script src="2021-04-21-python-삼성전자-주가-예측_files/header-attrs/header-attrs.js"></script>
 
 
 <center>
@@ -341,7 +342,7 @@ forecast_data = prophet.predict(future_data)
 </center>
 <div id="이상치-제거" class="section level4">
 <h4>이상치 제거</h4>
-<p>이번에는 모델의 성능을 향상시키는 다른 방법중 하나인 이상치 제거 기법을 살펴보자. 이상치란 평균적인 수치에 비해 지나치게 높거나 낮은 수치의 데이터를 의미한다. fbprophet 모델이 이상치를 제거한 데이터로 학습하려면 이상치에 해당하는 데이터를 None로 설정해주면 된다. 이번에는 63000이 넘는 데이터를 이상치라고 설정 해주었다.</p>
+<p>이번에는 모델의 성능을 향상시키는 다른 방법중 하나인 이상치 제거 기법을 살펴보자. 이상치란 평균적인 수치에 비해 지나치게 높거나 낮은 수치의 데이터를 의미한다. fbprophet 모델이 이상치를 제거한 데이터로 학습하려면 이상치에 해당하는 데이터를 None로 설정해주면 된다. 이번에는 90000이 넘는 데이터를 이상치라고 설정 해주었다.</p>
 <pre><code>samsung_train_df.loc[samsung_train_df[&#39;y&#39;] &gt; 90000, &#39;y&#39;] = None
 
 # prophet 모델 학습
