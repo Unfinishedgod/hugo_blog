@@ -1,0 +1,47 @@
+---
+title: '[Python] 카카오 API를 사용한 주소/위경도 추출'
+author: 최의용
+date: '2021-04-28'
+slug: python-카카오-api를-사용한-주소-위경도-추출
+categories:
+  - Python
+  - API
+  - 카카오
+  - 지도
+tags:
+  - Python
+  - API
+  - 카카오
+  - 지도
+  - 위경도
+  - 주소
+---
+
+
+
+<pre class="python"><code>import json
+import requests</code></pre>
+<div id="주소를-통해-위경도" class="section level1">
+<h1>주소를 통해 위경도</h1>
+<pre class="python"><code>def addr_to_lat_lon(addr):
+    url = &#39;https://dapi.kakao.com/v2/local/search/address.json?query={address}&#39;.format(address=addr)
+    headers = {&quot;Authorization&quot;: &quot;KakaoAK &quot; + api_key}
+    result = json.loads(str(requests.get(url, headers=headers).text))
+    match_first = result[&#39;documents&#39;][0][&#39;address&#39;]
+    return float(match_first[&#39;x&#39;]), float(match_first[&#39;y&#39;])
+
+addr_to_lat_lon(&#39;서울 중구 회현동1가&#39;)</code></pre>
+<pre><code>## (126.981204133005, 37.5555892070291)</code></pre>
+</div>
+<div id="위경도를-통해-주소" class="section level1">
+<h1>위경도를 통해 주소</h1>
+<pre class="python"><code>def lat_lon_to_addr(lon,lat):
+    url = &#39;https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x={longitude}&amp;y={latitude}&#39;.format(longitude=lon,latitude=lat)
+    headers = {&quot;Authorization&quot;: &quot;KakaoAK &quot; + api_key}
+    result = json.loads(str(requests.get(url, headers=headers).text))
+    match_first = result[&#39;documents&#39;][0][&#39;address_name&#39;]
+    return str(match_first)
+
+lat_lon_to_addr(126.981204133005, 37.5555892070291)</code></pre>
+<pre><code>## &#39;서울특별시 중구 회현동1가&#39;</code></pre>
+</div>
