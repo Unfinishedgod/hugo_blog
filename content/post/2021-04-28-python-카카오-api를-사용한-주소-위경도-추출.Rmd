@@ -22,6 +22,11 @@ library(reticulate)
 options(reticulate.repl.quiet = TRUE)
 ```
 
+카카오 API를 이용해 주소에서 위경도를, 위경도를 통해 주소를 추출해보자. 지난번의 R버전의 블로그를 그대로 파이썬 버전으로 함수화 하여 **기록용**으로 정리 해둔것이니, API관련 부분은 다음을 참고 하자.
+
+ - [R 카카오 API를 사용한 주소/위경도 추출](https://unfinishedgod.netlify.app/2020/12/26/r-%EC%B9%B4%EC%B9%B4%EC%98%A4-api%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%9C-%EC%A3%BC%EC%86%8C-%EC%9C%84%EA%B2%BD%EB%8F%84-%EC%B6%94%EC%B6%9C/)
+
+
 ```{python}
 import json
 import requests
@@ -31,7 +36,18 @@ import requests
 api_key = "2ecacbafd523802f293b245103346b06"
 ```
 
-# 주소를 통해 위경도
+
+### 1. API Key 세팅
+
+우선 다음과 같이 카카오 에서 발급받은 `REST API 키`를 다음과 같이 지정해주도록 하자.
+
+```api_key <- "api key 입력"```
+
+## 2. 지리정보 API를 사용해 주소에서 위경도에서 추출
+
+이제 GET()함수를 통해 다음과 같이 api를 호출 해주자. 주소는 남산을 택했으며 남산의 주소를 검색 결과 "서울 중구 회형동1가"로 나오게 되어 이곳의 위경도를 추출하려고 한다. api문서에서는 다음에 위치 한다.
+ 
+ - [개발가이드 - 주소 검색](https://developers.kakao.com/docs/latest/ko/local/dev-guide#address-coord)
 
 ```{python}
 def addr_to_lat_lon(addr):
@@ -40,11 +56,20 @@ def addr_to_lat_lon(addr):
     result = json.loads(str(requests.get(url, headers=headers).text))
     match_first = result['documents'][0]['address']
     return float(match_first['x']), float(match_first['y'])
+```
 
+이렇게 만든 addr_to_lat_lon()함수를 통해 남산의 위경도틀 추출하면 다음과 같은 결과가 나오게 된다.
+
+```{python}
 addr_to_lat_lon('서울 중구 회현동1가')
 ```
 
-# 위경도를 통해 주소
+## 3. 지리정보 API를 사용한 위경도에서 주소 추출 함수
+
+이번에는 역으로 위경도에서 주소를 추출해보자. 직전에 사용한 남산의 위경도를 추출 했으니 이를 그대로 사용하도록 한다.  api문서에서는 다음에 위치 한다.
+ 
+ - [개발가이드- 좌표로 주소 변환하기](https://developers.kakao.com/docs/latest/ko/local/dev-guide#coord-to-address)
+
 
 ```{python}
 def lat_lon_to_addr(lon,lat):
@@ -53,7 +78,11 @@ def lat_lon_to_addr(lon,lat):
     result = json.loads(str(requests.get(url, headers=headers).text))
     match_first = result['documents'][0]['address_name']
     return str(match_first)
+```
 
+이렇게 만든 lat_lon_to_addr()함수를 통해 남산의 위경도틀 추출하면 다음과 같은 결과가 나오게 된다.
+
+```{python}
 lat_lon_to_addr(126.981204133005, 37.5555892070291)
 ```
 
