@@ -241,3 +241,11 @@ $ docker container stop {NAME}
 
 이전에 R shiny를 사용해 Docker에서 shiny를 띄우는 글을 적은 적이 있다. 이번에는 Python버전으로 적게 되었는데, 최근에 삼성전자의 주가 흐름을 블로그로 쓴적이 있으니 이제 앞으로 매일 갱신되는 삼성전자의 주가 데이터와 뉴스데이터를 추가로 분석 하여 웹에 띄워보는 시간을 가져보려 한다.
 
+
+--- 
+
+# Rererence
+
+ - [우분투 18.04 도커(Docker) 설치 방법](https://blog.cosmosfarm.com/archives/248/%EC%9A%B0%EB%B6%84%ED%88%AC-18-04-%EB%8F%84%EC%BB%A4-docker-%EC%84%A4%EC%B9%98-%EB%B0%A9%EB%B2%95/)
+ - [Deployment on Docker](https://community.plotly.com/t/deployment-on-docker/38854)
+ - [Dash 튜토리얼](https://crong-dev.tistory.com/23?category=895521)
