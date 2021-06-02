@@ -1,0 +1,243 @@
+---
+title: '[Python] Docker를 사용한 Dash 웹앱 생성'
+author: 최의용
+date: '2021-06-02'
+slug: python-docker를-사용한-dash-웹앱-생성
+categories:
+  - Dash
+  - Docker
+tags:
+  - Dash
+  - docker
+---
+
+<center>
+![](/post/2021-06-02-python-docker를-사용한-dash-웹앱-생성_files/dash_docker_main.PNG){width=90%}
+</center>
+
+Dash와 Docker을 사용해 웹에 띄워보자. 지난번에는 R Shiny를 사용해 웹에 띄워보는 블로그를 썼으나, 이번에는 Python을 사용해 웹에 대시보드를 구축하는 최소한의 환경을 써보려 한다. 이를 계기로 차차, Dash를 구성하는 시각화와 DB를 연동하고 매일 갱신되는 블로그를 적을 계획이다. 
+
+# EC2 환경
+
+AWS EC2환경은 다음과 같다.
+
+- 운영체제: Ubuntu 20.04
+- 인스턴스 유형: t2.large
+- Port 범위
+  - 22
+  - 8050 (Dash)
+  - 8888 (Jupyter notebook)
+
+# Dash  
+  
+### Dash 설치
+
+우선 Dash를 설치 해주자. 다음의 코드를 사용하여 dash 모듈을 설치 해준다.
+
+```
+$ pip3 install dash
+```
+
+### APP
+
+이제 test를 위해 간단하게 dash app을 만들어주자. app.py라는 파일을 생성하고 그 안에는 간략한 시각화 코드를 넣어 주었다.
+
+```
+import plotly.express as px
+import pandas as pd
+
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+# assume you have a "long-form" data frame
+# see https://plotly.com/python/px-arguments/ for more options
+
+df = pd.DataFrame({
+    "Fruit": ["Apples", "Oranges", "Bananas", "Apples", "Oranges", "Bananas"],
+    "Amount": [4, 1, 2, 2, 4, 5],
+    "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"] })
+
+fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
+
+app.layout = html.Div(children=[
+    html.H1(children='Hello Dash'),
+    html.Div(children=''' Dash: A web application framework for Python. '''),
+    dcc.Graph( id='example-graph', figure=fig ) ])
+
+if __name__ == '__main__':
+    app.run_server(host='0.0.0.0', port=8050, debug=True)
+```
+
+### APP 실행 (테스트)
+
+위에서 만들어 놓은 app.py를 통해 실행을 통해 잘 만들어져있는지 테스트를 해보자. 실행을 해주면 다음과 같은 메시지를 확인할 수 있다. 이를 확인하기 위해서는 {EC2 IP}:8050을 웹에 넣어 주면 된다. 이렇게 설치가 확인되었으면, Docker를 통해 웹앱을 알아보자.
+
+```
+$ python3 app.py
+
+Dash is running on http://0.0.0.0:8050/
+
+ * Serving Flask app 'app' (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: on
+```
+
+# Docker 
+  
+### Docker 설치
+
+도커를 설치 해주자. Ubuntu에서는 다음의 코드를 통해 Docker 설치를 위한 기반을 다져준다. 
+
+```
+$ sudo apt update
+$ sudo apt install apt-transport-https ca-certificates curl software-properties-common
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+$ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+$ sudo apt update
+$ apt-cache policy docker-ce
+```
+
+그리고 다음의 명령어를 통해 Docker를 설치 해준다.
+
+```
+$ sudo apt install docker-ce
+```
+
+### 설치 확인
+
+그리고 다음을 통해 Docker가 정상적으로 실행중인지 확인해보자.
+
+```
+$ sudo systemctl status docker
+```
+
+다음의 방법을 통해 설치를 확인할 수도 있다.
+
+```
+$ docker -v
+Docker version 20.10.6, build 370c289
+```
+
+### Docker 시작
+
+이제 Docker service를 시작 한다.
+
+```
+$ sudo service docker start
+```
+
+### 사용자 추가
+
+docker에 사용자를 추가하자. 다음의 코드에서 {username} 부분에 넣어주면 된다. 이때 username은 Ubuntu의 계정명이다. 이렇게 계정을 추가해주고 나면 **재부팅을 꼭 해주어야 한다.**
+
+```
+$ sudo usermod -aG docker {username}
+```
+
+### Dockerfile 생성
+
+이제 Dash를 실행할 Dockerfile을 만들어주자. touch 명령어로 dockerfile를 만들고 vi편집기로 내부에 들어가주자.
+
+```
+$ touch Dockerfile
+$ vi Dockerfile
+```
+
+### requirements.txt 파일 생성
+
+Docker를 생성시 사용할 python 모듈을 설치 하기 위해 다음과 같이 requirements.txt를 생성 해주자. 리눅스에서 freeze를 통해 requirements.txt를 받아오게 되면 시스템 모듈까지 한꺼번에 가져오게 되어 충돌이 생기니 따로 생성해주자. 
+
+```
+$ touch requirements.txt
+$ vi requirements.txt
+```
+
+#### requirements.txt 내부
+
+dash에 사용할 모듈은 다음의 두가지만 있기 때문에 다음 두개의 모듈만 적어주자.
+
+```
+dash
+pandas
+```
+
+
+
+### Dockerfile 작성
+
+이제 vi편집기로 dockerfile에 들어왔으니 dash 실행을 위한 코드를 준비하자.
+
+```
+FROM python:3.6.9
+
+COPY ./ ./
+
+RUN pip3 install -r requirements.txt
+
+WORKDIR /
+
+EXPOSE 8050
+
+CMD ["python3", "./app.py"]
+```
+
+# 실행
+
+### Image 생성
+
+이제 Docker를 위한 이미지를 생성해보자. 중요한건 Dockerfile이 있는 경로로 간다. 이미지 생성코드는 다음과 같다.
+
+ - docker build -t {image name} {dockerfile path}
+  - {image name}: docker의 이미지 이름을 의미 한다. 이곳에서는 dash라고 지어 두었다.
+  - {dockerfile path}: 도커파일의 경로. 이미 dockerfile이 있는 경로에 들어와 있으니 ’.’으로 해둔다.
+
+```
+docker build -t dash .
+```
+
+### Image 실행
+
+docker 이미지를 생성 했으면 이를 실행 해보자. 이미지 실행 코드는 다음과 같다. 
+
+ - docker run -p 8050:8050 {image name}
+  - {image name}은 직전에 만들어두었던 image name이다.
+
+```
+$ docker run -p 8050:8050 dash
+```
+
+### 생성된 Dash앱 확인
+
+<center>
+![](/post/2021-06-02-python-docker를-사용한-dash-웹앱-생성_files/dash_image.PNG){width=80%}
+</center>
+
+생성된 앱을 확인 하기 위해서는 앱에 ’{host}:8050’을 입력해주면 된다. 이번에 ec2를 통해 만들어 둔건 다음과 같다. 서버 비용 때문에 언제 사라질지 모르며, 시간에 따라 ec2를 키고 꺼두어서 필요한 시간에만 열어두는 글도 차차 작성할 예정이다.
+
+ - [Dash Test](http://15.165.152.133:8050/)
+ 
+# CONTAINER 종료
+
+서버를 내려야할 필요가 있다. 그럴때는 다음의 코드를 사용한다. 그럼 다음과 같은 메시지가 나오는걸 확인할 수 있다.
+
+```
+$ docker container list
+CONTAINER ID   IMAGE       COMMAND              CREATED       STATUS       PORTS                              NAMES
+29abb3d71633   dash_2      "python3 ./app.py"   2 hours ago   Up 2 hours   0.0.0.0:5080->5080/tcp, 8050/tcp   optimistic_sanderson
+```
+
+이제 이곳에서 알아야할 정보가 ‘CONTAINER ID’ 또는 ’NAME’인데 다음의 코드를 통해 컨테이너를 종료 해주자.
+
+- docker container stop {CONTAINER ID}
+- docker container stop {NAME}
+
+```
+$ docker container stop {NAME}
+```
+
+# 총평
+
+이전에 R shiny를 사용해 Docker에서 shiny를 띄우는 글을 적은 적이 있다. 이번에는 Python버전으로 적게 되었는데, 최근에 삼성전자의 주가 흐름을 블로그로 쓴적이 있으니 이제 앞으로 매일 갱신되는 삼성전자의 주가 데이터와 뉴스데이터를 추가로 분석 하여 웹에 띄워보는 시간을 가져보려 한다.
+
