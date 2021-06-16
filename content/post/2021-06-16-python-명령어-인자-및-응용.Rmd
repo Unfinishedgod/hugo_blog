@@ -10,6 +10,93 @@ tags:
 ---
 
 <center>
-![](/post/2021-06-16-python-명령어-인자-및-응용_files/main.PNG){width=70%}
+![](/post/2021-06-16-python-명령어-인자-및-응용_files/main.PNG){width=90%}
 </center>
+
+최근에 파이썬 코드를 돌리다가 메모리에 과부하가 걸리는 경험을 했다. 위 이미지는 따로 상황을 만들어 본것이고 실제로는 8~9기가가 넘게까지 메모리를 잡아 먹어서 애를 먹었었다.  생각보다 많은 양의 데이터를 처리하게 되어서, 코드가 중간중간 멈추게 되었는데 이번에는 이를 해결한 경험에 대해 적어보려고 한다. 예전에 R관련 포스팅을 할때에도 비슷한 글을 적은 적이 있었는데, 파이썬 안에서 또, 파이썬 파일을 만들어 이를 스크립트로 실행 하는 구조이다. 다음을 보자.
+
+<center>
+![](/post/2021-06-16-python-명령어-인자-및-응용_files/blog_main.PNG){width=70%}
+</center>
+
+main.py함수 안에 for문을 구성해주고, 그 안에 코드가 있는데신 이를 func.py로 각각 호출 시켜 결과를 받는 개념이다. 이때, 원래 main.py에서 한꺼번에 돌아가게 되어 과부하가 걸리는 위험을 줄여주고, 각각 func.py를 약하게 실행하게되어 메모리에 부담이 덜 가게 되는 구조가 된다. 각각 하나씩 코드를 보자.
+
+## 1. main.py
+
+main.py를 보자. 위의 구조와 동일하게끔 간단하게 다음과 같은 코드를 작성 하였다. 여기서 핵심은 os.system()인데, 이는 커맨드에서 python을 실행 시키게 된다. 이렇게 for loop안에 각각의 python코드가 실행 되게끔 해주었다. 
+
+```
+import os
+import pandas as pd
+
+df = pd.DataFrame({'year':['2021', '2021', '2021'], 
+             'month': ['01', '02', '03']})
+
+for i in range(len(df)):
+    year = df['year'][i]
+    month = df['month'][i]
+    os.system("python3 func.py" + " " + year + " " + month)
+```
+
+위와 같이 코드를 구성할때 파이썬은 다음과 같은 커맨드 입력을 하여 python파일을 호출하게 된다. 여기서 func.py 파일을 호출하는 코드인데 뒤에 2021과 01과 같은 것들은 직접 func.py에 인자로 넘겨주게 된다. 이제 func.py를 보자.
+
+```
+python3 func.py 2021 01
+python3 func.py 2021 02
+python3 func.py 2021 03
+```
+
+## 2. func.py
+
+이번에는 func.py를 알아보자. main.py에서 호출받아 실행하게 되는 func.py는 main.py에서 변수를 받아 이곳에 적용하게 된다. 여기서는 year, month두개의 변수를 main.py에서 받았으며, 이를 func.py에서 적용시켜주기 위해서 각각 sys.argv[1], sys.argv[2]를 사용한다. 이 두 변수는 커맨드 입력창에서 `python3 func.py 2021 01` 각각 2021, 01의 역할을 하게 된다. 
+
+
+```
+# 경로 확인
+import os
+
+#필요한 라이브러리 호출
+import pandas as pd
+import numpy as np
+
+import datetime
+import sys
+
+year = sys.argv[1]
+month = sys.argv[2]
+```
+
+### 2-1. 번외) 로그
+
+번외로 func.py안에 main.py에서 받은 변수값에 대한 결과 값을 로그로 남겨보려 한다. datetime모듈을 사용였으며 to_csv()의 mode='a'옵션을 사용하여 다음과 같이 csv를 누적으로 저장하게 해주었다.
+
+```
+now = datetime.datetime.now()
+
+df = pd.DataFrame({
+    'year':year, 
+    'month': month,
+    'time': [now]
+})
+
+if not os.path.exists('result.csv'):
+    df.to_csv('result.csv', index=False, mode='w')
+else:
+    df.to_csv('result.csv', index=False, mode='a', header=False)
+```
+
+### 2-2. 결과
+
+이렇게 result.csv로 로그를 남기게 되어 다음과 같은 결과를 도출하게 되었다.
+
+```
+year,month,time
+2021,01,2021-06-16 23:32:22.143574
+2021,02,2021-06-16 23:32:22.527512
+2021,03,2021-06-16 23:32:22.922268
+```
+
+# 총평
+
+최근에 여러 질문들을 많이 보게 되었다. 반복문 안에 로그를 남긴다던가, 명령인자를 입력받아 실행하는 방법이던가. 다행히도 이번에  메모리 문제로 비슷한 경험을 하게 되어, 이를 해결하기 위한 경험 정도로 글을 쓸 계기가 생겼다.
 
