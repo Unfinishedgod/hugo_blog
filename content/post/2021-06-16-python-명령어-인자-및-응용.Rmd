@@ -1,0 +1,15 @@
+---
+title: '[python] 명령어 인자 및 응용'
+author: 최의용
+date: '2021-06-16'
+slug: python-명령어-인자-및-응용
+categories:
+  - Python
+tags:
+  - Python
+---
+
+<center>
+![](/post/2021-06-16-python-명령어-인자-및-응용_files/main.PNG){width=70%}
+</center>
+
