@@ -1,0 +1,402 @@
+---
+title: '[Python] CNN을 사용한 fashion mnist'
+author: 최의용
+date: '2021-06-24'
+slug: python-cnn을-사용한-fashion-mnist
+categories:
+  - Python
+tags:
+  - Python
+  - CNN
+  - Mnist
+---
+
+
+
+<div id="cnn을-사용한-fashion-mnist-분류" class="section level1">
+<h1>CNN을 사용한 Fashion mnist 분류</h1>
+<p>CNN을 사용해서 Fashion mnist를 분류 해보자. mnist의 기초에는 숫자도 있으며 이번에는 옷을 인식하고 분류 해보려 한다.</p>
+<div id="library" class="section level3">
+<h3>0. Library</h3>
+<p>라이브러리는 pandas, numpy, tensorflow, matplotlib, seaborn, keras, sklearn을 기본적으로 사용한다. 또한, 환경은 GPU를 사용할 수 있는 Google Colab 노트북에서 진행 한다.</p>
+<pre><code>import sys
+import os
+
+import pandas as pd
+import numpy as np
+import tensorflow as tf
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from keras.callbacks import ModelCheckpoint, EarlyStopping
+from keras.datasets import mnist
+from keras.utils import np_utils
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D
+
+from sklearn.metrics import confusion_matrix
+from sklearn.model_selection import train_test_split
+from IPython.display import Image
+
+for dirname, _, filenames in os.walk(&#39;/kaggle/input&#39;):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))</code></pre>
+</div>
+<div id="data" class="section level3">
+<h3>1. Data</h3>
+<p>우선 데이터를 불러오자. 그리고 label에 따라 X_train, Y_train으로 분류 해준다.</p>
+<pre><code>from google.colab import drive
+drive.mount(&#39;/content/gdrive&#39;)</code></pre>
+<pre><code>Mounted at /content/gdrive</code></pre>
+<pre><code># Load the data
+
+train = pd.read_csv(&quot;gdrive/MyDrive/Colab Notebooks/Dacon/Fashion_MNIST/train.csv&quot;)
+test = pd.read_csv(&quot;gdrive/MyDrive/Colab Notebooks/Dacon/Fashion_MNIST/test.csv&quot;)
+
+X_train = train.drop([&quot;index&quot;,&quot;label&quot;],axis=1)
+Y_train = train[&#39;label&#39;]
+
+test_index = test[&#39;index&#39;]
+test = test.drop([&#39;index&#39;], 1)</code></pre>
+<p>pandas로 불러온 데이터는 reshape함수를 통해 28 * 28배열로 변환 시켜 준다.|</p>
+<pre><code>X_train = X_train.values.reshape(-1,28,28,1)
+test = test.values.reshape(-1,28,28,1)</code></pre>
+</div>
+<div id="데이터-파악" class="section level3">
+<h3>2. 데이터 파악</h3>
+<p>10개의 class로 나눠져 있으며 각 번호에 대한 정보는 다음과 같다.</p>
+<ul>
+<li>0: T-shirt/top</li>
+<li>1: Trouser</li>
+<li>2: Pullover</li>
+<li>3: Dress</li>
+<li>4: Coat</li>
+<li>5: Sandal</li>
+<li>6: Shirt</li>
+<li>7: Sneaker</li>
+<li>8: Bag</li>
+<li>9: Ankle boot</li>
+</ul>
+<p>추가로 각각의 이미지는 다음과 같다.</p>
+<pre><code>class_names = [&#39;T_shirt/top&#39;, &#39;Trouser&#39;, &#39;Pullover&#39;, &#39;Dress&#39;, &#39;Coat&#39;, 
+               &#39;Sandal&#39;, &#39;Shirt&#39;, &#39;Sneaker&#39;, &#39;Bag&#39;, &#39;Ankle boot&#39;]
+
+plt.figure(figsize=(20, 20))
+for k in range(10):
+  XX = X_train[Y_train == k]
+  YY = Y_train[Y_train == k].reset_index()[&#39;label&#39;]
+  for i in range(10):
+    plt.subplot(10, 10, k*10 + i + 1)
+    plt.xticks([])
+    plt.yticks([])
+    plt.grid(False)
+    plt.imshow(XX[i][:,:,0], cmap=&#39;gray&#39;)
+    label_index = int(YY[i])
+    plt.title(&#39;{}. {}&#39;.format(k, class_names[label_index]))
+plt.show()</code></pre>
+<center>
+<img src="/post/2021-06-24-python-cnn을-사용한-fashion-mnist_files/output_8_0.png" style="width:100.0%" />
+</center>
+</div>
+<div id="traintest-set-분류" class="section level3">
+<h3>3. Train/test set 분류</h3>
+<p>sklearn의 model_selection에서 train_test_split 함수를 불러온 후, train set과 validation set으로 분리 시켜주자. train/val의 비율은 8:2로 test_size옵션에서 0.2를 사용 해주었다. 추가로 randaom_state=100으로 해주어, seed를 100으로 지정 해주었다. 다음에 사용된 라이브러리는 다음과 같다.</p>
+<ul>
+<li>from sklearn.model_selection import train_test_split</li>
+</ul>
+<pre><code>X_train, X_val, Y_train, Y_val = train_test_split(X_train, 
+                                                  Y_train, 
+                                                  test_size = 0.2, 
+                                                  random_state=100)</code></pre>
+<p>이렇게 10000개의 이미지 데이터중 8000개와 2000개로 분리 시켜주었다.</p>
+<pre><code>print(&quot;Train set 이미지 수: {} 개&quot;.format(X_train.shape[0]))
+print(&quot;Validation set 이미지 수: {} 개&quot;.format(X_val.shape[0]))</code></pre>
+<pre><code>Train set 이미지 수: 8000 개
+Validation set 이미지 수: 2000 개</code></pre>
+<div id="전처리" class="section level4">
+<h4>3-1. 전처리</h4>
+<ul>
+<li>X
+<ul>
+<li>이제 이 데이터를 255로 나누어 주자. 0에서 255의 숫자의 배열로 이루어진 이미지 데이터를 255로 나누어 주어 0~1로 변환 사켜주는 작업이다. 케라스는 데이터를 0에서 1 사이의 값으로 변환한 다음 구동할 때 최적의 성능을 보이기 때문이다. 따라서 astype()함수를 통해 실수형으로 바꿔준 후 255로 나누는 작업을 진행 했다.</li>
+</ul></li>
+<li>Y
+<ul>
+<li>Y의 경우에는 원-핫 인코딩을 적용해주자. np_utils.to_categorical()함수를 사용한다. 활성화 함수를 사용하기 위해서는 Y값이 0과 1로 이루어져야 하기 때문인데 이는 5라는 라벨을 갖고 있는 데이터를 array([0.,0.,0.,0.,1.,0.,0.,0.,0.]) 로 바꿔준다.</li>
+</ul></li>
+</ul>
+<pre><code># CNN
+X_train = X_train.reshape(X_train.shape[0], 28, 28, 1).astype(&#39;float32&#39;) / 255
+X_val = X_val.reshape(X_val.shape[0], 28, 28, 1).astype(&#39;float32&#39;) / 255
+
+Y_train = np_utils.to_categorical(Y_train)
+Y_val = np_utils.to_categorical(Y_val)</code></pre>
+</div>
+</div>
+<div id="모델" class="section level3">
+<h3>4. 모델</h3>
+<div id="모델-설계" class="section level4">
+<h4>4-1. 모델 설계</h4>
+<p>모델을 만들어보자. 우선 model.Sequential()한수를 사용하여 model을 선언 해주고 model.add()를 사용하여 차곡차곡 하나씩 층을 만들어 주려고 한다. 다음을 보자.</p>
+<p><strong>a. Convolution층</strong></p>
+<p>케라스에서 Convolution층을 추가하는 함수는 Conv2D()이다.</p>
+<ul>
+<li>model.add(Conv2D(32, kernel_size = (3,3), input_shape=(28,28,1), activation=‘relu’))
+<ul>
+<li>32: 32개의 mask를 사용</li>
+<li>kernel_size: (3,3)의 커널을 정한다.</li>
+<li>input_shape: (28,28,1)</li>
+<li>activation: 활성화 함수를 relu로 정해준다.</li>
+</ul></li>
+<li>model.add(Conv2D(64,(3,3), activation=‘relu’))
+<ul>
+<li>mask 64를 적용한 새로운 Convolution층을 하나 더 추가한다.</li>
+</ul></li>
+</ul>
+<p><strong>b. Maxpooling</strong></p>
+<p>이제 추가로 Maxpooling 층울 추가 하보자. convolution으로 층을 추가 했지만 여전히 크기 때문에 한번 더 축소를 진행 한다.</p>
+<ul>
+<li>model.add(MaxPooling2D(pool_size=2))
+<ul>
+<li>pool_size: pooling창의 크기를 정하는 것으로 2로 정하여 줄여 주었다.</li>
+</ul></li>
+</ul>
+<p><strong>c. Drop out &amp; Flatten</strong></p>
+<ul>
+<li>model.add(Dropout(0.25))
+<ul>
+<li>딥러닝을 학습할때 과적합을 효과적으로 피해가는 방법중 다음의 기법이 있다. drop out기법인데, 이는 은닉층에 배치된 노드 중 일부를 임의로 껴주는 것이다.</li>
+</ul></li>
+<li>model.add(Flatten())
+<ul>
+<li>convolution이나 max pooling는 2차원 배열인 채로 다루는데, 이를 1차원으로 바꿔주자.</li>
+</ul></li>
+</ul>
+<pre><code># 컨볼루션 신경망 설정
+model = Sequential()
+
+model.add(Conv2D(32, kernel_size = (3,3), input_shape=(28,28,1), activation=&#39;relu&#39;))
+model.add(Conv2D(64,(3,3), activation=&#39;relu&#39;))
+model.add(MaxPooling2D(pool_size=2))
+model.add(Dropout(0.25))
+model.add(Flatten())
+model.add(Dense(128, activation=&#39;relu&#39;))
+model.add(Dropout(0.5))
+model.add(Dense(10, activation=&#39;softmax&#39;))</code></pre>
+<p>모델 summary를 보자.</p>
+<pre><code>model.summary()</code></pre>
+<pre><code>Model: &quot;sequential&quot;
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+conv2d (Conv2D)              (None, 26, 26, 32)        320       
+_________________________________________________________________
+conv2d_1 (Conv2D)            (None, 24, 24, 64)        18496     
+_________________________________________________________________
+max_pooling2d (MaxPooling2D) (None, 12, 12, 64)        0         
+_________________________________________________________________
+dropout (Dropout)            (None, 12, 12, 64)        0         
+_________________________________________________________________
+flatten (Flatten)            (None, 9216)              0         
+_________________________________________________________________
+dense (Dense)                (None, 128)               1179776   
+_________________________________________________________________
+dropout_1 (Dropout)          (None, 128)               0         
+_________________________________________________________________
+dense_1 (Dense)              (None, 10)                1290      
+=================================================================
+Total params: 1,199,882
+Trainable params: 1,199,882
+Non-trainable params: 0
+_________________________________________________________________</code></pre>
+</div>
+<div id="모델-컴파일" class="section level4">
+<h4>4-2. 모델 컴파일</h4>
+<p>모델을 컴파일 해보자. 오차 함수로cetegorical_crossentropy, 최적화 함수로 adam을 사용한다.</p>
+<pre><code>model.compile(loss = &#39;categorical_crossentropy&#39;,
+              optimizer=&#39;adam&#39;,
+              metrics = [&#39;accuracy&#39;])</code></pre>
+</div>
+<div id="모델-최적화-설정" class="section level4">
+<h4>4-3. 모델 최적화 설정</h4>
+<p>이제 모델의 성과를 저장하고 모델의 최적화 단계에서 학습을 중단하게끔 설정 해주자. 이는 10회 이상 모델의 성과 향상이 없으면 자동으로 학습을 중단하게 된다.</p>
+<pre><code>MODEL_DIR = &quot;./model/&quot;
+
+if not os.path.exists(MODEL_DIR):
+  os.mkdir(MODEL_DIR)
+
+modelpath = &#39;./model/{epoch:02d}-{val_loss:.4f}.hdf5&#39;
+checkpointer = ModelCheckpoint(filepath=modelpath, monitor = &#39;val_loss&#39;, verbose=1, save_best_only=True)
+
+early_stopping_callback = EarlyStopping(monitor=&#39;val_loss&#39;, patience=10)</code></pre>
+</div>
+<div id="모델-실행" class="section level4">
+<h4>4-4. 모델 실행</h4>
+<p>이렇게 샘플 200개를 모두 30회 실행하게 해주았다. 그리고 valid set으로 최종 모델의 성과를 측정하여 그 값을 출력하게 해주었다. 이때, 조금 주의해야 할것이 있다면 cpu로 돌리는데 시간이 매우 많이 걸리기 때문에, gpu를 사용해주도록 한다.</p>
+<pre><code>history = model.fit(X_train, Y_train, validation_data = (X_val, Y_val), 
+                    epochs=20, 
+                    batch_size=200, 
+                    verbose=0, 
+                    callbacks=[early_stopping_callback, checkpointer])
+
+print(&quot;\n Test Accuracy: %.4f&quot; % (model.evaluate(X_val, Y_val)[1]))</code></pre>
+<pre><code>Epoch 00001: val_loss improved from inf to 0.56965, saving model to ./model/01-0.5696.hdf5
+
+Epoch 00002: val_loss improved from 0.56965 to 0.46285, saving model to ./model/02-0.4628.hdf5
+
+Epoch 00003: val_loss improved from 0.46285 to 0.41940, saving model to ./model/03-0.4194.hdf5
+
+Epoch 00004: val_loss improved from 0.41940 to 0.36893, saving model to ./model/04-0.3689.hdf5
+
+Epoch 00005: val_loss improved from 0.36893 to 0.35377, saving model to ./model/05-0.3538.hdf5
+
+Epoch 00006: val_loss improved from 0.35377 to 0.35094, saving model to ./model/06-0.3509.hdf5
+
+Epoch 00007: val_loss improved from 0.35094 to 0.34018, saving model to ./model/07-0.3402.hdf5
+
+Epoch 00008: val_loss improved from 0.34018 to 0.31981, saving model to ./model/08-0.3198.hdf5
+
+Epoch 00009: val_loss did not improve from 0.31981
+
+Epoch 00010: val_loss did not improve from 0.31981
+
+Epoch 00011: val_loss improved from 0.31981 to 0.31201, saving model to ./model/11-0.3120.hdf5
+
+Epoch 00012: val_loss improved from 0.31201 to 0.31156, saving model to ./model/12-0.3116.hdf5
+
+Epoch 00013: val_loss did not improve from 0.31156
+
+Epoch 00014: val_loss did not improve from 0.31156
+
+Epoch 00015: val_loss improved from 0.31156 to 0.30911, saving model to ./model/15-0.3091.hdf5
+
+Epoch 00016: val_loss did not improve from 0.30911
+
+Epoch 00017: val_loss did not improve from 0.30911
+
+Epoch 00018: val_loss did not improve from 0.30911
+
+Epoch 00019: val_loss did not improve from 0.30911
+
+Epoch 00020: val_loss did not improve from 0.30911
+63/63 [==============================] - 0s 2ms/step - loss: 0.3245 - accuracy: 0.9020
+
+ Test Accuracy: 0.9020</code></pre>
+</div>
+</div>
+<div id="오차와-정확도-확인" class="section level3">
+<h3>5. 오차와 정확도 확인</h3>
+<p>실행 결과를 그래프로 확인해보자. 오차와 정확도를 확인하려 한다.</p>
+<pre><code>fig, (ax1, ax2) = plt.subplots(1, 2, figsize = (12, 5))
+
+# 오차
+y_vloss = history.history[&#39;val_loss&#39;]
+
+# 학습셋 오차
+y_loss = history.history[&#39;loss&#39;]
+
+# 그래프로 표현
+x_len = np.arange(len(y_loss))
+ax1.plot(x_len, y_vloss, marker = &#39;.&#39;, c=&quot;red&quot;, label=&#39;Testset_loss&#39;)
+ax1.plot(x_len, y_loss, marker = &#39;.&#39;, c=&#39;blue&#39;, label = &#39;Trainset_loss&#39;)
+
+# 그래프에 그리드를 주고 레이블을 표시
+ax1.legend(loc=&#39;upper right&#39;)
+ax1.grid()
+ax1.set(xlabel=&#39;epoch&#39;, ylabel=&#39;loss&#39;)
+
+
+# 정확도
+y_vaccuracy = history.history[&#39;val_accuracy&#39;]
+
+# 학습셋
+y_accuracy = history.history[&#39;accuracy&#39;]
+
+# 그래프로 표현
+x_len = np.arange(len(y_accuracy))
+ax2.plot(x_len, y_vaccuracy, marker = &#39;.&#39;, c=&quot;red&quot;, label=&#39;Testset_accuracy&#39;)
+ax2.plot(x_len, y_accuracy, marker = &#39;.&#39;, c=&#39;blue&#39;, label = &#39;Trainset_accuracy&#39;)
+
+# 그래프에 그리드를 주고 레이블을 표시
+ax2.legend(loc=&#39;lower right&#39;)
+ax2.grid()
+
+ax2.set(xlabel=&#39;epoch&#39;, ylabel=&#39;accuracy&#39;)
+
+# draw gridlines
+ax2.grid(True)
+plt.show()</code></pre>
+<center>
+<img src="/post/2021-06-24-python-cnn을-사용한-fashion-mnist_files/output_26_0.png" style="width:80.0%" />
+</center>
+</div>
+<div id="틀린-데이터-확인" class="section level3">
+<h3>6. 틀린 데이터 확인</h3>
+<p>분류를 하는데 어떤 것을 틀렸는지 확인해보자.</p>
+<pre><code>y_pred = model.predict(X_val).round(2)
+
+y_val_label = list(map(np.argmax, Y_val))
+y_pred_label = list(map(np.argmax, y_pred))</code></pre>
+<p>우선 confusion_matrix을 통해 어떻게 분류를 했는지 확인해보자.</p>
+<pre><code>plt.figure(figsize = (16,9))
+
+cm = confusion_matrix(y_val_label,y_pred_label)
+
+sns.heatmap(cm , annot = True,fmt = &#39;d&#39;,xticklabels = class_names,yticklabels = class_names)</code></pre>
+<p>이번에는 이미지를 통해 틀린것을 확인해보자.</p>
+<pre><code>aaa = np.array(y_val_label) != np.array(y_pred_label)
+
+not_equel_list = np.where(aaa == True)[0]
+
+plt.figure(figsize=(20,20))
+j = 1
+for i in not_equel_list[0:36]:
+# for a in np.random.randint(0,206,36):
+#     i = not_equel_list[a]
+#     print(a)
+    plt.subplot(6,6,j); j+=1
+    plt.imshow(X_val[i].reshape(28,28),cmap = &#39;Greys&#39;)
+    plt.axis(&#39;off&#39;)
+    plt.title(&#39;Actual = {} / {} \nPredicted = {} / {}&#39;.format(class_names[y_val_label[i]],
+                                                            y_val_label[i],
+                                                            class_names[y_pred_label[i]],
+                                                            y_pred_label[i]))</code></pre>
+<center>
+<img src="/post/2021-06-24-python-cnn을-사용한-fashion-mnist_files/output_32_0.png" style="width:100.0%" />
+</center>
+<p>위의 사진을 보면 shirt를 pullover로 분류 하고 ankle boot를 sneaker로 분류 한것도 있는데 사실 이부분은 나도 구분을 못하긴 하겠다.</p>
+<center>
+<img src="/post/2021-06-24-python-cnn을-사용한-fashion-mnist_files/fashion_tail_img.PNG" style="width:80.0%" />
+</center>
+<pre><code>results = model.predict(test)
+results = np.argmax(results,axis = 1)
+results = pd.Series(results,name=&quot;Label&quot;)</code></pre>
+<pre><code>submission = pd.concat([pd.Series(range(1,28001),name = &quot;ImageId&quot;),results],axis = 1)
+submission.to_csv(&quot;results_fashion_mnist.csv&quot;,index=False)</code></pre>
+</div>
+</div>
+<div id="총평" class="section level1">
+<h1>총평</h1>
+<p>최근에 딥러닝을 공부 하고 있다. 기초적인 mnist를 필사 하는 과정인데, 아직은 모델을 설계 하는과정에서 직관적으로 와닿지가 않지만 이는 어느정도 훈련을 해가면서 익숙해야 겠다.</p>
+<hr />
+<div id="reference" class="section level3">
+<h3>Reference</h3>
+<ul>
+<li>Kaggle Mnist
+<ul>
+<li><a href="https://www.kaggle.com/yassineghouzam/introduction-to-cnn-keras-0-997-top-6">Introduction to CNN Keras - 0.997 (top 6%)</a></li>
+<li><a href="https://www.kaggle.com/kakauandme/tensorflow-deep-nn">TensorFlow deep NN</a></li>
+<li><a href="https://www.kaggle.com/cdeotte/25-million-images-0-99757-mnist">25 Million Images! [0.99757] MNIST</a></li>
+</ul></li>
+<li>kaggle fashion
+<ul>
+<li><a href="https://www.kaggle.com/shivamb/how-autoencoders-work-intro-and-usecases">How Autoencoders Work: Intro and UseCases</a></li>
+<li><a href="https://www.kaggle.com/pavansanagapati/a-simple-cnn-model-beginner-guide">A Simple CNN Model Beginner Guide !!!!!!</a></li>
+<li><a href="https://www.kaggle.com/lykin22/cnn-fashion-mnist-image-classification">CNN-Fashion-MNIST Image Classification</a></li>
+<li><a href="https://www.kaggle.com/sayakdasgupta/introduction-to-gans-on-fashion-mnist-dataset">Introduction to GANs on Fashion MNIST Dataset</a></li>
+<li><a href="https://www.kaggle.com/bugraokcu/cnn-with-keras">CNN with Keras</a></li>
+<li><a href="https://www.kaggle.com/gpreda/cnn-with-tensorflow-keras-for-fashion-mnist">CNN with Tensorflow|Keras for Fashion MNIST</a></li>
+</ul></li>
+</ul>
+</div>
+</div>
