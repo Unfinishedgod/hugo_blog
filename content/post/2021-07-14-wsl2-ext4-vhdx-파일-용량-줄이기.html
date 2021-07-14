@@ -1,0 +1,46 @@
+---
+title: '[WSL2] ext4.vhdx 파일 용량 줄이기'
+author: 최의용
+date: '2021-07-14'
+slug: wsl2-ext4-vhdx-파일-용량-줄이기
+categories:
+  - WSL2
+tags:
+  - WSL2
+  - ext4
+  - vhdx
+---
+
+
+
+<center>
+<img src="/post/2021-07-14-wsl2-ext4-vhdx-파일-용량-줄이기_files/main.PNG" style="width:80.0%" />
+</center>
+<p>최근에 WSL2로 업데이트 하게 되었다. 그러다 보니 어느순간 갑자기 컴퓨터에 용량이 꽉 차게 되는걸 확인하게 되었는데, 찾아보니 wsl2의 ext4.vhx 파일이더라. 처음에는 90 GB 까지 올라가는데 이게 도대체 뭐길래 그렇게 많이 나가는가 알아보니, WSL2에서의 핵심인 가상 하드디스크 였다. 늘어만 나지 줄어들지는 않는다는 .vhdx를 압축 하는 방법이 있어서 이번에는 압축하는 방법을 알아보려고 한다. 우선 압축 하기전에 ext4.vhdx 파일을 캡쳐한 모습.</p>
+<div id="before" class="section level3">
+<h3>1. Before</h3>
+<center>
+<img src="/post/2021-07-14-wsl2-ext4-vhdx-파일-용량-줄이기_files/before.png" style="width:60.0%" />
+</center>
+</div>
+<div id="solution" class="section level3">
+<h3>2. Solution</h3>
+<p>관리자 권한으로 Power shell을 접속 한다. 그리고 다음의 코드를 하나씩 입력 해주면 된다. 특히 ext4.vhdx파일의 경로는 wsl2의 경우 다음과 같은데 이는 환경마다, 우분투 버전마다 다르기 때문에 이는 참고 하자.</p>
+<ul>
+<li><code>C:\Users\{Users}\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu20.04onWindows_79rhkp1fndgsc\LocalState\</code></li>
+</ul>
+<pre><code>wsl --shutdown
+diskpart
+select vdisk file=&quot;경로/ext4.vhdx&quot;
+attach vdisk readonly
+compact vdisk
+detach vdisk
+exit</code></pre>
+</div>
+<div id="after" class="section level3">
+<h3>3. After</h3>
+<p>위의 코드를 실행하면 vhdx파일이 압축이 되고 다음과 같이 용량 확보가 가능해진다.</p>
+<center>
+<img src="/post/2021-07-14-wsl2-ext4-vhdx-파일-용량-줄이기_files/after.png" style="width:60.0%" />
+</center>
+</div>
