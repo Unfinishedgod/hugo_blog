@@ -30,6 +30,10 @@ filename = "sitemap.xml"
 [[menu.main]]
     name = "Facebook"
     url = "https://www.facebook.com/shjj08"
+    
+[[menu.main]]
+    name = "Book"
+    url = "https://medium.com/@owen_book"    
 
 [params]
     description = "A website built through Hugo and blogdown."
