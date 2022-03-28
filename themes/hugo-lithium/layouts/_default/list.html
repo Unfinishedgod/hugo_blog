@@ -34,4 +34,6 @@
 
 {{ partial "footer.html" . }}
 
+{{ if .Site.Params.GoogleAnalyticsID }}
 {{ partial "analytics-gtag.html" . }}
+{{ end }}
