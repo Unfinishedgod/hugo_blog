@@ -11,6 +11,7 @@ tags:
   - ubuntu
 ---
 
+
 <center>
 ![](/post/2022-03-28-aws-ec2-스파크-설치-및-ec2-이미지-생성_files/Apache_Spark_logo.svg.png){width=50%}
 </center>
