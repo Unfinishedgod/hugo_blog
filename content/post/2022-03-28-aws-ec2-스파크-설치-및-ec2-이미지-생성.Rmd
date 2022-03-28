@@ -12,7 +12,7 @@ tags:
 ---
 
 <center>
-![](/post/2022-03-28-aws-ec2-스파크-설치-및-ec2-이미지-생성_files/Apache_Spark_logo.svg.png){width=30%}
+![](/post/2022-03-28-aws-ec2-스파크-설치-및-ec2-이미지-생성_files/Apache_Spark_logo.svg.png){width=50%}
 </center>
 
 
@@ -31,16 +31,194 @@ tags:
 -Jupyter에서 pyspark 확인 <br>
 
 2. 이미지 생성
+- 이미지 생성 <br>
+- 생성된 이미지로 EC2 구축 <br>
 
  그럼 이제 우선 콘다 부터 설치해보자. 
  
 # 1. EC2에서 기본 세팅
 
+우선 새로 EC2를 생성 했으니 기본적으로 다음을 진행 해주자.
+
+```
+$ sudo apt update
+```
+
 ## Anaconda 설치 
 
-우선 
+이제 콘다를 설치 해보자. 2021년 11월에 올라온 콘다를 설치 하려고 한다. 아나콘다 버전별 정보는 다음을 참고.
+
+ - https://repo.anaconda.com/archive/
 
 ```
-sudo apt update
+$ wget https://repo.anaconda.com/archive/Anaconda3-2021.11-Linux-x86_64.sh
+
+$ bash Anaconda3-2021.11-Linux-x86_64.sh
 ```
 
+이렇게 설치 했으면 환경 설정을 해주도록 하자. 다음과 같이 vi 편집기로 넘어가서 환경 세팅을 해주면 된다.
+
+```
+vi ~/.bashrc
+```
+
+환경세팅을 다음과 같이. 애초에 AWS에서 Ubuntu로 진행 했으니 다음코드를 그대로 복붙 하면서 진행.  
+
+```
+# Conda set
+export PATH=/home/ubuntu/anaconda3/bin:$PATH
+```
+
+그럼 이제 빠져 나와서 적용 하고 콘다 버전을 확인 해보자. Conda 버전이 잘 나왔다면 성공.
+
+```
+$ source ~/.bashrc
+$ conda -V
+conda 4.10.3
+```
+
+이제 주피터 설정을 해주자. 다음의 코드를 통해 주피터 편집기로 넘어가서 추가 로 적용해야 할 것이 있다.
+
+```
+$ jupyter notebook --generate-config
+$ vi ~/.jupyter/jupyter_notebook_config.py
+```
+
+jupyter_notebook_config.py에서 다음의 코드를 찾아서 넣어 주고 저장하고 나오자.
+
+```
+## Whether to allow the user to run the notebook as root.
+#c.NotebookApp.allow_root = False
+c.NotebookApp.allow_root = True
+
+## The IP address the notebook server will listen on.
+#c.NotebookApp.ip = 'localhost'
+c.NotebookApp.ip = '0.0.0.0'
+```
+
+이제 `jupyter notebook` 커맨드로 주피터가 잘 작동 된다면 성공
+
+## Java 설치
+
+이제 자바를 설치 해보자. 스파크를 설치 하기위해서 자바와 스칼라가 기본적으로 설치 되어야 한다.
+
+```
+$ sudo apt install openjdk-8-jdk
+```
+
+설치를 완료 했으면 다음 버전을 확인해보자. 버전이 잘 나오면 설치는 성공
+
+```
+$ java -version
+openjdk version "1.8.0_312"
+OpenJDK Runtime Environment (build 1.8.0_312-8u312-b07-0ubuntu1~20.04-b07)
+OpenJDK 64-Bit Server VM (build 25.312-b07, mixed mode)
+```
+
+이제 환경 변수 설정을 진행하자. `vi ~/.bashrc`를 사용해 들어가서 다음의 코드를 넣어 주자. 그리고 나서 `source ~/.bashrc`로 마무리
+
+```
+# Java set
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASS_PATH=$JAVA_HOME/lib:$CLASS_PATH
+```
+
+## Scala 설치
+
+이번에는 스칼라 설치. 자바 설치와 비슷하다.
+
+```
+$ sudo apt-get install scala
+```
+
+환경변수도 동일. `vi ~/.bashrc`를 사용해 들어가서 다음의 코드를 넣어주고  `source ~/.bashrc`로 마무리
+
+```
+# Scala set
+export SCALA_HOME=/usr/bin/scala
+export PATH=$SCALA_HOME/bin:$PATH
+```
+
+## Spark 설치 
+
+이제 스파크를 설치 해주자. 스파크에 대한 버전은 다음을 참고 하고.
+
+ - https://spark.apache.org/downloads.html
+
+```
+$ wget https://dlcdn.apache.org/spark/spark-3.2.1/spark-3.2.1-bin-hadoop3.2.tgz
+$ tar xvf spark-3.2.1-bin-hadoop3.2.tgz
+$ sudo mv spark-3.2.1-bin-hadoop3.2 /opt/spark
+```
+
+스파크도 역시 환경 변수를 지정해주자. conda환경에서 진행 하기때문에 PYSPARK_PYTHON은 콘다 버전으로 해두었다.
+
+```
+# Spark set
+export SPARK_HOME=/opt/spark
+export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
+export PYSPARK_PYTHON=/home/ubuntu/anaconda3/bin/python3
+```
+
+`pyspark`커맨드 실행시 다음과 같이 나오면 성공.
+
+```
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 3.2.1
+      /_/
+```
+
+이제 주피터에서 pyspark를 테스트 해보기 위해 pip를 사용헤 pyspark를 설치 해주자.
+
+```
+$ pip install pyspark
+```
+
+여기까지가 EC2에서 진행한 Spark의 기초 적인 환경이다. 그러나 매번 EC2생성시 이런 번거로움이 있으니 이를 이미지로 만들어 두자.
+
+# 2. 이미지 생성
+
+## 이미지 생성
+
+이미지 생성은 간단한다. 먼저 EC2대시보드에서, 작업 > 이미지 및 템플릿 > 이미지 생성 버튼을 클릭해주자.
+
+<center>
+![](/post/2022-03-28-aws-ec2-스파크-설치-및-ec2-이미지-생성_files/image_1.PNG){width=80%}
+</center>
+
+이미지 이름을 입력 해주고 이미지 생성 버튼 클릭하면 완성
+
+<center>
+![](/post/2022-03-28-aws-ec2-스파크-설치-및-ec2-이미지-생성_files/image_2.PNG){width=80%}
+</center>
+
+## 생성된 이미지로 EC2 구축 
+
+이제 EC2 구축시 앞서서 고생 했던 아나콘다, 스파크 설치를 또 할 필요가 없다. 이미지로 인스턴스 시작 버튼을 통해 새로 이미지를 생성 하면 된다.
+
+<center>
+![](/post/2022-03-28-aws-ec2-스파크-설치-및-ec2-이미지-생성_files/image_3.PNG){width=80%}
+</center>
+
+새로 구축한 EC2에서 바로 `pyspark` 커맨드 실행시 다음과 같이 나오게 된다.
+
+```
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /__ / .__/\_,_/_/ /_/\_\   version 3.2.1
+      /_/
+```
+
+---
+
+### 참고 
+
+ - [WSL을 활용한 Rstudio-server 설치](https://hslee09.medium.com/r-wsl%EC%9D%84-%ED%99%9C%EC%9A%A9%ED%95%9C-rstudio-server-%EC%84%A4%EC%B9%98-418428112341)
+ - [ ubuntu에 spark 설치 및 jupyter notebook과 pyspark연동](https://hslee09.medium.com/linux-ubuntu%EC%97%90-spark-%EC%84%A4%EC%B9%98-444213df02e3)
+ - [Ubuntu(EC2)에 Apache Spark를 설치해보자](https://velog.io/@jodawooooon/BigData-UbuntuEC2%EC%97%90-Apache-Spark%EB%A5%BC-%EC%84%A4%EC%B9%98%ED%95%B4%EB%B3%B4%EC%9E%90)
