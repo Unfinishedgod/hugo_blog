@@ -2,7 +2,8 @@ baseurl = "/"
 languageCode = "en-us"
 title = "미완성의신"
 theme = "hugo-lithium"
-googleAnalytics = "UA-145407326-5"
+# googleAnalytics = "UA-145407326-5"
+googleAnalytics = "308508194"
 disqusShortname = "hugoblog-4"
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
