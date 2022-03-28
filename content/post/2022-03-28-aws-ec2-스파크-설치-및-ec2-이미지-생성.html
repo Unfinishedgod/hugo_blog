@@ -1,0 +1,43 @@
+---
+title: '[AWS] EC2 스파크 설치 및 EC2 이미지 생성'
+author: 최의용
+date: '2022-03-28'
+slug: aws-ec2-스파크-설치-및-ec2-이미지-생성
+categories:
+  - AWS
+tags:
+  - EC2
+  - spark
+  - ubuntu
+---
+
+<script src="2022-03-28-aws-ec2-스파크-설치-및-ec2-이미지-생성_files/header-attrs/header-attrs.js"></script>
+
+
+<center>
+<img src="/post/2022-03-28-aws-ec2-스파크-설치-및-ec2-이미지-생성_files/Apache_Spark_logo.svg.png" style="width:30.0%" />
+</center>
+<p>데이터 엔지니어링을 공부 하고 있다. 그렇게 Spark를 알게 되었는데 Spark 설치가 나름 복잡한 면이 있기도 하고, 이번에 EC2의 이미지내용도 같이 넣으면 좋을까 싶어서 같이 넣으려고 한다. 이렇게 한번에 환경을 만들어 놓고 이미지로 만들어 놓으면 앞으로 새로 EC2 구축할때 이런저런 시간낭비 없이 바로
+구축을 할수 있는 장점이 있다. 우선 환경은 AWS의 Ubuntu 맨땅에서 부터 진행 하려고 한다. 기본적인 EC2구축은 다음을 참고 하자.</p>
+<ul>
+<li><a href="https://unfinishedgod.netlify.app/2020/04/05/aws-ec2%EA%B5%AC%EC%B6%95/">EC2 구축 하기</a></li>
+</ul>
+<p>이제 막 EC2가 생성 되었다는 전제하에 pyspark를 사용하는데 까지 다음의 순서로 진행할 예정이다.</p>
+<ol style="list-style-type: decimal">
+<li><p>EC2에서 기본 세팅 <br>
+-Anaconda 설치 <br>
+-Java 설치 <br>
+-Scala 설치 <br>
+-Spark 설치 <br>
+-Jupyter에서 pyspark 확인 <br></p></li>
+<li><p>이미지 생성</p></li>
+</ol>
+<p>그럼 이제 우선 콘다 부터 설치해보자.</p>
+<div id="ec2에서-기본-세팅" class="section level1">
+<h1>1. EC2에서 기본 세팅</h1>
+<div id="anaconda-설치" class="section level2">
+<h2>Anaconda 설치</h2>
+<p>우선</p>
+<pre><code>sudo apt update</code></pre>
+</div>
+</div>
