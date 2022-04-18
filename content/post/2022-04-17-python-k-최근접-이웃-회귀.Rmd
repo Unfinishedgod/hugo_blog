@@ -11,7 +11,7 @@ tags:
 ---
 
 <center>
-![](/post/2022-04-17-python-k-최근접-이웃-회귀_files/main1.PNG){width=80%}
+![](/post/2022-04-17-python-k-최근접-이웃-회귀_files/main1.PNG){width=100%}
 </center>
  
 
