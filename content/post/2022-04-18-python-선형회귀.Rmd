@@ -86,13 +86,9 @@ plt.scatter(train_input[indexes], train_target[indexes], marker = 'D')
 plt.scatter(50,1033, marker = '^')
 plt.show()
 ```
-
-
     
 ![png](ch3-2_linear_regression_files/ch3-2_linear_regression_7_0.png)
     
-
-
 ## 선형회귀
 
 
@@ -132,10 +128,8 @@ plt.scatter(50, 1241.8, marker = '^')
 plt.show()
 ```
 
-    
 ![png](ch3-2_linear_regression_files/ch3-2_linear_regression_13_0.png)
     
-
 이렇게 농어 데이터의 회귀에 대한 직선을 찾아내었다. 이제 $R^2$값을 한번 알아보자.
 
 ```{python}
