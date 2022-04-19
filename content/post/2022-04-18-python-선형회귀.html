@@ -113,7 +113,6 @@ lr.fit(train_poly, train_target)</code></pre>
 <p>이렇게 생성된 모델에 대해 50cm 농어를 다시 예측 해보자. 1,573g로 기존 보다 더 높은 값을 예측 했다.</p>
 <pre class="python"><code>print(lr.predict([[50**2, 50]]))</code></pre>
 <pre><code>## [1573.98423528]</code></pre>
-<pre><code>[1573.98423528]</code></pre>
 <p>이에 대한 a,b,c를 구하면 다음과 같다.</p>
 <pre class="python"><code>print(lr.coef_, lr.intercept_)</code></pre>
 <pre><code>## [  1.01433211 -21.55792498] 116.05021078278259</code></pre>
@@ -130,10 +129,6 @@ plt.plot(point, 1.01*point**2 - 21.6*point + 116.05)
 plt.scatter([50], [1574], marker = &#39;^&#39;)
 plt.show()</code></pre>
 <p><img src="/post/2022-04-18-python-%EC%84%A0%ED%98%95%ED%9A%8C%EA%B7%80_files/figure-html/unnamed-chunk-13-5.png" width="672" /></p>
-<div class="figure">
-<img src="ch3-2_linear_regression_files/ch3-2_linear_regression_25_0.png" alt="" />
-<p class="caption">png</p>
-</div>
 <p>앞선 단순 선형 회귀 모델 보다 훨씬 나은 그래프가 그려진것을 확인 할 수 있다. 이제 <span class="math inline">\(R^2\)</span>값을 알아보자. 이 값 역시 더 높아 진것을 확인 할수 있다.</p>
 <pre class="python"><code>print(lr.score(train_poly, train_target))</code></pre>
 <pre><code>## 0.9706807451768623</code></pre>

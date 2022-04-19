@@ -162,8 +162,6 @@ lr.fit(train_poly, train_target)
 print(lr.predict([[50**2, 50]]))
 ```
 
-    [1573.98423528]
-
 
 이에 대한 a,b,c를 구하면 다음과 같다.
 
@@ -189,7 +187,6 @@ plt.show()
 ```
 
     
-![png](ch3-2_linear_regression_files/ch3-2_linear_regression_25_0.png)
     
 
 앞선 단순 선형 회귀 모델 보다 훨씬 나은 그래프가 그려진것을 확인 할 수 있다. 이제 $R^2$값을 알아보자. 이 값 역시 더 높아 진것을 확인 할수 있다.
