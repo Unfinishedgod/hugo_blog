@@ -1,8 +1,8 @@
 ---
-title: '[python] k-최근접 이웃 회귀'
+title: '[Python] k-최근접 이웃 회귀'
 author: 최의용
 date: '2022-04-17'
-slug: python-k-최근접-이웃-회귀
+slug: Python-k-최근접-이웃-회귀
 categories:
   - Python
 tags:
@@ -15,7 +15,7 @@ tags:
 <center>
 <img src="/post/2022-04-17-python-k-최근접-이웃-회귀_files/main1.PNG" style="width:100.0%" />
 </center>
-<p>k-최근접 이웃 회귀에 대해 알아보자. 이에 대한 내용은 <a href="혼자%20공부하는%20머신러닝+딥러닝">혼자 공부하는 머신러닝+딥러닝</a>의 Chapter 3-1를 기반으로 하며 이곳에 사용한 데이터를 사용할 예정이다. 여기서 사용하는 데이터는 농어 데이터를 사용하는데 기본적인 배경을 먼저 보자.</p>
+<p>k-최근접 이웃 회귀에 대해 알아보자. 이에 대한 내용은 <a href="http://www.yes24.com/Product/Goods/96024871">혼자 공부하는 머신러닝+딥러닝</a>의 Chapter 3-1를 기반으로 하며 이곳에 사용한 데이터를 사용할 예정이다. 여기서 사용하는 데이터는 농어 데이터를 사용하는데 기본적인 배경을 먼저 보자.</p>
 <blockquote>
 <p>여름 농어 철로 농어 주문이 크게 늘어나자 한빛 마켓은 업계 최초로 농어를 무게 단위로 판매하려 합니다. 농어를 마리당 가격으로 판매했을 때 기대보다 볼품없는 농어를 받은 고객이 항의하는 일이발생했기 때문입니다. 무게 단위로 가격을 책정하면 고객들도 합리적이라고 생각하겠죠? 그런데 공급처에서 생선 무게를 잘못 측정해서 보냈습니다. 큰일이네요.</p>
 </blockquote>
@@ -85,13 +85,11 @@ perch_weight = np.array([5.9, 32.0, 40.0, 51.5, 70.0, 100.0, 78.0, 80.0, 85.0, 8
 <div id="산점도" class="section level2">
 <h2>산점도</h2>
 <p>이제 이렇게 주어진 데이터가 어떤 형태를 나타내는진 산점도로 그려보자. matplotlib.plot의 sactter()함수를 사용한다. 산점도를 통해 확인할 수 있듯, 길이가 커짐에 따라 무게가 늘어나는 것을 확인할 수 있다.</p>
-<pre><code>plt.scatter(perch_length, perch_weight)
+<pre class="python"><code>plt.scatter(perch_length, perch_weight)
 plt.xlabel(&#39;length&#39;)
 plt.ylabel(&#39;weight&#39;)
 plt.show()</code></pre>
-<center>
-<img src="/post/2022-04-17-python-k-최근접-이웃-회귀_files/scatter.PNG" style="width:60.0%" />
-</center>
+<p><img src="/post/2022-04-17-python-k-%EC%B5%9C%EA%B7%BC%EC%A0%91-%EC%9D%B4%EC%9B%83-%ED%9A%8C%EA%B7%80_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 </div>
 <div id="traintest-set" class="section level2">
 <h2>Train/test set</h2>
