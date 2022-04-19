@@ -94,10 +94,6 @@ plt.plot([15,50], [15*lr.coef_ + lr.intercept_, 50*lr.coef_ + lr.intercept_])
 plt.scatter(50, 1241.8, marker = &#39;^&#39;)
 plt.show()</code></pre>
 <p><img src="/post/2022-04-18-python-%EC%84%A0%ED%98%95%ED%9A%8C%EA%B7%80_files/figure-html/unnamed-chunk-7-3.png" width="672" /></p>
-<div class="figure">
-<img src="ch3-2_linear_regression_files/ch3-2_linear_regression_13_0.png" alt="" />
-<p class="caption">png</p>
-</div>
 <p>이렇게 농어 데이터의 회귀에 대한 직선을 찾아내었다. 이제 <span class="math inline">\(R^2\)</span>값을 한번 알아보자.</p>
 <pre class="python"><code>print(lr.score(train_input, train_target))</code></pre>
 <pre><code>## 0.939846333997604</code></pre>
