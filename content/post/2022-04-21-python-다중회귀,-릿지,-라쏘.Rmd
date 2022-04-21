@@ -18,7 +18,6 @@ matplotlib$use("Agg", force = TRUE)
 
 ![](/post/2022-04-21-python-다중회귀,-릿지,-라쏘_files/linear_regre.PNG){width=1%}
 
-![](/post/2022-04-21-python-%EB%8B%A4%EC%A4%91%ED%9A%8C%EA%B7%80,-%EB%A6%BF%EC%A7%80,-%EB%9D%BC%EC%8F%98_files/figure-html/unnamed-chunk-18-3.png)
 
 이번에는 여러 특성을 사용한 다중회귀와, 릿지, 라쏘에 대해서 알아보자. 여전히 농어 데이터를 사용하나 차이가 있다면 기존에 농어의 길이만 사용했다면 농어의 길이, 높이, 두께를 전부 사용한다. 그럼 이제 다중 회귀에 대해 간략히 알아보자.
 
@@ -229,7 +228,7 @@ plt.legend()
 plt.show()
 ```
 
- 
+ ![](/post/2022-04-21-python-%EB%8B%A4%EC%A4%91%ED%9A%8C%EA%B7%80,-%EB%A6%BF%EC%A7%80,-%EB%9D%BC%EC%8F%98_files/figure-html/unnamed-chunk-15-1.png){width=80%}
 
 파란색은 Train, 주황색은 Test. 왼쪽에는 점수차이가 매우 크다. 전형적인 과대적합의 모습을 확인할 수 있고, 오른쪽 편은 둘다 낮아지는 과소 적합을 확인할 수 있다. 최종적으로 우리는 alpha값을 -1즉, 0.1로 선택을 해주도록 하자.
 
@@ -290,7 +289,7 @@ plt.legend()
 plt.show()
 ```
     
-
+![](/post/2022-04-21-python-%EB%8B%A4%EC%A4%91%ED%9A%8C%EA%B7%80,-%EB%A6%BF%EC%A7%80,-%EB%9D%BC%EC%8F%98_files/figure-html/unnamed-chunk-18-3.png){width=80%}
 
 왼쪽에는 과대적합을, 오른쪽에는 과소 적합을 보여 주고 있다. alpha는 1, 즉 10에서 가장 좋은 결과가 나오게 된다. 다시 훈련 시키자.
 
