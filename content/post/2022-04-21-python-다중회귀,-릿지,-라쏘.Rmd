@@ -206,7 +206,7 @@ pd.DataFrame({"set":['train', 'test'],
 여기서 alpha과 같은 사람이 직접 지정해야 하는 파라미터를 하이퍼파라미터라고 부른다. 적절한 alpha 값을 찾는 방법은 alpha값에 대한 $R^2$값의 그래프를 그려 보는 것이다. 이렇게 그려보면서 최적의 score를 찾아보자. alpha값을 0.001에서 100까지 10배찍 늘려 다음과 같은 결과를 확인해보고 하나씩 해석해보자. 시각화를 할때 np.log10을 한 이유는 시각화의 가독성을 위해 x축을 -3,-2,-1,0,1,2로 해두었다.
 
 
-```{python message = FALSE}
+```{python}
 train_score = []
 test_score = []
 
