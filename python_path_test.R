@@ -11,16 +11,4 @@ use_python("/usr/local/bin/python3")
 
 a <- 1
 
-library(lubridate)
-library(lsa)
-install.packages('lsa')
 
-?lsa
-?isoweek
-x <- ymd("2012-03-26")
-week(x)
-week(x) <- 1
-x
-week(x) <- 53
-x
-week(x) > 3
