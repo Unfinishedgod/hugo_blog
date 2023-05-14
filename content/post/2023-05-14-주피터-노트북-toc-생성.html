@@ -1,0 +1,64 @@
+---
+title: 주피터 노트북 ToC 생성
+author: 최의용
+date: '2023-05-14'
+slug: 주피터-노트북-toc-생성
+categories:
+  - Jupyter notebook
+tags:
+  - Jupyter notebook
+---
+
+
+
+<center>
+<img src="/post/2023-05-14-주피터-노트북-toc-생성_files/Toc_1.png" style="width:70.0%" />
+<br>
+<a href="https://jupyter-contrib-nbextensions.readthedocs.io/en/latest/install.html">공식 문서: Installing jupyter_contrib_nbextensions</a>
+</center>
+<p>주피터에 TOC 기능을 넣어보자. Table Of Contents 의 약자로 목차를 생성 하여 해당하는 위치로 버튼 하나로 이동 하는 기능이다. 워드며, 구글시트며 문서를 작성할때 사용해봤던 아주 유용한 기능으로 주피터의 셀이 길어질경우 편리하게 사용할 수 있는 장점이 있다. 이 좋은 기능을 단순하게 확장프로그램을 설치 하며 편리하게 사용할 수 있다. 그럼 다음을 하나씩 알아보자.</p>
+<div id="설치" class="section level1">
+<h1>설치</h1>
+<div id="step-1." class="section level2">
+<h2>Step 1.</h2>
+<p>우선 pip3를 통해 jupyter_nbextensions_configurator 를 설치 해주자. 터미널을 열어 다음과 같이 입력 해주면 된다.</p>
+<pre><code>pip3 install jupyter_nbextensions_configurator</code></pre>
+<div id="아나콘다" class="section level3">
+<h3>아나콘다</h3>
+<p>아나콘다에서 설치 하려면 다음과 같이 입력 해주면 된다.</p>
+<pre><code>conda install -c conda-forge jupyter_nbextensions_configurator</code></pre>
+</div>
+</div>
+<div id="step-2." class="section level2">
+<h2>Step 2.</h2>
+<p>다음 명령어를 통해 사용자의 홈 jupyter 디렉토리에 user를 등록 해준다.</p>
+<pre><code>jupyter nbextensions_configurator enable --user</code></pre>
+</div>
+<div id="step-3." class="section level2">
+<h2>Step 3.</h2>
+<p>지금까지 nbextensions_configurator 에 대한 설치와 설정을 완료 했으니, jupyter_contrib_nbextensions를 설치 해주자.</p>
+<pre><code>pip3 install jupyter_contrib_nbextensions</code></pre>
+</div>
+<div id="step-4." class="section level2">
+<h2>Step 4.</h2>
+<p>설치를 했으니 이 역시 user를 등록해주자. 그리고 나서 서버를 재실행 또는 재부팅 하고 주피터를 다시 실행 해보자.</p>
+<pre><code>jupyter contrib nbextension install --user</code></pre>
+</div>
+</div>
+<div id="nbextensions" class="section level1">
+<h1>Nbextensions</h1>
+<div id="설치-확인" class="section level2">
+<h2>설치 확인</h2>
+<center>
+<img src="/post/2023-05-14-주피터-노트북-toc-생성_files/Toc_2.PNG" style="width:40.0%" />
+</center>
+<p>주피터를 다시 실행 하면 위와 상단에 Nbextensions 탭이 추가 된걸 확인하면 성공이다. Nbextensions을 클릭해보자.</p>
+</div>
+<div id="toc-설정" class="section level2">
+<h2>TOC 설정</h2>
+<center>
+<img src="/post/2023-05-14-주피터-노트북-toc-생성_files/Toc_3.PNG" style="width:70.0%" />
+</center>
+<p>이제 이곳에서 Table of Contents (2) 버튼을 클릭하면 성공이다.</p>
+</div>
+</div>
