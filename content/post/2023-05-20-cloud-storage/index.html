@@ -1,0 +1,118 @@
+---
+title: '[Bigquery] Cloud Storage를 통한 빅쿼리 테이블 생성'
+author: 최의용
+date: '2023-05-20'
+slug: cloud-storage
+categories:
+  - Bigquery
+tags:
+  - Bigquery
+---
+
+
+
+<center>
+<p><img src="images/bq_storage_main_2.png" style="width:80.0%" /></p>
+</center>
+<p>최근부터 Bigquery를 공부 하기 시작했다. ‘구글 빅쿼리 완벽 가이드’ 라는 책을 필사 하면서 공부중인데, 빅쿼에서 테이블 생성시 직접 업로드 하여 생성하는데 10MB 제한이 있어 Cloud storage에 업로드 하여 테이블을 생성하라는 내용이 부족하여 이번에 추가 해보려 한다. 방법은 간단하다 Cloud Storage에서 버킷을 생성하고 데이터를
+업로드 하여, Bigquery에서 Cloud Storage를 통해 테이블만 생성하면 된다. 사진을 통해 하나씩 알아보도록 하자. 우선, 프로젝트를 통일 실켜주자. GCP에서는 프로젝트 별로 세팅이 가능한데, 이번 Bigquery와 Cloud Storage는 모두 프로젝트를 bigquery-study 로 통일 시켜 주었다.</p>
+<div id="cloud-storage-bucket-생성" class="section level1">
+<h1>Cloud Storage Bucket 생성</h1>
+<p>다음의 Google Cluod화면에서 Cloud storage 버튼을 클릭해서 넘어가도록 하자.</p>
+<ul>
+<li><a href="https://console.cloud.google.com/" class="uri">https://console.cloud.google.com/</a></li>
+</ul>
+<center>
+<img src="images/bq_storage.png" style="width:80.0%" />
+</center>
+<div id="step-1.-버킷-생성" class="section level3">
+<h3>Step 1. 버킷 생성</h3>
+<p>이제 Cloud Storage에서 Bucket을 생성해주자. 상단의 만들기 버튼을 클릭 해주자.</p>
+<center>
+<img src="images/bq_storage_2.png" style="width:80.0%" />
+</center>
+</div>
+<div id="step-2." class="section level3">
+<h3>Step 2.</h3>
+<p>버킷의 이름을 지어주고 저장 위치를 선택 해주자. 버킷이름은 Cloud_storage_bucket 이라고 지어 주었다.</p>
+<center>
+<img src="images/bq_storage_3.png" style="width:80.0%" />
+</center>
+</div>
+<div id="step-3." class="section level3">
+<h3>Step 3.</h3>
+<p>다음의 옵션을 확인해주자. ’이 버킷에 공개 액세스 방지 적용’옵션을 적용했고, 확인 버튼을 클릭해주었다.</p>
+<center>
+<img src="images/bq_storage_4.png" style="width:60.0%" />
+</center>
+</div>
+<div id="step-4." class="section level3">
+<h3>Step 4.</h3>
+<p>cloud_storage_study라는 버킷이 생성된 모습이다. 이제 파일 업로드 버튼을 클릭하여 iris.csv 파일을 업로드 해주려고 한다.</p>
+<center>
+<img src="images/bq_storage_5.png" style="width:80.0%" />
+</center>
+</div>
+<div id="step-5." class="section level3">
+<h3>Step 5.</h3>
+<p>이렇게 iris.csv 가 cloud_storage_study에 잘 업로드 되었다. 이제 빅쿼리로 넘어가 보자.</p>
+<center>
+<img src="images/bq_storage_6.png" style="width:80.0%" />
+</center>
+</div>
+</div>
+<div id="bigquery를-통한-테이블-생성" class="section level1">
+<h1>BigQuery를 통한 테이블 생성</h1>
+<p>BigQuery로 넘어가서 테이블을 생성해보자. Google Cloud에서 BigQuery로 넘어 가도 되고 다음의 링크를 클릭해도 된다. 프로젝트명은 항상 통일 시켜야 한므로, Cloud Storage와 같은지 다시 한번 확인해보자.</p>
+<ul>
+<li><a href="https://console.cloud.google.com/bigquery" class="uri">https://console.cloud.google.com/bigquery</a></li>
+</ul>
+<div id="step-1." class="section level3">
+<h3>Step 1.</h3>
+<p>빅쿼리에 들어가게 되면 나의 프로젝트명과 함께 프로젝트명 우측에 옵션 버튼이 존재한다. 옵션 버튼을 클릭하여 데이터 세트 만들기 버튼을 클릭해주자.</p>
+<center>
+<img src="images/bq_storage_7.png" style="width:80.0%" />
+</center>
+</div>
+<div id="step-2.-1" class="section level3">
+<h3>Step 2.</h3>
+<p>우선 데이터 세트를 만들어 보자. 빅쿼리의 기본적인 구조는 다음과 같다.</p>
+<ul>
+<li>(프로젝트 ID).(데이터 세트).(테이블)</li>
+</ul>
+<p>우리의 프로젝트 ID는 bigquery-study이고, 데이터 세트는 study로 생성 해주었다. 지역은 ara-northeast3(서울) 로 설정 해주어 데이터세트 만들기 버튼을 클릭해주자.</p>
+<center>
+<img src="images/bq_storage_8.png" style="width:80.0%" />
+</center>
+</div>
+<div id="step-3.-1" class="section level3">
+<h3>Step 3.</h3>
+<p>성공적으로 데이터 세트가 생성 되면 다음과 같이 데이터 세트 정보를 확인할 수 있다. 이제 우측 상단에 테이블 만들기 버튼을 클릭해주도록 하자.</p>
+<center>
+<img src="images/bq_storage_9.png" style="width:80.0%" />
+</center>
+</div>
+<div id="step-4.-1" class="section level3">
+<h3>Step 4.</h3>
+<center>
+<img src="images/bq_storage_10.png" style="width:80.0%" />
+</center>
+<center>
+<img src="images/bq_storage_11.png" style="width:80.0%" />
+</center>
+<center>
+<img src="images/bq_storage_12.png" style="width:80.0%" />
+</center>
+<center>
+<img src="images/bq_storage_13.png" style="width:80.0%" />
+</center>
+</div>
+</div>
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<ul>
+<li><a href="https://cloud.google.com/bigquery/docs/batch-loading-data?hl=ko#limitations-local-files">Google Cloud 공식문서: 빅쿼리</a></li>
+<li><a href="https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=256496408">구글 빅쿼리 완벽 가이드</a></li>
+<li><a href="https://robomoan.medium.com/bigquery-a-z-1-%EB%8C%80%EC%8B%9C%EB%B3%B4%EB%93%9C%EC%97%90%EC%84%9C-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0-a0f22736fdba">노범환: BigQuery A-Z: 1. 대시보드에서 사용학.</a></li>
+</ul>
+</div>
