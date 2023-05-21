@@ -94,19 +94,49 @@ tags:
 </div>
 <div id="step-4.-1" class="section level3">
 <h3>Step 4.</h3>
+<p>이제 테이블을 생성 해주자. 다음의 옵션을 하나 하나 보면서 따라가 주면 된다.</p>
+<ol style="list-style-type: decimal">
+<li>테이블을 만들 소스: 여러가지가 있다. 이중에서 우리는 Google Cloud Storage 를 선택 해준다.</li>
+<li>GCS(Google cloud Storage)에서 찾을 버킥을 선택한다. 찾아보기 버튼을 클릭하여 버켓과 파일을 선택해준다.</li>
+<li>프로젝트를 선택해준다. 꼭 빅쿼리와, Cloud Storage는 통일 시켜주어야 한다.</li>
+<li>테이블 이름이다. iris_sample 라는 테이블로 생성 해준다.</li>
+<li>스키마는 자동으로 선택 해준다. GCS에서 자동으로 생성해준다.</li>
+</ol>
+<ul>
+<li>물론 한계는 있다.</li>
+</ul>
 <center>
-<img src="images/bq_storage_10.png" style="width:80.0%" />
+<img src="images/bq_storage_10.png" style="width:100.0%" />
 </center>
+</div>
+</div>
+<div id="bigquery-테이블-확인" class="section level1">
+<h1>BigQuery 테이블 확인</h1>
+<div id="step-1.-1" class="section level3">
+<h3>Step 1.</h3>
+<p>성공적으로 테이블이 생성되었으면 다음과 같이 확인이 가능하다.</p>
 <center>
 <img src="images/bq_storage_11.png" style="width:80.0%" />
 </center>
+</div>
+<div id="step-2.-2" class="section level3">
+<h3>Step 2.</h3>
+<p>세부정보는 다음과 같다.</p>
 <center>
 <img src="images/bq_storage_12.png" style="width:80.0%" />
 </center>
+</div>
+<div id="step-3.-2" class="section level3">
+<h3>Step 3.</h3>
+<p>마지막으로 쿼리를 통해 확인해보자. 빅쿼리에서 쿼리를 실행 할때는 (프로젝트 ID).(데이터 세트).(테이블) 순서로 선택 해주어야 한다.</p>
 <center>
 <img src="images/bq_storage_13.png" style="width:80.0%" />
 </center>
 </div>
+</div>
+<div id="총평" class="section level1">
+<h1>총평</h1>
+<p>BigQuery 에서 테이블을 생성 하는 방법은 여러가지가 있다. 파이썬 스크립트를 통해 생성할 수도 있고, AWS S3에서 가져와서도 생성이 가능하다. 또한 직접 csv로 도 테이블이 생성이 가능하다. 이번 포스팅은 직접 csv를 통해 테이블을 생성시 10MB 제한이 있기에 이에 대한 해결 방안중 GCS를 통해 우회 하여 테이블 생성하는 방법에 대해 공부하고자 만들었다.</p>
 </div>
 <div id="reference" class="section level1">
 <h1>Reference</h1>
