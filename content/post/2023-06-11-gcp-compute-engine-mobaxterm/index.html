@@ -1,0 +1,205 @@
+---
+title: '[GCP] Compute Engine 방화벽 및 MobaXterm 연결'
+author: 최의용
+date: '2023-06-11'
+slug: gcp-compute-engine-mobaxterm
+categories:
+  - GCP
+tags:
+  - GCP
+---
+
+
+
+<center>
+<img src="images/compute-engine-option-main.png" style="width:80.0%" />
+</center>
+<p>지난 블로그에서는 GCP에서 Compute Engine을 구축을 다뤘었다. 상단의 이미지를 보면 최종적으로 Jupyter 설치 하는 부분은 다음 블로그에 남겨둘 예정이며, 이번에는 구축한 서버에 방화벽으로 8888포트를 열어두고 MobaXterm에 연결하는 내용을 다루려고 한다. 지난번 블로그는 다음을 참고 한다.</p>
+<ul>
+<li><a href="https://unfinishedgod.netlify.app/2023/06/10/gcp-gcp/">GCP Compute Engine 구축</a></li>
+</ul>
+<p>이번에는 총 3개의 소 주제가 있다. 하나씩 알아보자.</p>
+<ul>
+<li>고정 IP 생성</li>
+<li>주피터 포트(8888) 개방</li>
+<li>ppk 생성 및 MobaXterm 연동</li>
+</ul>
+<div id="고정-ip-생성" class="section level1">
+<h1>1. 고정 IP 생성</h1>
+<p>우선 고정 IP를 만들어 줄 것이다. AWS에서는 탄력적 IP로 사용되는 이 서비스는 서버를 크고 킬때 매번 달라지는 IP를 고정 시켜주는 역할을 한다. 하나씩 알아보자. 고정 IP를 사용하기 위해서는 <strong>우선 서버가 작동 하여야 하니 우선 서버를 켜주도록 하자.</strong></p>
+<div id="section" class="section level3">
+<h3>1-1.</h3>
+<p>고정IP는 ‘방화벽 규칙 설정’ 파트에서 진행을 한다. ‘방화벽 규칙 설정’ 버튼을 클릭해주자.</p>
+<center>
+<img src="images/compute-engine-option.png" style="width:100.0%" />
+</center>
+</div>
+<div id="section-1" class="section level3">
+<h3>1-2.</h3>
+<p>‘방화벽 규칙 설정’ 버튼을 클릭하게 되면 VPC네트워크 페이지로 넘어가게 된다. 여기서 우리는 다음의 순서로 진행을 해주면 된다.</p>
+<ul>
+<li>‘IP 주소’ 메뉴를 클릭</li>
+<li>하고 외부 IP쪽 최 우측에 메뉴 버튼 클릭</li>
+<li>‘고정 IP주소로 승급’ 버튼 클릭</li>
+</ul>
+<center>
+<img src="images/compute-engine-option_1.png" style="width:100.0%" />
+</center>
+<p>이렇게 고정 IP로 설정을 해주면 해당 외부 IP는 임시에서 고정으로 바뀌게 된다.</p>
+<center>
+<img src="images/compute-engine-option_2.png" style="width:80.0%" />
+</center>
+</div>
+</div>
+<div id="주피터-포트8888-개방" class="section level1">
+<h1>2. 주피터 포트(8888) 개방</h1>
+<p>이번에는 주피터 포트(8888)을 개방 해보자.</p>
+<div id="section-2" class="section level3">
+<h3>2-1.</h3>
+<p>이번에는 ‘방화벽’ 메뉴를 클릭해주고 넘어가서, ‘방화벽 규칙만들기’ 버튼을 클릭해주면 된다.</p>
+<center>
+<img src="images/compute-engine-option_3.png" style="width:80.0%" />
+</center>
+</div>
+<div id="section-3" class="section level3">
+<h3>2-2.</h3>
+<p>이제 방화벽 규칙의 옵션을 설정 해주자. 이름과, 설명을 적어주고 아래로 내려간다.</p>
+<center>
+<img src="images/compute-engine-option_4.png" style="width:80.0%" />
+</center>
+</div>
+<div id="section-4" class="section level3">
+<h3>2-3.</h3>
+<p>추가 설정이다. 다음의 옵션들을 함께 설정 해주고 만들기 버튼을 클릭해주면 완료.</p>
+<ul>
+<li>대상: 네트워크의 모든 인스턴스</li>
+<li>소스 IPv4 범위: 0.0.0.0/0
+<ul>
+<li>AWS에서는 ‘위치 무관’ 의 옵션이다. 어디든 해당 port로 접속이 가능한데, 우리는 개인 서버의 용도로만 사용하기 때문에 이렇게 사용하지만, 실제로는 각 접속자의 특정 IP를 적어주는것이 보안상 좋다.</li>
+</ul></li>
+<li>지정된 프로토콜 및 포트: TCP 8888</li>
+</ul>
+<center>
+<img src="images/compute-engine-option_5.png" style="width:80.0%" />
+</center>
+</div>
+<div id="tips" class="section level2">
+<h2>Tips</h2>
+<p>GCP에는 추가로 제공되는 기능이 있는데, 아래에 ‘동등한 명령줄’ 버튼이 있다. 를 클릭하면 우리가 방금 했었던 모든 행위에 대한 내용을 gcloud 명령줄로 보여준다. 이는 cloud shell에서 제공하는 기능이다.</p>
+<center>
+<img src="images/compute-engine-option_6.png" style="width:80.0%" />
+</center>
+</div>
+</div>
+<div id="ppk-생성-및-mobaxterm-연동" class="section level1">
+<h1>3. ppk 생성 및 MobaXterm 연동</h1>
+<p>이번에는 MobaXterm에 연동을 해보자. MobaXterm에 연동을 하기 위해서는 우선 rsa키를 생성하고 gcp에 등록하고 ppk를 생성해야 한다. 하나씩 따라해보자.</p>
+<div id="ppk-생성" class="section level2">
+<h2>3-1. ppk 생성</h2>
+<p>우선 ppk를 생성해보자. ppk는 MovaXterm을 통해 생성한다. 물론 puttygen을 통해서도 생성 가능하다. mobaxterm의 공식링크는 다음 링크에서 참고 하며, 이곳에서 다운을 받으면 된다.</p>
+<ul>
+<li><a href="https://mobaxterm.mobatek.net/">MobaXterm</a></li>
+</ul>
+<div id="step-1." class="section level3">
+<h3>Step 1.</h3>
+<p>MobaXterm을 설치 하고 실행하고 나면 상단의 Tools &gt; MobaKeyGen (SSH key generator) 버튼을 클릭해주자.</p>
+<center>
+<img src="images/compute-engine-option_7.png" style="width:60.0%" />
+</center>
+</div>
+<div id="step-2." class="section level3">
+<h3>Step 2.</h3>
+<p>MobaXterm SSH KEy Generater 화면이다.</p>
+<p>이곳에서 ‘Generate’ 버튼을 클릭해주자.</p>
+<center>
+<img src="images/compute-engine-option_8.png" style="width:80.0%" />
+</center>
+</div>
+<div id="step-3." class="section level3">
+<h3>Step 3.</h3>
+<p>generate 키가 생성되고 있는 화면이다. 빈 공간에 마우스를 움직이면 generate key가 생성 된다.</p>
+<center>
+<img src="images/compute-engine-option_9.png" style="width:80.0%" />
+</center>
+</div>
+<div id="step-4." class="section level3">
+<h3>Step 4.</h3>
+<p>키가 생성되면 상단에 RSA값이 나오게 된다. 이는 따로 복사 해주어 저장해두도록 하자. 그리고 다음의 절차를 하나씩 따라가자.</p>
+<ul>
+<li>Key comment: 계정명을 입력한다.</li>
+<li>Key passphrase: 서버에 접속할 비밀번호 입력 (Optional)</li>
+<li>Confirm passphrase: 비밀번호 확인</li>
+</ul>
+<p>이렇게 입력했으면 ‘Save private key’ 버튼을 클릭하여 ppk파일을 저장한다.</p>
+<center>
+<img src="images/compute-engine-option_10.png" style="width:80.0%" />
+</center>
+</div>
+</div>
+<div id="compute-engine-메타데이터-생성" class="section level2">
+<h2>3-2. Compute Engine 메타데이터 생성</h2>
+<p>ppk를 생성 했으니, 이제 이 ppk에 해당하는 RSA값을 GCP Compute Engine에 등록 해주자.</p>
+<div id="step-1.-1" class="section level3">
+<h3>Step 1.</h3>
+<p>이제 Compute Engine에서 메타 데이터 메뉴 &gt; 메타데이터탭 &gt; ’메타데이터 추가’버튼을 클릭한다.</p>
+<center>
+<img src="images/compute-engine-option_11.png" style="width:80.0%" />
+</center>
+</div>
+<div id="step-2.-1" class="section level3">
+<h3>Step 2.</h3>
+<p>메타데이터를 추가 하자.</p>
+<ul>
+<li>키: 키 이름을 만들어 준다.</li>
+<li>값: 복사 했던, RSA값을 넣어 준다.</li>
+</ul>
+<center>
+<img src="images/compute-engine-option_12.png" style="width:80.0%" />
+</center>
+</div>
+<div id="step-3.-1" class="section level3">
+<h3>Step 3.</h3>
+<p>이제 SSH 키 탭 으로 가서 SSH에 또 다시 RSA값을 복사 해주고 저장 버튼을 클릭해주면 등록은 완료.</p>
+<center>
+<img src="images/compute-engine-option_13.png" style="width:80.0%" />
+</center>
+</div>
+</div>
+<div id="mobaxterm-연결" class="section level2">
+<h2>MobaXterm 연결</h2>
+<p>이제 Compute Engine와 MobaXterm과 연결 해보도록 하자.</p>
+<div id="step-1.-2" class="section level3">
+<h3>Step 1.</h3>
+<p>MobaXterm에서 Session &gt; SSH 아이콘을 클릭 &gt; Advanced SSH setting탭을 클릭하면 다음과 같은 화면을 볼 수 있다. 다음의 절차를 통해 입력 해주면 된다.</p>
+<ul>
+<li>Remote host: Compute Engine의 고정 IP
+<ul>
+<li>처음에 고정 IP를 설정 해주었던 이유가, 매번 바뀌게 되면 MobaXterm에서 접속할때 매번 바꿔줘야 하는 번거로움이 있기 때문에 미리 고정 IP를 잡아 주었다.</li>
+</ul></li>
+<li>Specify username: 계정명을 입력 해준다.</li>
+<li>Use private key: 생성한 ppk 파일 경로를 입력 해준다.</li>
+</ul>
+<center>
+<img src="images/compute-engine-option_14.png" style="width:80.0%" />
+</center>
+</div>
+<div id="step-2.-2" class="section level3">
+<h3>Step 2.</h3>
+<p>Bookmark setting탭에서는 서버 이름을 편리하게 적어준다. 적지 않으면 서버의 ip가 나오게되어 알아보기 힘들 수 있다. 그리고 나서 OK 버튼으로 마무리를 해주도록 하자.</p>
+<center>
+<img src="images/compute-engine-option_15.png" style="width:80.0%" />
+</center>
+</div>
+<div id="step-3.-2" class="section level3">
+<h3>Step 3.</h3>
+<p>최종적으로 GCP의 Compute Engine와 MobaXterm과 연동을 마무리한 모습</p>
+<center>
+<img src="images/compute-engine-option_16.png" style="width:80.0%" />
+</center>
+</div>
+</div>
+</div>
+<div id="총평" class="section level1">
+<h1>총평</h1>
+<p>GCP의 Compute Engine을 구축하고, 방화벽 및 MobaXterm연동 하는 과정을 마무리 하게 되었다. 이제 다음에는 Jupyter 설치 하는 과정을 간략하게 남기려고 한다.</p>
+</div>
