@@ -7,7 +7,6 @@ categories:
   - Postgresql
 tags:
   - postgresql
-toc: True
 ---
  
 <center>
