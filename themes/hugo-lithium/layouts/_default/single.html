@@ -1,8 +1,17 @@
 {{ partial "header.html" . }}
 
 <main class="content" role="main">
-
   <article class="article">
+    <style>
+    aside {
+      width: 30%;
+      padding-left: 15px;
+      margin-left: 15px;
+      float: right;
+      font-style: italic;
+      background-color: lightgray;
+    }
+    </style>
     {{ if eq .Section "post" }}
     <span class="article-duration">{{ .ReadingTime }} min read</span>
     {{ end }}
@@ -16,11 +25,10 @@
     <div class="article-content">
       {{ .Content }}
     </div>
-    
   </article>
   
   <aside>
-      {{ partial "toc.html" .}}
+    {{ partial "toc.html" .}}
   </aside>
 
   {{ partial "disqus.html" .}}
