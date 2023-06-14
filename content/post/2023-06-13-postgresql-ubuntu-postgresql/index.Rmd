@@ -183,12 +183,13 @@ from sqlalchemy import create_engine
 ```
 
 sqlalchemy라이브러리의 create_engine함수를 사용한다. sqlalchemy의 공식문서는 다음을 참고 한다.
- - SQLAlchemy 공식문서: [SQLAlchemy](https://docs.sqlalchemy.org/en/20/core/engines.html)
+
+- SQLAlchemy 공식문서: [SQLAlchemy](https://docs.sqlalchemy.org/en/20/core/engines.html)
   
 여기에 우리가 필요한 정보를 입력하여 postgresql과 파이썬을 연결 시켜 준다. 접속하기위해서는 다음의 룰을 따른다.
 
-- create_engine('postgresql+psycopg2://{계정명}:{비밀번호}@{호스트명}:5432/{데이터베이스이름}')
-
+- create_engine('postgresql+psycopg2://{**계정명**}:{**비밀번호**}@{**호스트명**}:{**port**}/{**데이터베이스이름**}')
+ 
 우리는 f-string를 사용해 각각의 정보를 입력해주자.
 
 ```
