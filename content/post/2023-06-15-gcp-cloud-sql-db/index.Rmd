@@ -1,0 +1,140 @@
+---
+title: '[GCP] Cloud SQL DB 구축'
+author: 최의용
+date: '2023-06-15'
+slug: gcp-cloud-sql-db
+categories:
+  - GCP
+  - SQL
+tags: []
+---
+
+<center>
+![](images/gcp_sql.png){width=80%}
+</center>
+
+이번에는 GCP의 CLoud SQL이라는 서비스를 사용해보자. 지난 블로그에서 GCP Compute Engine에 postgresql을 다루었는데, 사실 DB서버는 따로 구축 해야 한다. 그렇기에 이번에는 Cloud SQL이라는 서비스를 통해 DB서버를 하나 만들어 보는 과정을 가져보려 한다. 서버를 구축하고 파이썬과 VSCODE 연동은 지난 블로그를 참고 하면 된다. 
+
+- [ubuntu에 postgresql  설치 및 vscode 연결](https://unfinishedgod.netlify.app/2023/06/13/postgresql-ubuntu-postgresql/)
+
+### DB 서버를 따로 구축 하는 이유? 
+
+DB서버를 따로 구축하는 이유는 다음과 같다.
+
+1. 성능
+  - DB서버를 독립적으로 운영하면 다른 서버의 부하로 인해 DB성능에 영향을 주지 않는다. 즉, DB서버와 운영서버를 동시에 운영할경우 부하가 걸리기 때문에 DB성능에 영향을 끼치는 문제가 발생한다. 또한, DB서버는 중요한 역할을 담당하기 때문에 고성능의 스펙이 필요하다.
+2. 확장성
+  - DB서버는 트래픽이 증가하게 되면 성능이 저하될 수 있다. 독립된 DB서버를 사용하면 필요에 따라 서버를 구축하여 처리 능력을 확장할 수 있다.
+3. 보안 
+  - DB에는 중요한 데이터가 저장되기 때문에 보안이 매우 중요하다. 따라서 독립적인 DB서버를 사용하여 데이터 유출 및 악의적인 공격으로부터 보호할 수 있다.  
+
+---
+
+# 1. Cloud SQL 구축
+
+그럼 이제 하나씩 알아보도록 하자.
+
+## Cloud SQL 메뉴 이동
+
+우선 Google cloud 콘솔 메뉴에서 SQL 탭을 선택 해준다.
+
+<center>
+![](images/gcp_sql_1.png){width=80%}
+</center>
+
+## 인스턴스 만들기
+
+그러면 이제 상단에 '인스턴스 만들기' 버튼을 클릭해주자. 
+
+<center>
+![](images/gcp_sql_2.png){width=80%}
+</center>
+
+## DB 선택
+
+Cloud SQL은 기본적으로 MySQL, PostgreSQL, MSSQL을 제공한다. 우리는 PostgreSQL을 선택 해주자.
+
+<center>
+![](images/gcp_sql_3.png){width=80%}
+</center>
+
+
+## 인스턴스 스펙 구성
+
+### Step 1. 
+
+이제 인스턴스 정보에 다음과 같이 필요한 정보를 하나씩 입력 해주자.
+
+<center>
+![](images/gcp_sql_4.png){width=80%}
+</center>
+
+### Step 2. 
+
+DB서버의 스펙내용인데 기본적으로 프로덕션, 개발 용도로 나뉘게 된다. 각 스펙에 따른 비용이 들기 때문에 이는 용도에 맞게 선택하는것이 좋다. 또한, 더 자세한 옵션은 하단에도 있고 구축 후에도 부분적으로 변경이 가능하다.
+
+<center>
+![](images/gcp_sql_5.png){width=80%}
+</center>
+
+### Step 3.
+
+리전을 선택해주자. asia-northeast3 (서울)로 설정을 해주고 '인스턴스 만들기' 버튼을 클릭하면 된다. 물론, '구성 옵션 표시' 버튼을 클릭해서 자세한 옵션을 설정 해주어도 된다.
+
+<center>
+![](images/gcp_sql_6.png){width=80%}
+</center>
+
+## 2. Cloud SQL 옵션 설정
+
+DB서버를 구축 했으면 이제 하나씩 옵션을 설정 해보자. 구축된 서버를 클릭해준다.
+
+<center>
+![](images/gcp_sql_7.png){width=80%}
+</center>
+
+## 네트워킹 설정
+
+### Step 1. 
+
+네트워킹 설정을 해주도록 하자. DB서버에 접근하기 위함이다. 연결메뉴 > 네트워킹> 네트워크 추가 버튼을 차례로 눌러주자.
+
+<center>
+![](images/gcp_sql_9.png){width=80%}
+</center>
+
+### Step 2. 
+
+서버에 접근할 수 있는 IP이다. 여기서는 위치무관이라는 뜻의 0.0.0.0/0을 해주었지만, **실제로는 이렇게 하면 안된다.** DB는 보안이 중요하기 때문에 사용자의 특정 IP만, 또는 특정 집단만 설정해주는것이 옳다.
+
+<center>
+![](images/gcp_sql_10.png){width=80%}
+</center>
+
+### Step 3.
+
+설정을 완료 했으면 저장 버튼을 클릭해주자.
+
+<center>
+![](images/gcp_sql_11.png){width=80%}
+</center>
+
+## 사용자 추가 
+
+이제 사용자를 추가 해보자. 사용자 탭 > 사용자 계정을 추가 하여, 다음의 정보를 입력 해주고 추가 버튼을 클릭하면 끝
+
+<center>
+![](images/gcp_sql_12.png){width=80%}
+</center>
+
+## 데이터베이스 추가
+
+데이터베이스 추가 또한 간단하다. 다음과 같이 데이터베이스 메뉴 > 데이터베이스 이름을 만들어주고 만들기 버튼.
+
+<center>
+![](images/gcp_sql_13.png){width=80%}
+</center>
+
+# 총평
+
+이렇게 Cloud SQL 을 사용하는 방법을 다뤄보았다. 이제 다음에는 이를 응용해서 파이썬을 사용하여 DB에 데이터 적재 하는 방법을 올리려고 한다.
