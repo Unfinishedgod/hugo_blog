@@ -13,7 +13,7 @@ tags:
 ![](images/python-bigquery-storage.png){width=80%}
 </center>
 
-이번에는 BigQuery와 Cloud Storage에 Python을 연동 해보려고 한다. 그동안 BigQuery관련한 블로그와 그리고 Storage를 통해서 BigQuery 테이블승 생성 하는 글을 적었었다. 이번에는 Python와 각각 연동을 하는 과정에 대한 글을 남겨보려 한다. 그렇게 되어 후에는 Google cloud Function을 사용하여 이 3가지를 적절히 사용하기 위함이다. 오늘의 블로그 과정중에서 BigQuery와 Cloud Storage 관련한 내용이 있으니 다음을 참고 하면 된다.
+이번에는 BigQuery와 Cloud Storage에 Python을 연동 해보려고 한다. 그동안 BigQuery관련한 블로그와 그리고 Storage를 통해서 BigQuery 테이블을 생성 하는 글을 적었었다. 이번에는 Python와 각각 연동을 하는 과정에 대한 글을 남겨보려 한다. 그렇게 되어 후에는 Google cloud Function을 사용하여 이 3가지를 적절히 사용하기 위함이다. 오늘의 블로그 과정중에서 BigQuery와 Cloud Storage 관련한 내용이 있으니 다음을 참고 하면 된다.
 
 - [BigQuery와 Storage](https://unfinishedgod.netlify.app/2023/05/20/cloud-storage/)
 
@@ -43,7 +43,7 @@ IAM 및 관리자 페이지로 넘어 가게 되는데 여기서 '서비스 계�
 
 서비스 계정의 이름과, 서비스 계정 설명을 입력해주고 '만들고 계속하기' 버튼 클릭
 
-<center>![](images/python-bigquery-storage_3.png){width=60%}</center>
+<center>![](images/python-bigquery-storage_3.png){width=50%}</center>
 
 ## 1-2. 역할 부여
 
@@ -53,7 +53,7 @@ IAM 및 관리자 페이지로 넘어 가게 되는데 여기서 '서비스 계�
 
 역할 부분을 클릭해주자.
 
-<center>![](images/python-bigquery-storage_4.png){width=60%}</center>
+<center>![](images/python-bigquery-storage_4.png){width=50%}</center>
 
 ### Step 2.
 
@@ -81,7 +81,7 @@ Cloud Storage의 역할이다. 여기서는 Cluod Storage > 저장소 관리자 
 
 역할을 부여 했으니 완료 버튼을 클릭하여 넘어가주자.
 
-<center>![](images/python-bigquery-storage_8.png){width=60%}</center>
+<center>![](images/python-bigquery-storage_8.png){width=50%}</center>
 
 ### Step 6.
 
@@ -101,7 +101,7 @@ Cloud Storage의 역할이다. 여기서는 Cluod Storage > 저장소 관리자 
 
 비공개 키 만들기 화면이 나오게 된다. JSON 파일을 받아서 저장할 예정이니 만들기 버튼을 클릭하고 넘어가자.
 
-<center>![](images/python-bigquery-storage_11.png){width=60%}</center>
+<center>![](images/python-bigquery-storage_11.png){width=50%}</center>
 
 ### Step 3.
 
@@ -123,7 +123,7 @@ Cloud Storage의 역할이다. 여기서는 Cluod Storage > 저장소 관리자 
 - iris.csv   : Storage에 업로드/다운로드용
 - 비공개 키  : BigQuery, Storage권한 연결용
 
-<center>![](images/python-bigquery-storage_13.png){width=60%}</center>
+<center>![](images/python-bigquery-storage_13.png){width=50%}</center>
 
 ### Step 2.
 
@@ -251,10 +251,10 @@ bucket = storage_client.bucket(bucket_name) # Bucket 접속
 blob = bucket.blob(source_blob_name) # 저장되어 있는 파일 연결
 blob.download_to_filename(destination_file_name) # 파일 다운로드
 ```
-
+ 
 잘 다운이 받아졌으면 우리의 경로에서 iris_download.csv파일이 있는지 확인해보자.
 
-<center>![](images/python-bigquery-storage_15.png){width=60%}</center>
+<center>![](images/python-bigquery-storage_15.png){width=50%}</center>
 
 # 총평
 
