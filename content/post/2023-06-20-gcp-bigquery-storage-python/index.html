@@ -175,7 +175,7 @@ credentials = service_account.Credentials.from_service_account_file(key_path)</c
 <pre><code># BigQuery 클라이언트 객체 생성
 client = bigquery.Client(credentials = credentials, 
                          project = credentials.project_id)</code></pre>
-<p>이제 쿼리를 날려 BigQuery의 테이블을 불러오자. 쿼리는 빅쿼리에 저장되었던 iris 테이블을 불러 오도록 해주었다. BigQuery 테이블 생성이 되어 있지 않다면, 다음을 참고 하여 테이블을 생성해주자.</p>
+<p>이제 쿼리를 날려 BigQuery의 테이블을 불러오자. 쿼리는 BigQuery에 저장되었던 iris 테이블을 불러 오도록 해주었다. BigQuery 테이블 생성이 되어 있지 않다면, 다음을 참고 하여 테이블을 생성해주자.</p>
 <ul>
 <li><a href="https://unfinishedgod.netlify.app/2023/05/20/cloud-storage/">BigQuery와 Storage</a></li>
 </ul>
