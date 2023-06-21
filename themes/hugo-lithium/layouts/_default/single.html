@@ -3,14 +3,6 @@
 <main class="content" role="main">
   <article class="article">
     <style>
-    article {
-    background-color: #FFFFFF;
-    float: left;
-    padding: 0 20px 40px;
-    width: 560px; /* 560px + 20px + 20px = 600px */
-      
-    }
-
     aside {
         background-color: #CCCCCC;
         float: right;
@@ -34,7 +26,7 @@
   </article>
   
   <aside id = 'aside'>
-    {{ partial "toc.html" .}}
+    {{ .TableOfContents }}
   </aside>
 
   {{ partial "disqus.html" .}}
