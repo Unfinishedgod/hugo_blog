@@ -3,13 +3,19 @@
 <main class="content" role="main">
   <article class="article">
     <style>
+    article {
+    background-color: #CBE86B;
+    float: left;
+    padding: 0 20px 40px;
+    width: 560px; /* 560px + 20px + 20px = 600px */
+      
+    }
+
     aside {
-      width: 30%;
-      padding-left: 15px;
-      margin-left: 15px;
-      float: right;
-      font-style: italic;
-      background-color: lightgray;
+        background-color: #CCCCCC;
+        float: right;
+        padding-left: 20px;
+        width: 280px; /* 280px + 20px = 300px */
     }
     </style>
     {{ if eq .Section "post" }}
@@ -27,7 +33,7 @@
     </div>
   </article>
   
-  <aside>
+  <aside id = 'aside'>
     {{ partial "toc.html" .}}
   </aside>
 
