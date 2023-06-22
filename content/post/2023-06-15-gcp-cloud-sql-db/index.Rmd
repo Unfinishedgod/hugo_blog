@@ -7,7 +7,7 @@ categories:
   - GCP
   - SQL
 tags: []
-toc: TRUE
+toc: true
 ---
 
 <center>
