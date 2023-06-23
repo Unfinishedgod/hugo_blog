@@ -1,0 +1,78 @@
+---
+title: '[Python] Google BARD API 사용'
+author: 최의용
+date: '2023-06-23'
+slug: python-google-bard-api
+categories: []
+tags: []
+---
+
+
+
+<center>
+<img src="images/python_bard.png" style="width:100.0%" />
+</center>
+<p>바야흐로 생성형 AI의 시대이다. Openai의 Chatgpt가 세상을 떠들썩 한지도 얼마 안가서 Google도 Bard를 출시 했다. 현재 Chatgpt와 Bard를 같이 사용하고 있는데, 이번에 BARD와 파이썬을 연동하는게 관심이 생겨 알아 보게 되었다. 아직 BARD의 정식 API가 나온것이 아니라서, 추후에 정식 API가 나오게 되면 그때 업데이트를 하려고 한다.</p>
+<div id="api-key-확보" class="section level1">
+<h1>API KEY 확보</h1>
+<p>우선 python에 사용할 BARD의 API를 확보 하자. 그리고 다음과 같이 하나씩 따라 하면 된다.</p>
+<ol style="list-style-type: decimal">
+<li>BARD 접속</li>
+</ol>
+<ul>
+<li><a href="https://bard.google.com/" class="uri">https://bard.google.com/</a></li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>개발자 모드 진입</li>
+</ol>
+<ul>
+<li>(크롬 기준) F12 또는 Ctrl + Shift + i</li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>상단에 Application 탭 클릭</li>
+<li>왼쪽 메뉴에 Cookies &gt; <a href="https://bard.google.com" class="uri">https://bard.google.com</a> 클릭</li>
+<li>secure-1PASID 클릭</li>
+<li>하단에 API키 복사</li>
+</ol>
+<center>
+<img src="images/python_bard_1.png" style="width:80.0%" />
+</center>
+<p>이렇게 apikey를 확보 했으면 이제 bard를 설치 해주자.</p>
+<pre><code>$ pip3 install bardapi</code></pre>
+</div>
+<div id="python-bard-연동" class="section level1">
+<h1>Python BARD 연동</h1>
+<p>apikey도 확보 했고, bard api도 설치 했으면 이제 준비는 끝났다. 파이썬에서 하나씩 확인해보자. 우선 다음의 모듈을 불러온다.</p>
+<pre><code>import pandas as pd
+import bardapi
+import os</code></pre>
+<p>앞서 준비한 bard의 API키를 넣어 준다.</p>
+<pre><code>os.environ[&#39;_BARD_API_KEY&#39;] = &#39;API_KEY&#39;</code></pre>
+<p>질문을 테스트 해본다.</p>
+<pre><code>question = &quot;&quot;&quot;
+삼성전자는 2023년 6월 22일, 인포컴 2023에서 지속가능성부터 &#39;최고의 모바일 기기&#39;까지 다양한 분야에서 7개의 상을 수상했다고 발표했다. 삼성전자는 &quot;이번 수상은 삼성전자의 지속가능한 혁신에 대한 헌신을 인정받은 것으로, 앞으로도 더 나은 미래를 위해 혁신을 지속하겠다&quot;고 밝혔다.
+
+3줄 요약좀 해줘
+&quot;&quot;&quot;</code></pre>
+<p>그리고 다음의 <code>bardapi.core.Bard().get_answer()</code> 함수를 사용해 테스트 하면 BARD의 결과물이 나오게 된다.</p>
+<pre><code>response = bardapi.core.Bard().get_answer(question)
+response</code></pre>
+<center>
+<img src="images/python_bard_2.png" style="width:80.0%" />
+</center>
+<p>이를 잘 정리 하려면 다음과 같이 데이터프레임으로 감싸도 된다.</p>
+<pre><code>df = pd.DataFrame(response[&#39;choices&#39;])
+df</code></pre>
+</div>
+<div id="총평" class="section level1">
+<h1>총평</h1>
+<p>openai, google에서 아주 멋진걸 만들어 놨다. 이제는 이걸 어떻게 잘 써먹어야 하는 시대가 벌써 눈앞에 왔는데, 파이썬을 사용해서 앞으로 어떻게 사용할지는 조만간 한번 만들어 봐야 겠다.</p>
+<hr />
+</div>
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<ul>
+<li><a href="https://github.com/dsdanielpark/Bard-API">dsdanielpark bard api</a></li>
+<li>yeko90님의 블로그: <a href="https://yeko90.tistory.com/entry/%EB%B0%94%EB%93%9C-api-%EC%82%AC%EC%9A%A9%EB%B2%95">Google Bard 사용법</a></li>
+</ul>
+</div>
