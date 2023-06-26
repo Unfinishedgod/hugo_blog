@@ -11,3 +11,10 @@ tags:
 ---
 
 
+
+<center>![](images/naver_bard.png){width=80%}</center>
+
+<center>![](images/naver_bard_1.png){width=80%}</center>
+
+
+
