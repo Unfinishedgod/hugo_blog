@@ -46,9 +46,11 @@ tags: []
 ### 설치
 
 ```
-$ pip install pykrx 
-$ pip install -U finance-datareader
+$ pip install pykrx  # pykrx 설치
+$ pip install -U finance-datareader # finance-datareader 설치
 ```
+
+
 
 
 
