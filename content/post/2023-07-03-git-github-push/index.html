@@ -1,0 +1,34 @@
+---
+title: '[Git] 토큰 없이 Github push 하는 방법 '
+author: 최의용
+date: '2023-07-03'
+slug: git-github-push
+categories:
+  - github
+tags:
+  - github
+---
+
+
+
+<p>최근에 git push를 자주 하는 일이 생겼다. 그러다 보니 git token을 자주 복사 하고 붙여넣기 해야 하는 일이 생겼는데 이번에 그런 번거로움이 없이 commit 하는 방법을 찾아서 기록으로 남긴다.</p>
+<p>아주 간단하다.</p>
+<ol style="list-style-type: decimal">
+<li>우선 git 폴더를 가서 다음과 같은 커맨드를 입력한다.</li>
+</ol>
+<pre><code>$ cd .git</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>그리고 나서 다음의 커맨드를 입력하여 config 파일을 수정해준다.</li>
+</ol>
+<pre><code>$ vi config</code></pre>
+<p>위의 커맨드를 입력했으면 다음과 같은 화면을 볼 수 있다. 여기서 <strong>필요한 부분만 수정</strong> 해주면 된다.</p>
+<pre><code>[remote &quot;origin&quot;]
+  url = https://{Git id}:{token}@github.com/{레포지토리 파일}/Capstone.git</code></pre>
+<p>그리고 나서 이를 esc + shift + : 를 입력 하고 wq를 통해 저장하고 나가면 된다.</p>
+<hr />
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<ul>
+<li><a href="https://velog.io/@danbibibi/Github-token-%EC%9E%85%EB%A0%A5-%EC%97%86%EC%9D%B4-Push"></a></li>
+</ul>
+</div>
