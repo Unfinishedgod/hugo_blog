@@ -14,6 +14,12 @@ tags: []
 
 이번에는 Pykrx 와 FinanceDataReader를 사용한 금융 데이터 수집을 해보려 한다. GCP를 하면서 ETL에 좋은 예제가 무엇이 있을까 생각하던 도중 금융 데이터를 사용하는 것이 생각이 났다. Pykrx나 FinanceDataReader는 종종 찾아서 쓰던 라이브러리 였으나, 이번에 정리도 하면서 블로그를 남기려고 한다. 둘중 하나만 사용해볼까 했는데 국내, 국외 주식 및 여러 세부정보들이 각각 다르게 제공을 하기 때문에 두개를 써야 하는 상황이 생겼다. 우번 이번에는 Pykrx부터 사용해보도록 하자. 
 
+# Github
+
+깃헙은 다음과 같다. 앞으로 이곳에 하나씩 파일을 업로드 하면서 문서를 생성할 예정
+
+- [GCP, 파이썬을 사용한 금융 데이터 ETL 및 대시보드 구축](https://github.com/Unfinishedgod/finance_mlops)
+
 # Pykrx
 
  - 공식문서: [Pykrx](https://github.com/sharebook-kr/pykrx)
