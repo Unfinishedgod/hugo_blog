@@ -29,13 +29,13 @@ $ vi config
 
 ```
 [remote "origin"]
-  url = https://{Git id}:{token}@github.com/{레포지토리 파일}/Capstone.git
+  url = https://{Git id}:{token}@github.com/{Git id}/{레포지토리 파일}.git
 ```
 
 그리고 나서 이를 esc + shift + : 를 입력 하고 wq를 통해 저장하고 나가면 된다. 
 
 ---
-
+ 
 
 # Reference
 
