@@ -35,6 +35,8 @@ $ vi config
 그리고 나서 이를 esc + shift + : 를 입력 하고 wq를 통해 저장하고 나가면 된다. 
 
 ---
+
+
 # Reference
 
-- [](https://velog.io/@danbibibi/Github-token-%EC%9E%85%EB%A0%A5-%EC%97%86%EC%9D%B4-Push)
+- [danbibibi.log 님의 블로그](https://velog.io/@danbibibi/Github-token-%EC%9E%85%EB%A0%A5-%EC%97%86%EC%9D%B4-Push)
