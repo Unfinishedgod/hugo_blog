@@ -1,0 +1,222 @@
+---
+title: '[Python] Cron을 사용한 금융 데이터 수집 자동화'
+author: 최의용
+date: '2023-07-06'
+slug: python-cron
+categories:
+  - crontab
+tags:
+  - crontab
+---
+
+<center>
+![](images/crontab.png){width=70%}
+</center>
+
+지난 블로그에서 pykrx를 사용한 금융 데이터를 수집하는 내용을 담았다.([pykrx를 사용한 금융 데이터 수집 part 1](https://unfinishedgod.netlify.app/2023/07/03/python-pykrk-part-1/)) 이번에는 이를 자동화 하는 내용을 작성하려 한다. 데이터 수집 자동화를 하는데 있어서 가장 많이 보이는 내용은 Airflow 이다. 물론 그전에 nifi 든지 여러 방법이 있었지만 이번에는 crontab를 소개 해보려 한다. 겸사 겸사 이번 블로그를 한 문장으로 소개 해보자면 다음과 같다.
+
+<center>
+태초에 Cron이 있었다.
+</center>
+
+그럼 crontab에 대해 알아보고 이를 응용 해보자. 
+
+## cron이란?
+
+cron을 검색해보면 위키백과에 다음과 같이 소개 된다. <소프트웨어 유틸리티 cron은 유닉스 계열 컴퓨터 운영 체제의 시간 기반 잡 스케줄러이다. 소프트웨어 환경을 설정하고 관리하는 사람들은 작업을 고정된 시간, 날짜, 간격에 주기적으로 실행할 수 있도록 스케줄링하기 위해 cron을 사용한다.>
+
+쉽게 말하자면 스케쥴러 이다. 그럼 이제 crontab를 사용해보자. 환경은 gcp compute engine의 ubuntu에서 작업 한다.
+
+### crontab 설정
+
+다음의 커맨드를 입력 해보자. 여기서 -e는 edit의 줄임말인다.
+
+```
+$ crontab -e
+```
+```
+no crontab for ubuntu - using an empty one
+
+Select an editor.  To change later, run 'select-editor'.
+  1. /bin/nano        <---- easiest
+  2. /usr/bin/vim.basic
+  3. /usr/bin/vim.tiny
+  4. /bin/ed
+
+Choose 1-4 [1]:
+```
+처음에 `crontab -e`를 입력 하게 되면 위와 같은 리눅스 에디터가 나오는데 여기서 2번을 해주자. 개인적으로 nano 보다는 vi 편집기가 더 편하다.
+
+사진
+
+그렇게 넘어 가게 되면 `crontab -e` 의 결과가 보이게 된다. 이곳에서 우리는 스케쥴러 설정을 해줄 예정이다. 일단 우선 ctrl + shift + ; 하고 나가 주자. 
+
+### 스케쥴러 리스트 확인
+
+이번에는 crontab에 들어가 있는 리스트를 확인하는 커맨드를 알아보자. 역시나 여기서 -l은 list의 약자 이다.
+
+```
+$ crontab -l
+```
+
+### crontab 삭제
+
+crontab 삭제는 다음의 커맨드를 입력 하면 된다. -r은 remove의 약자 이다.
+
+```
+$ crontab -r
+```
+
+### crontab 문법
+
+이번에는 문법을 알아보자. 총 5개의 *을 사용하며 각각 분, 시간, 일, 월, 요일을 지정해 줄 수 있다. 따라서 기본적인 형식은 다음과 같다. 
+
+ - * * * * *  {파일 실행 명령어} {파일 절대 경로}
+
+```
+ # ┌───────────── 분 (0 - 59)
+ # │ ┌────────────── 시간 (0 - 23)
+ # │ │ ┌─────────────── 일 (1 - 31)
+ # │ │ │ ┌──────────────── 월 (1 - 12)
+ # │ │ │ │ ┌───────────────── 요일 (0 - 6) (0 ~ 6 은 일요일 부터 토요일까지)
+ # │ │ │ │ │
+ # │ │ │ │ │
+ # * * * * *  {파일 실행 명령어} {파일 절대 경로}
+```
+
+### 예시
+
+그럼 이제 예시를 한번 알아 보자. 1분마다 실행되는 파이썬 스크립트를 만들어 주고 싶다. 
+
+#### 파이썬 스크립트
+
+우선 간단하게 crontab_test.py를 만들어주어 다음과 같이 코드를 생성 해주 었다. 이 파이썬 스크립트는 현재 날짜를 데이터프레임으로 생성 하고 저장해주는 csv 이다.
+
+```
+#!/usr/bin/env python
+# coding: utf-8
+
+import pandas as pd
+import datetime 
+import os
+
+# 현재 시간
+now = datetime.datetime.now()
+now_time = now.strftime('%Y-%m-%d %H:%M:%S')
+
+# 데이터 프레임 생성
+df = pd.DataFrame({
+    'nowtime': now_time
+}, index = [0])
+
+
+file_name = 'cron_test'
+
+# 파일 저장
+if not os.path.exists(f'{file_name}.csv'):
+    df.to_csv(f'{file_name}.csv', index=False, mode='w')
+else:
+    df.to_csv(f'{file_name}.csv', index=False, mode='a', header=False)
+```
+
+#### crontab 입력
+
+1분마다 실행 되는 파이썬 스크립트를 만들고 싶다면, 다음과 같이 설정 해주면 된다. 여기서 파일 실행 명령어와 파일 절대 경로를 파악해보면 다음과 같다. `crontab -e`를 해주고 다음 커맨드를 입력 해주자.
+
+- /home/owenchoi07/anaconda3/bin/python3
+  - python3를 실행하기 위한 명령어 이다. 이는 `which python3`을 입력했을경우 나오게 된다.
+- /home/owenchoi07/finance_mlops/crontab_test.py
+  - crontab_test.py를 실행하기 위한 절대 경로 이다. 
+
+```
+* * * * * /home/owenchoi07/anaconda3/bin/python3 /home/owenchoi07/finance_mlops/crontab_test.py
+```
+
+#### cron service 실행
+
+cron을 입력 했으니 이를 실행 해주자. 다음의 커맨드를 꼭 해주어 상태를 확인해주어야 한다. 
+
+```
+$ sudo service cron start
+$ sudo service cron status
+```
+
+
+### pykrx 수집 자동화
+
+그러면 이제 응용을 해보자. 한국 주식시장이 끝나고 난 평일 6 시에 그날의 종가를 수집 하는 코드를 생성 해보자. pykrx 를 사용한 주가 데이터 수집은 다음을 참고 한다. 
+
+- [pykrx를 사용한 금융 데이터 수집 part 1](https://unfinishedgod.netlify.app/2023/07/03/python-pykrk-part-1/)
+
+#### 파이썬 스크립트
+
+우선 파이썬 스크립트는 다음과 같다. crontab_pykrx_test.py 생성후 다음과 같이 입력 해주었다.
+
+```
+#!/usr/bin/env python
+# coding: utf-8
+
+import pandas as pd
+from pykrx import stock
+from pykrx import bond
+from time import sleep
+
+from datetime import datetime
+import os
+import time
+
+kor_ticker_list_df = pd.read_csv(f'kor_ticker_list.csv')
+kor_ticker_list = kor_ticker_list_df['ticker']
+
+
+# 현재 시간
+now = datetime.datetime.now()
+now_time = now.strftime('%Y-%m-%d %H:%M:%S')
+
+for ticker_nm in kor_ticker_list:
+    file_name = 'kor_stock_ohlcv'
+    
+    try:
+        df_raw = stock.get_market_ohlcv(start_date, today_date1, ticker_nm)
+        df_raw = df_raw.reset_index()
+        df_raw['ticker'] = ticker_nm
+        
+        
+        if not os.path.exists(f'{file_name}.csv'):
+            df_raw.to_csv(f'{file_name}.csv', index=False, mode='w')
+        else:
+            df_raw.to_csv(f'{file_name}.csv', index=False, mode='a', header=False)
+        
+        print(f'{ticker_nm} success')
+    except:
+        print(f'{ticker_nm} fail')    
+
+```
+
+#### crontab 입력
+
+그리고 나서 다음과 같이 입력 해주면 평일, 18시, 1분에 실행이 되게 된다. 이로써 주가 데이터수집은 이제 수동으로 안해도 되고 자동으로 쌓이게 된다. 이번에도 `crontab -e`를 해주고 다음 커맨드를 입력 해주자.
+
+```
+1 18 * * 1,2,3,4,5 /home/owenchoi07/anaconda3/bin/python3 /home/owenchoi07/finance_mlops/crontab_pykrx_test.py
+```
+
+
+#### cron service 실행
+
+이번에도 cron을 입력 했으니 이를 실행 해주자. 
+
+```
+$ sudo service cron start
+$ sudo service cron status
+```
+
+# 총평
+
+이렇게 crontab를 사용한 파이썬 스크립트 자동화를 마무리 했다. 이제 이후에 airflow를 설치 해보고 이를 사용해보도록 하자. 
+
+---
+
+# Reference 
+
+- https://jdm.kr/blog/2
