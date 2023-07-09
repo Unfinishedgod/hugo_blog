@@ -26,12 +26,11 @@ tags: []
 
 ### 사용할 데이터
 
-- 사용 예정 데이터
-  - 국내종목시세
-  - 종목별 DIV/BPS/PER/EPS 조회
-  - 일자별 시가총액
-  - 일자별 거래실적 추이(거래대금)
-  - 일자별 거래실적 추이(거래량)
+ - 국내종목시세
+ - 종목별 DIV/BPS/PER/EPS 조회
+ - 일자별 시가총액
+ - 일자별 거래실적 추이(거래대금)
+ - 일자별 거래실적 추이(거래량)
 
 
 # 파이썬을 사용한 데이터 수집 가이드
@@ -48,7 +47,7 @@ $ pip install pykrx  # pykrx 설치
 
 ### 라이브러리 호출
 
-```
+```python
 import pandas as pd
 from pykrx import stock
 from pykrx import bond
@@ -63,7 +62,7 @@ import time
 
 현재 날짜를 호출하자. 시작 날짜는 start_date로 20180101로 지정해주어 2018년 부터 수집을 해주도록 한다.
 
-```
+```python
 now = datetime.now()
 today_date1 = now.strftime('%Y%m%d')
 start_date = '20180101'
@@ -83,7 +82,7 @@ start_date = '20180101'
 
 ticker를 구했으면 그에 따른 회사를 호출해주는 함수가 위의 함수 이다. 이렇게 ticker, 회사이름, 마켓을 구하여서 앞으로 수집할 마스터 데이터로 사용할 예정이다. 
 
-```
+```python
 market_list = ['KOSPI', 'KOSDAQ', 'KONEX']
 
 kor_ticker_list_df = pd.DataFrame()
@@ -110,7 +109,7 @@ kor_ticker_list_df.head()
 
 최종적으로 생성된 kor_ticker_list_df는 data_crawler 경로에 넣어서 저장해주고, 앞으로 사용할 ticker리스트를 위해 kor_ticker_list를 따로 만들어 주도록 하자.
 
-```
+```python
 kor_ticker_list = kor_ticker_list_df['ticker']
 
 kor_ticker_list_df.to_csv(f'data_crawler/kor_ticker_list.csv', index=False, mode='w')
@@ -132,7 +131,7 @@ ticker는 넣어 주었는데, 회사명은 왜 안넣지? 하는 의문이 생�
 - 2. 데이터 적재시 데이터 성능에 따른 이유
   - 고유값인 ticker를 사용하고 나머지는 우리가 수집한 마스터 테이블을 통해 join을 사용하면 된다. 굳이 넣어서 데이터베이스 성능을 저하시킬 필요는 없다.
 
-```
+```python
 for ticker_nm in kor_ticker_list:
     file_name = 'kor_stock_ohlcv'
     
@@ -154,7 +153,7 @@ for ticker_nm in kor_ticker_list:
 
 간단하게 확인해보면 다음과 같은 테이블이 생성 된다.
 
-```
+```python
 df_raw.head(3)
 ```
 
@@ -170,7 +169,7 @@ df_raw.head(3)
 
 - 특별한 점이 있다면 종목별 시가총액과 동일한 컬럼이 존재 한다. 종가, 거래량, 거래대금인데 이는 수집 대상에서 제거 한다. 앞으로 우리는 이 데이터를 여러 방법(cron, airflow, google cloud function)을 사용하여 데이터베이스에 적재 할 예정이다. 적재할 때 중복되는 컬럼은 사용할 필요가 없기 때문에 사용하지 않는다.
 
-```
+```python
 for ticker_nm in kor_ticker_list:
     file_name = 'kor_market_cap'
     
@@ -194,7 +193,7 @@ for ticker_nm in kor_ticker_list:
 
 간단하게 확인해보면 다음과 같은 테이블이 생성 된다.
 
-```
+```python
 df_raw.head(3)
 ```
 
@@ -209,7 +208,7 @@ df_raw.head(3)
 
 이번에는 DIV/BPS/PER/EPS 데이터를 수집 해보자. 역시 방법은 똑같다. kor_stock_fundamental.csv로 저장해준다.
 
-```
+```python
 for ticker_nm in kor_ticker_list:
     file_name = 'kor_stock_fundamental'
     
@@ -231,7 +230,7 @@ for ticker_nm in kor_ticker_list:
 
 간단하게 확인해보면 다음과 같은 테이블이 생성 된다.
 
-```
+```python
 df_raw.head(3)
 ```
 
@@ -246,7 +245,7 @@ df_raw.head(3)
 
 이번에는 거래대금에 따른 일자별 거래실적 추이 데이터를 불러와보자. 일자별 거래대금 종류에는 순매수, 매수, 매도로 나뉘어 지는데 여기서 순매수는 매수 + 매도를 해서 나온 값이다. stock.get_market_trading_value_by_date() 함수를 사용하며 순매수, 매수, 매도에 따른 옵션이 추가로 생성되어서 이에 따라서 반복문을 하나 더 추가 했다. 그리고 이는 kor_stock_trading_value_by_investor.csv로 저장해준다.
 
-```
+```python
 buy_sell_type_list = ['순매수', '매수', '매도']
 for buy_sell_type in buy_sell_type_list:
     for ticker_nm in kor_ticker_list:
@@ -276,7 +275,7 @@ for buy_sell_type in buy_sell_type_list:
 
 간단하게 확인해보면 다음과 같은 테이블이 생성 된다.
 
-```
+```python
 df_raw.head(2)
 ```
 
@@ -291,7 +290,7 @@ df_raw.head(2)
 
 이번에는 거래량에 따른 일자별 거래실적 추이 데이터를 불러와보자. 거래 대금에 따른 일자별 거래 실적과 동일한 방법대로 수집을 하면 된다. kor_stock_trading_volume_by_date.csv로 저장해 준다.
 
-```
+```python
 buy_sell_type_list = ['순매수', '매수', '매도']
 for buy_sell_type in buy_sell_type_list:
     for ticker_nm in kor_ticker_list:
@@ -320,7 +319,7 @@ for buy_sell_type in buy_sell_type_list:
 
 간단하게 확인해보면 다음과 같은 테이블이 생성 된다.
 
-```
+```python
 df_raw.head(2)
 ```
 
