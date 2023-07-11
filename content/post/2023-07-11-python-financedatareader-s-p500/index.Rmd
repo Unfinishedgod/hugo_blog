@@ -1,0 +1,196 @@
+---
+title: '[Python] FinanceDataReader을 사용한 금융 데이터 수집 (S&P500, 비트코인)'
+author: 최의용
+date: '2023-07-11'
+slug: python-financedatareader-s-p500
+categories: []
+tags: []
+---
+
+<center>
+![](images/pykrxfinancedartreader_3.png){width=80%}
+</center>
+
+이번에는 FinanceDataReader를 사용해보자. 그동안 국내 주식을 사용하기 위해 pykrx를 사용했었는데, FinanceDataReader도 국내 주식정보를 제공한다. 그러나 pykrx의 여러 다른 데이터(등락률) 때문에 통일성을 위해 사용해야 했었다. 이번에 FinanceDataReader을 통해 S&P 500와 비트코인, 환율 데이터를 사용해보자. 
+
+
+# 기본 정보
+
+#### Github
+
+깃헙은 다음과 같다. 앞으로 이곳에 하나씩 파일을 업로드 하면서 문서를 생성할 예정
+ 
+- [GCP, 파이썬을 사용한 금융 데이터 ETL 및 대시보드 구축](https://github.com/Unfinishedgod/finance_mlops)
+
+#### FinanceDataReader
+
+- 공식문서: [FinanceDataReader](https://github.com/financedata-org/FinanceDataReader)
+
+#### 사용할 데이터
+
+ - 해외 종목 리스트
+ - 해외주식 가격 데이터
+ - 환율 데이터
+ - 비트코인 가격
+
+# 파이썬을 사용한 데이터 수집 가이드
+
+### 설치
+
+우선 설치를 해보자. finance-datareader설치는 다음과 같다.
+
+```python
+$ pip install -U finance-datareader # finance-datareader 설치
+```
+
+### 라이브러리 호출
+
+```python
+import pandas as pd
+from time import sleep
+import FinanceDataReader as fdr
+
+from datetime import datetime
+import os
+import time
+```
+
+ 
+### 날짜 호출
+
+현재 날짜를 호출하자. 시작 날짜는 start_date로 2017-01-01로 지정해주어 2017년 부터 수집을 해주도록 한다.
+
+```python
+now = datetime.now()
+today_date2 = now.strftime('%Y-%m-%d')
+start_date2 = '2017-01-01'
+```
+
+### S&P 500 종목 리스트 생성
+
+이번엔 S&P 500 종목 리스트를 저장 해주자. fdr.StockListing() 함수를 통해 가져올 수 있으며 컬렴명은 ticker. corp_name, sector, industry로 저장해준다.
+
+```python
+# S&P 500 symbol list
+snp500 = fdr.StockListing('S&P500')
+snp500.columns = ['ticker', 'corp_name', 'sector', 'industry']
+snp500.head()
+```
+
+| ticker |   corp_name |                 sector |                       industry |
+|-------:|------------:|-----------------------:|-------------------------------:|
+|    MMM |          3M |            Industrials |       Industrial Conglomerates |
+|    AOS | A. O. Smith |            Industrials |              Building Products |
+|    ABT |      Abbott |            Health Care |          Health Care Equipment |
+|   ABBV |      AbbVie |            Health Care |                Pharmaceuticals |
+|    ACN |   Accenture | Information Technology | IT Consulting & Other Services |
+
+이제 이 데이터는 snp500_ticker_list로 저장해주도록 하자.
+
+```python
+sp500_ticker_list = snp500['ticker']
+snp500.to_csv('data_crawler/snp500_ticker_list.csv', index = False)
+```
+
+
+### S&P 500 주가 데이터 수집
+
+
+```python
+for ticker_nm in sp500_ticker_list:
+    file_name = 'snp500_daily'
+    try:
+        # Apple(AAPL), 2017-01-01 ~ Now
+        df_raw = fdr.DataReader(ticker_nm, start_date2,today_date2)
+        df_raw['ticker'] = ticker_nm
+        df_raw = df_raw.reset_index()
+        
+        
+        if not os.path.exists(f'data_crawler/{file_name}.csv'):
+            df_raw.to_csv(f'data_crawler/{file_name}.csv', index=False, mode='w')
+        else:
+            df_raw.to_csv(f'data_crawler/{file_name}.csv', index=False, mode='a', header=False)
+        
+        print(f'{ticker_nm} success')    
+    except:
+        print(f'{ticker_nm} fail')
+```
+
+간단하게 확인해보면 다음과 같은 테이블이 생성 된다.
+
+
+```python
+df_raw.head()
+```
+
+|       Date |      Open |      High |       Low |     Close | Adj Close |   Volume | ticker |
+|-----------:|----------:|----------:|----------:|----------:|----------:|---------:|-------:|
+| 2017-01-03 | 38.630001 | 39.080002 | 38.340000 | 39.049999 | 34.819305 |  9677300 |    ABT |
+| 2017-01-04 | 39.060001 | 39.730000 | 39.060001 | 39.360001 | 35.095726 | 22644500 |    ABT |
+| 2017-01-05 | 39.240002 | 39.750000 | 38.980000 | 39.700001 | 35.398884 | 12080100 |    ABT |
+| 2017-01-06 | 39.700001 | 40.990002 | 39.660000 | 40.779999 | 36.361877 | 14628900 |    ABT |
+| 2017-01-09 | 40.790001 | 41.060001 | 40.619999 | 40.740002 | 36.326210 | 10992500 |    ABT |
+
+
+### 비트코인 
+
+이번에는 비트코인 데이터를 수집해보자. 간단하다. fdr.DataReader() 함수에 시작날짜와 끝날짜를 설정 해주면 된다.
+
+```python
+btc_df = fdr.DataReader('BTC/KRW', "2016-01-01",today_date2)
+btc_df = btc_df.reset_index()
+```
+
+간단하게 확인해보면 다음과 같은 테이블이 생성 된다.
+
+```python
+btc_df.head()
+```
+
+|       Date |        Open |        High |         Low |       Close |   Adj Close |       Volume |
+|-----------:|------------:|------------:|------------:|------------:|------------:|-------------:|
+| 2017-01-01 | 1162412.500 | 1209403.500 | 1155893.750 | 1202971.625 | 1202971.625 | 178067406890 |
+| 2017-01-02 | 1203323.500 | 1245300.250 | 1203916.375 | 1229052.875 | 1229052.875 | 267264105027 |
+| 2017-01-03 | 1228872.375 | 1259066.500 | 1235420.875 | 1258881.375 | 1258881.375 | 223314459680 |
+| 2017-01-04 | 1259556.875 | 1385054.750 | 1260194.000 | 1379382.750 | 1379382.750 | 412055225187 |
+| 2017-01-05 | 1381771.750 | 1406141.125 | 1074738.125 | 1196467.375 | 1196467.375 | 602376662775 |
+
+이는 btc_df.csv로 저장 해주도록 하자.
+
+```python
+btc_df.to_csv(f'data_crawler/btc_df.csv')
+```
+
+### 환율 정보
+
+마지막으로 환율 정보를 가져와 보자. fdr.DataReader() 함수에 'USD/KRW' 옵션을 넣어 주자.
+
+```python
+usdkrw = fdr.DataReader('USD/KRW', '1995-01-01', today_date2) # 달러 원화
+usdkrw = usdkrw.reset_index()
+```
+
+간단하게 확인해보면 다음과 같은 테이블이 생성 된다.
+
+```python
+usdkrw.tail()
+```
+
+|       Date |        Open |        High |         Low |       Close |   Adj Close | Volume |
+|-----------:|------------:|------------:|------------:|------------:|------------:|-------:|
+| 2023-07-05 | 1295.500000 | 1305.770020 | 1295.609985 | 1295.500000 | 1295.500000 |    0.0 |
+| 2023-07-06 | 1302.969971 | 1313.800049 | 1299.560059 | 1302.969971 | 1302.969971 |    0.0 |
+| 2023-07-07 | 1309.219971 | 1310.150024 | 1295.819946 | 1309.219971 | 1309.219971 |    0.0 |
+| 2023-07-10 | 1297.369995 | 1307.199951 | 1297.670044 | 1297.369995 | 1297.369995 |    0.0 |
+| 2023-07-11 | 1297.780029 | 1300.880005 | 1289.640015 | 1293.719971 | 1293.719971 |    0.0 |
+
+이는 usdkrw로 저장 해주도록 하자.
+
+```python
+usdkrw.to_csv(f'data_crawler/usdkrw.csv')
+```
+
+# 총평
+
+드디어 데이터 수집 부분에 대한 블로그를 마무리 했다. pykrx의 국내 주식부터 시작해서 FinanceDataReader를 사용하여 S&P 500, 비트코인, 환율 정보를 모두 수집 하였고 이제 본격적으로 이를 자동으로 수집할 예정이다. 또한 필요에 맞게 전처리 와 시각화 및 모델링을 통한 대시보드를 구현해보자.
+

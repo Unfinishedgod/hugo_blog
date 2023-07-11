@@ -1,0 +1,384 @@
+---
+title: '[Python] FinanceDataReader을 사용한 금융 데이터 수집 (S&P500, 비트코인)'
+author: 최의용
+date: '2023-07-11'
+slug: python-financedatareader-s-p500
+categories: []
+tags: []
+---
+
+
+
+<center>
+<img src="images/pykrxfinancedartreader_3.png" style="width:80.0%" />
+</center>
+<p>이번에는 FinanceDataReader를 사용해보자. 그동안 국내 주식을 사용하기 위해 pykrx를 사용했었는데, FinanceDataReader도 국내 주식정보를 제공한다. 그러나 pykrx의 여러 다른 데이터(등락률) 때문에 통일성을 위해 사용해야 했었다. 이번에 FinanceDataReader을 통해 S&amp;P 500와 비트코인, 환율 데이터를 사용해보자.</p>
+<div id="기본-정보" class="section level1">
+<h1>기본 정보</h1>
+<div id="github" class="section level4">
+<h4>Github</h4>
+<p>깃헙은 다음과 같다. 앞으로 이곳에 하나씩 파일을 업로드 하면서 문서를 생성할 예정</p>
+<ul>
+<li><a href="https://github.com/Unfinishedgod/finance_mlops">GCP, 파이썬을 사용한 금융 데이터 ETL 및 대시보드 구축</a></li>
+</ul>
+</div>
+<div id="financedatareader" class="section level4">
+<h4>FinanceDataReader</h4>
+<ul>
+<li>공식문서: <a href="https://github.com/financedata-org/FinanceDataReader">FinanceDataReader</a></li>
+</ul>
+</div>
+<div id="사용할-데이터" class="section level4">
+<h4>사용할 데이터</h4>
+<ul>
+<li>해외 종목 리스트</li>
+<li>해외주식 가격 데이터</li>
+<li>환율 데이터</li>
+<li>비트코인 가격</li>
+</ul>
+</div>
+</div>
+<div id="파이썬을-사용한-데이터-수집-가이드" class="section level1">
+<h1>파이썬을 사용한 데이터 수집 가이드</h1>
+<div id="설치" class="section level3">
+<h3>설치</h3>
+<p>우선 설치를 해보자. finance-datareader설치는 다음과 같다.</p>
+<pre class="python"><code>$ pip install -U finance-datareader # finance-datareader 설치</code></pre>
+</div>
+<div id="라이브러리-호출" class="section level3">
+<h3>라이브러리 호출</h3>
+<pre class="python"><code>import pandas as pd
+from time import sleep
+import FinanceDataReader as fdr
+
+from datetime import datetime
+import os
+import time</code></pre>
+</div>
+<div id="날짜-호출" class="section level3">
+<h3>날짜 호출</h3>
+<p>현재 날짜를 호출하자. 시작 날짜는 start_date로 2017-01-01로 지정해주어 2017년 부터 수집을 해주도록 한다.</p>
+<pre class="python"><code>now = datetime.now()
+today_date2 = now.strftime(&#39;%Y-%m-%d&#39;)
+start_date2 = &#39;2017-01-01&#39;</code></pre>
+</div>
+<div id="sp-500-종목-리스트-생성" class="section level3">
+<h3>S&amp;P 500 종목 리스트 생성</h3>
+<p>이번엔 S&amp;P 500 종목 리스트를 저장 해주자. fdr.StockListing() 함수를 통해 가져올 수 있으며 컬렴명은 ticker. corp_name, sector, industry로 저장해준다.</p>
+<pre class="python"><code># S&amp;P 500 symbol list
+snp500 = fdr.StockListing(&#39;S&amp;P500&#39;)
+snp500.columns = [&#39;ticker&#39;, &#39;corp_name&#39;, &#39;sector&#39;, &#39;industry&#39;]
+snp500.head()</code></pre>
+<table>
+<colgroup>
+<col width="10%" />
+<col width="16%" />
+<col width="31%" />
+<col width="41%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">ticker</th>
+<th align="right">corp_name</th>
+<th align="right">sector</th>
+<th align="right">industry</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">MMM</td>
+<td align="right">3M</td>
+<td align="right">Industrials</td>
+<td align="right">Industrial Conglomerates</td>
+</tr>
+<tr class="even">
+<td align="right">AOS</td>
+<td align="right">A. O. Smith</td>
+<td align="right">Industrials</td>
+<td align="right">Building Products</td>
+</tr>
+<tr class="odd">
+<td align="right">ABT</td>
+<td align="right">Abbott</td>
+<td align="right">Health Care</td>
+<td align="right">Health Care Equipment</td>
+</tr>
+<tr class="even">
+<td align="right">ABBV</td>
+<td align="right">AbbVie</td>
+<td align="right">Health Care</td>
+<td align="right">Pharmaceuticals</td>
+</tr>
+<tr class="odd">
+<td align="right">ACN</td>
+<td align="right">Accenture</td>
+<td align="right">Information Technology</td>
+<td align="right">IT Consulting &amp; Other Services</td>
+</tr>
+</tbody>
+</table>
+<p>이제 이 데이터는 snp500_ticker_list로 저장해주도록 하자.</p>
+<pre class="python"><code>sp500_ticker_list = snp500[&#39;ticker&#39;]
+snp500.to_csv(&#39;data_crawler/snp500_ticker_list.csv&#39;, index = False)</code></pre>
+</div>
+<div id="sp-500-주가-데이터-수집" class="section level3">
+<h3>S&amp;P 500 주가 데이터 수집</h3>
+<pre class="python"><code>for ticker_nm in sp500_ticker_list:
+    file_name = &#39;snp500_daily&#39;
+    try:
+        # Apple(AAPL), 2017-01-01 ~ Now
+        df_raw = fdr.DataReader(ticker_nm, start_date2,today_date2)
+        df_raw[&#39;ticker&#39;] = ticker_nm
+        df_raw = df_raw.reset_index()
+        
+        
+        if not os.path.exists(f&#39;data_crawler/{file_name}.csv&#39;):
+            df_raw.to_csv(f&#39;data_crawler/{file_name}.csv&#39;, index=False, mode=&#39;w&#39;)
+        else:
+            df_raw.to_csv(f&#39;data_crawler/{file_name}.csv&#39;, index=False, mode=&#39;a&#39;, header=False)
+        
+        print(f&#39;{ticker_nm} success&#39;)    
+    except:
+        print(f&#39;{ticker_nm} fail&#39;)</code></pre>
+<p>간단하게 확인해보면 다음과 같은 테이블이 생성 된다.</p>
+<pre class="python"><code>df_raw.head()</code></pre>
+<table>
+<colgroup>
+<col width="14%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="12%" />
+<col width="11%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">Date</th>
+<th align="right">Open</th>
+<th align="right">High</th>
+<th align="right">Low</th>
+<th align="right">Close</th>
+<th align="right">Adj Close</th>
+<th align="right">Volume</th>
+<th align="right">ticker</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">2017-01-03</td>
+<td align="right">38.630001</td>
+<td align="right">39.080002</td>
+<td align="right">38.340000</td>
+<td align="right">39.049999</td>
+<td align="right">34.819305</td>
+<td align="right">9677300</td>
+<td align="right">ABT</td>
+</tr>
+<tr class="even">
+<td align="right">2017-01-04</td>
+<td align="right">39.060001</td>
+<td align="right">39.730000</td>
+<td align="right">39.060001</td>
+<td align="right">39.360001</td>
+<td align="right">35.095726</td>
+<td align="right">22644500</td>
+<td align="right">ABT</td>
+</tr>
+<tr class="odd">
+<td align="right">2017-01-05</td>
+<td align="right">39.240002</td>
+<td align="right">39.750000</td>
+<td align="right">38.980000</td>
+<td align="right">39.700001</td>
+<td align="right">35.398884</td>
+<td align="right">12080100</td>
+<td align="right">ABT</td>
+</tr>
+<tr class="even">
+<td align="right">2017-01-06</td>
+<td align="right">39.700001</td>
+<td align="right">40.990002</td>
+<td align="right">39.660000</td>
+<td align="right">40.779999</td>
+<td align="right">36.361877</td>
+<td align="right">14628900</td>
+<td align="right">ABT</td>
+</tr>
+<tr class="odd">
+<td align="right">2017-01-09</td>
+<td align="right">40.790001</td>
+<td align="right">41.060001</td>
+<td align="right">40.619999</td>
+<td align="right">40.740002</td>
+<td align="right">36.326210</td>
+<td align="right">10992500</td>
+<td align="right">ABT</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="비트코인" class="section level3">
+<h3>비트코인</h3>
+<p>이번에는 비트코인 데이터를 수집해보자. 간단하다. fdr.DataReader() 함수에 시작날짜와 끝날짜를 설정 해주면 된다.</p>
+<pre class="python"><code>btc_df = fdr.DataReader(&#39;BTC/KRW&#39;, &quot;2016-01-01&quot;,today_date2)
+btc_df = btc_df.reset_index()</code></pre>
+<p>간단하게 확인해보면 다음과 같은 테이블이 생성 된다.</p>
+<pre class="python"><code>btc_df.head()</code></pre>
+<table style="width:100%;">
+<colgroup>
+<col width="13%" />
+<col width="14%" />
+<col width="14%" />
+<col width="14%" />
+<col width="14%" />
+<col width="14%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">Date</th>
+<th align="right">Open</th>
+<th align="right">High</th>
+<th align="right">Low</th>
+<th align="right">Close</th>
+<th align="right">Adj Close</th>
+<th align="right">Volume</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">2017-01-01</td>
+<td align="right">1162412.500</td>
+<td align="right">1209403.500</td>
+<td align="right">1155893.750</td>
+<td align="right">1202971.625</td>
+<td align="right">1202971.625</td>
+<td align="right">178067406890</td>
+</tr>
+<tr class="even">
+<td align="right">2017-01-02</td>
+<td align="right">1203323.500</td>
+<td align="right">1245300.250</td>
+<td align="right">1203916.375</td>
+<td align="right">1229052.875</td>
+<td align="right">1229052.875</td>
+<td align="right">267264105027</td>
+</tr>
+<tr class="odd">
+<td align="right">2017-01-03</td>
+<td align="right">1228872.375</td>
+<td align="right">1259066.500</td>
+<td align="right">1235420.875</td>
+<td align="right">1258881.375</td>
+<td align="right">1258881.375</td>
+<td align="right">223314459680</td>
+</tr>
+<tr class="even">
+<td align="right">2017-01-04</td>
+<td align="right">1259556.875</td>
+<td align="right">1385054.750</td>
+<td align="right">1260194.000</td>
+<td align="right">1379382.750</td>
+<td align="right">1379382.750</td>
+<td align="right">412055225187</td>
+</tr>
+<tr class="odd">
+<td align="right">2017-01-05</td>
+<td align="right">1381771.750</td>
+<td align="right">1406141.125</td>
+<td align="right">1074738.125</td>
+<td align="right">1196467.375</td>
+<td align="right">1196467.375</td>
+<td align="right">602376662775</td>
+</tr>
+</tbody>
+</table>
+<p>이는 btc_df.csv로 저장 해주도록 하자.</p>
+<pre class="python"><code>btc_df.to_csv(f&#39;data_crawler/btc_df.csv&#39;)</code></pre>
+</div>
+<div id="환율-정보" class="section level3">
+<h3>환율 정보</h3>
+<p>마지막으로 환율 정보를 가져와 보자. fdr.DataReader() 함수에 ‘USD/KRW’ 옵션을 넣어 주자.</p>
+<pre class="python"><code>usdkrw = fdr.DataReader(&#39;USD/KRW&#39;, &#39;1995-01-01&#39;, today_date2) # 달러 원화
+usdkrw = usdkrw.reset_index()</code></pre>
+<p>간단하게 확인해보면 다음과 같은 테이블이 생성 된다.</p>
+<pre class="python"><code>usdkrw.tail()</code></pre>
+<table>
+<colgroup>
+<col width="14%" />
+<col width="15%" />
+<col width="15%" />
+<col width="15%" />
+<col width="15%" />
+<col width="15%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">Date</th>
+<th align="right">Open</th>
+<th align="right">High</th>
+<th align="right">Low</th>
+<th align="right">Close</th>
+<th align="right">Adj Close</th>
+<th align="right">Volume</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">2023-07-05</td>
+<td align="right">1295.500000</td>
+<td align="right">1305.770020</td>
+<td align="right">1295.609985</td>
+<td align="right">1295.500000</td>
+<td align="right">1295.500000</td>
+<td align="right">0.0</td>
+</tr>
+<tr class="even">
+<td align="right">2023-07-06</td>
+<td align="right">1302.969971</td>
+<td align="right">1313.800049</td>
+<td align="right">1299.560059</td>
+<td align="right">1302.969971</td>
+<td align="right">1302.969971</td>
+<td align="right">0.0</td>
+</tr>
+<tr class="odd">
+<td align="right">2023-07-07</td>
+<td align="right">1309.219971</td>
+<td align="right">1310.150024</td>
+<td align="right">1295.819946</td>
+<td align="right">1309.219971</td>
+<td align="right">1309.219971</td>
+<td align="right">0.0</td>
+</tr>
+<tr class="even">
+<td align="right">2023-07-10</td>
+<td align="right">1297.369995</td>
+<td align="right">1307.199951</td>
+<td align="right">1297.670044</td>
+<td align="right">1297.369995</td>
+<td align="right">1297.369995</td>
+<td align="right">0.0</td>
+</tr>
+<tr class="odd">
+<td align="right">2023-07-11</td>
+<td align="right">1297.780029</td>
+<td align="right">1300.880005</td>
+<td align="right">1289.640015</td>
+<td align="right">1293.719971</td>
+<td align="right">1293.719971</td>
+<td align="right">0.0</td>
+</tr>
+</tbody>
+</table>
+<p>이는 usdkrw로 저장 해주도록 하자.</p>
+<pre class="python"><code>usdkrw.to_csv(f&#39;data_crawler/usdkrw.csv&#39;)</code></pre>
+</div>
+</div>
+<div id="총평" class="section level1">
+<h1>총평</h1>
+<p>드디어 데이터 수집 부분에 대한 블로그를 마무리 했다. pykrx의 국내 주식부터 시작해서 FinanceDataReader를 사용하여 S&amp;P 500, 비트코인, 환율 정보를 모두 수집 하였고 이제 본격적으로 이를 자동으로 수집할 예정이다. 또한 필요에 맞게 전처리 와 시각화 및 모델링을 통한 대시보드를 구현해보자.</p>
+</div>
