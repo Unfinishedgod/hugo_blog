@@ -29,6 +29,14 @@ code {
   background-color: rgba(0, 0, 0, 0.02);
 }
 
+.hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 0.5em;
+    color: #333;
+    background: #efefef;
+}
+
 .wrapper {
   overflow: hidden;
   position: relative;
