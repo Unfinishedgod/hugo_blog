@@ -47,8 +47,8 @@ filename = "sitemap.xml"
     description = "A website built through Hugo and blogdown."
 
     # options for highlight.js (version, additional languages, and theme)
-    # highlightjsVersion = "9.12.0"
-    highlightjsVersion = "11.2.0"
+    highlightjsVersion = "9.12.0"
+    # highlightjsVersion = "11.2.0"
     highlightjsCDN = "//cdnjs.cloudflare.com/ajax/libs"
     highlightjsLang = ["r", "yaml", "python"]
     highlightjsTheme = "github"
