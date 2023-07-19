@@ -29,6 +29,13 @@ code {
   background-color: rgba(0, 0, 0, 0.02);
 }
 
+
+.container {
+  display: flex; /* or inline-flex */
+}
+
+
+
 .hljs {
     display: block;
     overflow-x: auto;

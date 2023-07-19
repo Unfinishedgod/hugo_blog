@@ -113,7 +113,7 @@ nohup airflow scheduler &
 </center>
 
 # 총평
-
+ 
 원래 Airflow 설치와 기본 세팅 까지 한꺼번에 적으려 했었다. 생각보다 Airflow설명 하는 과정과 절차가 조금 있어서 다음에 Airflow 세팅에 대한 내용을 적고 빠르게 DAG 하는 글을 적어야 겠다. 
 
 ---
