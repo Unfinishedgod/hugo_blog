@@ -3,7 +3,7 @@ title: '[Airflow] Airflow 2. 기본 세팅(예제 제거, PostgreSQL 연결)'
 author: 최의용
 date: '2023-07-20'
 slug: airflow-airflow-2-dag
-thumbnail: images/airflow_2.png
+thumbnail: /images/airflow_2.png
 categories:
   - Airflow
 tags:
