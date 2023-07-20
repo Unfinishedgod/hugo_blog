@@ -1,0 +1,176 @@
+---
+title: '[Airflow] Airflow 2. 기본 세팅(예제 제거, PostgreSQL 연결)'
+author: 최의용
+date: '2023-07-20'
+slug: airflow-airflow-2-dag
+categories:
+  - Airflow
+tags:
+  - Airflow
+---
+
+
+<center>
+![](images/airflow_2.png){width=80%}
+</center>
+
+지난 블로그에서 이번에는 Airflow설치를 다루었다. 이번에는 Airflow를 원활하게 사용하기 위한 세팅을 진행해보도록 하자.
+
+이번에 세팅할 주제는 2가지 이다. 
+
+- 세팅
+  - 예제 파일 리스트 제거
+  - PostgreSQL 연결
+
+
+Airflow 설치는 지난 블로그 참고. 
+
+- [Airflow 설치](https://unfinishedgod.netlify.app/2023/07/18/airflow-airflow-1/)
+
+
+
+
+## 1. 예제 파일 리스트 제거
+
+<center>
+![](images/airflow_2_1.png){width=80%}
+</center>
+
+우선 Airflow를 접속 했을때 위 화면을 볼 수 있다. 아무런 설정도 하지 않았는데 추가된 예제로 이 부분을 먼저 제거 해주자. 주피터에서 `airflow/` 로 이동하면 `airflow.cfg` 를 확인할 수 있다. 이곳을 열어서 다음과 같이 수정 해주면 된다. 68번 라인이다.
+
+```
+# 68번 Line
+# load_examples = True
+load_examples = False
+```
+
+이제 다음의 커맨드를 입력하게 되면 airflow 화면에 예제가 사라지게 된다.
+
+```
+airflow db init
+```
+
+<center>
+![](images/airflow_2_2.png){width=80%}
+</center>
+
+
+## 2. PostgreSQL 연결
+
+예제 Dag를 제거 했는데 아직도 상단에 경고 메시지가 보인다. 이는 PostgreSQL 연동이 안되어 있어서 경고 하는것이기 때문에 이를 연결 해주면 된다. 이는 기본적으로 Airflow SQLite를 지원하는데 이때 사용하는 Executor가 SequentialExecutor인데 Executor에 대한 간단한 설명은 다음과 같다.
+
+1. LocalExecutor
+  - LocalExecutor는 Airflow 작업을 동일한 호스트에서 병렬로 실행하는 Executor입니다. 일반적으로 개발 및 테스트 환경에서 사용됩니다.
+
+2. SequentialExecutor
+  - SequentialExecutor는 Airflow 작업을 순차적으로 실행하는 Executor입니다. 이 Executor는 단일 작업자(worker)에서만 작동하며, 작업 간에는 병렬 처리가 없습니다. 주로 테스트 및 디버깅 용도로 사용됩니다.
+
+3. CeleryExecutor
+  - CeleryExecutor는 작업을 Celery 워커(worker)에 전달하여 병렬로 실행하는 Executor입니다. Celery는 분산 작업 큐 관리를 위한 파이썬 라이브러리로, 별도의 워커(worker) 프로세스 또는 머신에서 작업을 처리할 수 있습니다.
+
+4. KubernetesExecutor
+  - KubernetesExecutor는 작업을 Kubernetes 클러스터에서 실행하는 Executor입니다. Kubernetes를 사용하여 작업을 컨테이너로 패키징하고, Kubernetes의 스케줄러를 사용하여 실행합니다. 이 Executor를 사용하면 작업의 확장성과 격리성을 확보할 수 있습니다.
+
+우리는 여기서 PostgreSQL을 Airflow와 연동 하고 LocalExecutor를 SequentialExecutor로 바꿔줄 예정이다. 이렇게 하면 Airflow DAG를 병렬로 처리가 가능하다.
+
+우선 기본적으로 PostgreSQL이 설치 되어 있는것을 가정한다. GCP 프로젝트를 하면서 PostgreSQL을 설치 했으니 다음의 블로그를 꼭 참고 하자.
+ - [PostgreSQL 설치](https://unfinishedgod.netlify.app/2023/06/13/postgresql-ubuntu-postgresql/)
+
+그러면 이제 하나씩 알아보자.
+
+### 2-1. Airflow DB 생성
+
+Airflow에 연동할 PostgreSQL DB를 생성 해주자. 우선 PostgreSQL 에 접속을 해주자. 다음의 커맨드를 입력 한다.
+
+```bash
+sudo -i -u postgres
+```
+
+그리고 나서 다음의 커맨드를 입력 해준다.
+
+```bash
+psql
+```
+
+이제 DB를 생성할 차례이다. airflow_db라는 DB를 다음과 같이 생성 해주자.
+
+```
+CREATE DATABASE airflow_db;
+```
+
+user는 따로 추가 하지않고 생성되어 있는 superuser로 진행 하도록 한다. 다음의 블로그를 꼭 참고 한다.
+
+ - [PostgreSQL 설치](https://unfinishedgod.netlify.app/2023/06/13/postgresql-ubuntu-postgresql/)
+ 
+이제 다시 `ctrl + z`를 사용하고 root 로 넘어가서 postgresql 을 restart 해주자.
+ 
+```
+sudo service postgresql restart
+```
+
+### 2-2. Executor 수정
+
+이렇게 PostgreSQL DB를 추가 했으니 이제 Airflow에서 수정을 해주자. 이번에도 주피터에서 `airflow/` 로 이동해서 `airflow.cfg` 를 다음과 같이 수정 해주자. 이곳에서 32번 Line이다. 
+
+```
+# executor = SequentialExecutor
+executor = LocalExecutor
+```
+ 
+### 2-3. DB 초기화
+
+DB를 초기화 해주자. SQLite에서 PostgreSQL로 바꾸었으니 DB를 초기화 해주어야 한다.
+
+```bash
+airflow db init
+```
+
+### 2-4. 계정 생성
+
+이제 User를 등록 해준다. 왠만하면 그대로 복사하지말고 하나씩 본인의 정보를 입력해주자.
+
+```bash
+airflow users create \
+    --username admin \
+    --firstname Peter \
+    --lastname Parker \
+    --role Admin \
+    --email spiderman@superhero.org
+```
+
+### 2-5. 실행
+
+다음의 커맨드를 통해 Airflow를 실행 시킨다. Airflow의 웹서버를 담당한다.
+
+```bash
+nohup airflow webserver --port 8080 &
+```
+
+그리고 다음의 커맨드를 통해 DAG를 스케쥴링한다.
+
+```bash
+nohup airflow scheduler &
+```
+
+### 2-6. 변경된 화면
+
+이제 접속을 하게 되면 성공적으로 경고 문구가 제거 된것을 확인할 수 있다.
+
+<center>
+![](images/airflow_2_3.png){width=80%}
+</center>
+
+
+## 총평
+
+이렇게 Airflow 에 대한 기본적인 세팅을 마무리 했다. 이제 다음 블로그에서는 기본적인 DAG 세팅과 Timezone을 한국시간대에 맞추는 작업을 진행해야 겠다.
+
+
+---
+
+## Reference
+
+ - [LocalExecutor - Task 병렬 실행](https://passwd.tistory.com/entry/Airflow-LocalExecutor-Task-%EB%B3%91%EB%A0%AC-%EC%8B%A4%ED%96%89)
+ - [Executor의 종류와 사용가이드라인 알아보기](https://magpienote.tistory.com/225)
+ - [Airflow DB 변경, SQLite to PostgreSQL](https://velog.io/@insutance/Airflow-DB-%EB%B3%80%EA%B2%BD-SQLite-to-PostgreSQL)
+ - [Airflow 공식문서: Set up a Database Backend](https://airflow.apache.org/docs/apache-airflow/2.6.2/howto/set-up-database.html)
