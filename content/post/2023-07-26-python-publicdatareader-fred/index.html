@@ -1,0 +1,298 @@
+---
+title: '[Python] PublicDataReader 라이브러리를 사용한 FRED 데이터 수집'
+author: 최의용
+date: '2023-07-26'
+slug: python-publicdatareader-fred
+categories:
+  - PublicDataReader
+tags:
+  - PublicDataReader
+---
+
+
+
+<center>
+<img src="images/PublicDataReader.png" style="width:80.0%" />
+</center>
+<p>최근에 PublicDataReader 라이브러리를 알게 되었다. 그리고 FRED에서 API를 통해 데이터를 제공 하며, 이를 쉽게 가져올 수 있다는것도 알게 되었다. 지난번에 S&amp;P 500 데이터를 수집했었는데, 너무도 빈약했어서 어떻게 하나 고민하던 차에 좋은 주제라고 생각하고 들여다 본다. PublicDataReader에서는 FRED 뿐만 아니라 다른 데이터도 쉽게 수집할 수 있도록 도와 주지만 이번에는 FRED에서 제공하는 데이터를 수집하는 것이 목적이기에 FRED 관련 내용만 담는다. PublicDataReader 공식 Github은 다음을 참고 한다.</p>
+<ul>
+<li><a href="https://github.com/WooilJeong/PublicDataReader">PublicDataReader 공식 Github</a></li>
+<li><a href="https://wooiljeong.github.io/python/pdr-fred/">PublicDataReader - FRED 관련 블로그</a></li>
+</ul>
+<div id="fred-란" class="section level1">
+<h1>FRED 란?</h1>
+<p>우선 FRED에 대해 알아보자. <strong>F</strong>ederal <strong>R</strong>eserve <strong>E</strong>conomic <strong>D</strong>ata의 약자로 세인트 루이스 연방 준비 은행에서 제공하는 경제 데이터 이다. 이곳에서 다양한 경제 지표 데이터를 제공한다. 그럼 이제 FRED 데이터를 사용하기 위해 API를 얻어 보자.</p>
+<div id="fred-api-신청" class="section level2">
+<h2>FRED API 신청</h2>
+<p>우선 FRED 공식 링크를 들어가보자.</p>
+<ul>
+<li><a href="https://fred.stlouisfed.org/">FRED 공식 사이트</a></li>
+</ul>
+<div id="step-1." class="section level3">
+<h3>Step 1.</h3>
+<p>링크를 타고 들어가게 되면 우측 상단에 ‘My Account’ 버튼을 확인할 수 있는데 이를 클릭한다. 그러면 메뉴가 나오는데 여기서 ‘API Key’ 버튼을 클릭한다.</p>
+<center>
+<img src="images/PublicDataReader_2.png" style="width:50.0%" />
+</center>
+</div>
+<div id="step-2." class="section level3">
+<h3>Step 2.</h3>
+<p>그러면 API key 신청하는 페이지로 넘어 가게 된다. 여기서 ‘Request API Key’ 버튼을 클릭한다.</p>
+<center>
+<img src="images/PublicDataReader_3.png" style="width:50.0%" />
+</center>
+</div>
+<div id="step-3." class="section level3">
+<h3>Step 3.</h3>
+<p>목적을 묻는데 여기선 간단히 ‘study’ 라고 적어 두었다. 또 여기서 ‘Request API Key’ 버튼을 클릭한다.</p>
+<center>
+<img src="images/PublicDataReader_4.png" style="width:50.0%" />
+</center>
+</div>
+<div id="step-4." class="section level3">
+<h3>Step 4.</h3>
+<p>최종적으로 API가 생성이 되는것을 확인할 수 있다. 이는 잘 저장해두자. 곧 파이썬에서 csv로 변환 하고 git에서는 노출되지 않게 변경할 예정이다.</p>
+<center>
+<img src="images/PublicDataReader_5.png" style="width:80.0%" />
+</center>
+</div>
+</div>
+<div id="python을-사용한-데이터-수집" class="section level2">
+<h2>Python을 사용한 데이터 수집</h2>
+<p>이제 데이터를 수집해보자. 그전에 FRED에서 데이터를 수집하기 위한 구조를 조금 알아야 한다. FRED에는 Series 라는 개념이 있다. 아주 쉽게 설명하자면 상위 카테고리 정도로 생각을 해두면 된다. 그래서 우리는 Series를 알아야 원하는 데이터에 접근이 더욱 용이하다. 다음 링크는 FRED의 Series 리스트 이다. 참고로, Series 조차도 2,759개가 넘기 때문에 FRED 데이터를 사용하기 위해서는 경제에 대한 도메인 지식이 상당히 많이 필요하다. 우리는 여기서 필요한 데이터만 찾아서 사용하도록 한다.</p>
+<ul>
+<li><a href="https://fred.stlouisfed.org/tags/series?t=all+items">FRED - Series</a></li>
+</ul>
+<p>우선 다음의 커맨드를 통해 설치부터 진행 해주자.</p>
+<pre class="bash"><code>pip3 install PublicDataReader</code></pre>
+<p>설치가 되었으면 이제 라이브러리를 불러와보자.</p>
+<pre class="python"><code>from PublicDataReader import Fred
+import pandas as pd</code></pre>
+<p>라이브러리를 불러왔으면 이제 우리가 얻었던 API키를 따로 저장해주자. 그리고 생성된 fred_apikey.csv는 gitignore에서 git에 올라가지 않도록 설정 해주자.</p>
+<pre class="python"><code>fred_apikey = &#39;FRED API KEY&#39;
+df = pd.DataFrame({
+    &#39;api_key&#39;:fred_apikey}, index = [0])
+df.to_csv(&#39;fred_apikey.csv&#39;, index = False)</code></pre>
+<p>이제 FRED API키를 사용하여 인스턴스를 생성해주자.</p>
+<pre class="python"><code>df = pd.read_csv(&#39;fred_apikey.csv&#39;)
+
+fred_apikey = df[&#39;fred&#39;][0]
+
+# 인스턴스 생성
+fred_api = Fred(fred_apikey)</code></pre>
+<div id="series-검색" class="section level3">
+<h3>Series 검색</h3>
+<center>
+<img src="images/PublicDataReader_7.png" style="width:80.0%" />
+</center>
+<p>먼저 Series를 검색 해보자. 다시한번 FRED의 Series를 소개 한다. 이곳에서 적절한 Series를 검색해주면 된다.</p>
+<ul>
+<li><a href="https://fred.stlouisfed.org/tags/series?t=all+items">FRED - Series</a></li>
+</ul>
+<p>여기서는 Series를 persons로 검색을 해보았다. 그리고 다음과 같이 파이썬 코드를 통해 확인해보자. 생각보다 columns이 길어서, 여기서는 <code>result.head(3).T</code> 를 통해 행과 열을 바꾸어 보기 좋게 변경 하였다.</p>
+<p>이렇게 Series를 통해 확인하면 각각의 id를 확인할 수 있다. 이제 이 id 값을 가지고 데이터를 수집하면 된다. 물론 id값을 알고 있으면 바로 수집해도 된다.</p>
+<pre class="python"><code>search_text = &quot;Persons&quot;
+result = fred_api.get_data(api_name=&quot;series_search&quot;, search_text=search_text)
+result.head(3).T</code></pre>
+<table>
+<colgroup>
+<col width="16%" />
+<col width="31%" />
+<col width="31%" />
+<col width="21%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">id</th>
+<th align="right">PCE</th>
+<th align="right">PCEC</th>
+<th align="right">PCECA</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">realtime_start</td>
+<td align="right">2023-07-26</td>
+<td align="right">2023-07-26</td>
+<td align="right">2023-07-26</td>
+</tr>
+<tr class="even">
+<td align="right">realtime_end</td>
+<td align="right">2023-07-26</td>
+<td align="right">2023-07-26</td>
+<td align="right">2023-07-26</td>
+</tr>
+<tr class="odd">
+<td align="right">title</td>
+<td align="right">Personal Consumption Expenditures</td>
+<td align="right">Personal Consumption Expenditures</td>
+<td align="right">Personal Consumption Expenditures</td>
+</tr>
+<tr class="even">
+<td align="right">observation_start</td>
+<td align="right">1959-01-01</td>
+<td align="right">1947-01-01</td>
+<td align="right">1929-01-01</td>
+</tr>
+<tr class="odd">
+<td align="right">observation_end</td>
+<td align="right">2023-05-01</td>
+<td align="right">2023-01-01</td>
+<td align="right">2022-01-01</td>
+</tr>
+<tr class="even">
+<td align="right">frequency</td>
+<td align="right">Monthly</td>
+<td align="right">Quarterly</td>
+<td align="right">Annual</td>
+</tr>
+<tr class="odd">
+<td align="right">frequency_short</td>
+<td align="right">M</td>
+<td align="right">Q</td>
+<td align="right">A</td>
+</tr>
+<tr class="even">
+<td align="right">units</td>
+<td align="right">Billions of Dollars</td>
+<td align="right">Billions of Dollars</td>
+<td align="right">Billions of Dollars</td>
+</tr>
+<tr class="odd">
+<td align="right">units_short</td>
+<td align="right">Bil. of $</td>
+<td align="right">Bil. of $</td>
+<td align="right">Bil. of $</td>
+</tr>
+<tr class="even">
+<td align="right">seasonal_adjustment</td>
+<td align="right">Seasonally Adjusted Annual Rate</td>
+<td align="right">Seasonally Adjusted Annual Rate</td>
+<td align="right">Not Seasonally Adjusted</td>
+</tr>
+<tr class="odd">
+<td align="right">seasonal_adjustment_short</td>
+<td align="right">SAAR</td>
+<td align="right">SAAR</td>
+<td align="right">NSA</td>
+</tr>
+<tr class="even">
+<td align="right">last_updated</td>
+<td align="right">2023-06-30 07:43:05-05</td>
+<td align="right">2023-06-29 07:55:06-05</td>
+<td align="right">2023-03-30 07:53:03-05</td>
+</tr>
+<tr class="odd">
+<td align="right">popularity</td>
+<td align="right">82</td>
+<td align="right">53</td>
+<td align="right">33</td>
+</tr>
+<tr class="even">
+<td align="right">group_popularity</td>
+<td align="right">83</td>
+<td align="right">83</td>
+<td align="right">83</td>
+</tr>
+<tr class="odd">
+<td align="right">notes</td>
+<td align="right">BEA Account Code: DPCERCGuide to the Natio…</td>
+<td align="right">BEA Account Code: DPCERCGuide to the Nat…</td>
+<td align="right">BEA Account Code: DPCERC</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="데이터-수집" class="section level3">
+<h3>데이터 수집</h3>
+<p>이제 Series ID를 통해 데이터를 수집 해보자. 간단히 SP500 지수를 한번 알아보도록 하려 한다.</p>
+<pre class="python"><code># 시리즈 ID 값
+series_id = &quot;SP500&quot;
+
+# 시리즈 데이터 조회
+df = fred_api.get_data(api_name=&quot;series_observations&quot;, series_id=series_id)
+df.tail()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right"></th>
+<th align="right">realtime_start</th>
+<th align="right">realtime_end</th>
+<th align="right">date</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">2603</td>
+<td align="right">2023-07-26</td>
+<td align="right">2023-07-26</td>
+<td align="right">2023-07-19</td>
+<td>4565.72</td>
+</tr>
+<tr class="even">
+<td align="right">2604</td>
+<td align="right">2023-07-26</td>
+<td align="right">2023-07-26</td>
+<td align="right">2023-07-20</td>
+<td>4534.87</td>
+</tr>
+<tr class="odd">
+<td align="right">2605</td>
+<td align="right">2023-07-26</td>
+<td align="right">2023-07-26</td>
+<td align="right">2023-07-21</td>
+<td>4536.34</td>
+</tr>
+<tr class="even">
+<td align="right">2606</td>
+<td align="right">2023-07-26</td>
+<td align="right">2023-07-26</td>
+<td align="right">2023-07-24</td>
+<td>4554.64</td>
+</tr>
+<tr class="odd">
+<td align="right">2607</td>
+<td align="right">2023-07-26</td>
+<td align="right">2023-07-26</td>
+<td align="right">2023-07-25</td>
+<td>4567.46</td>
+</tr>
+</tbody>
+</table>
+<p>그러면 이제 <a href="https://wooiljeong.github.io/python/pdr-fred/">FRED 데이터 조회하기</a> 를 참고 삼아 데이터를 수집해보자. 우리가 수집할 총 데이터 리스트는 다음과 같다. 이제 위의 파이썬 코드에 series_id만 다음과 같이 지정해주고 수집을 해주면 된다.</p>
+<ul>
+<li>SP500 지수
+<ul>
+<li>series_id: SP500</li>
+</ul></li>
+<li>미국 소비자 물가 지수 CPI(Consumer Price Index)
+<ul>
+<li>series_id: CPIAUCNS</li>
+</ul></li>
+<li>미국 개인 소비 지출 PCE(Personal Consumption Expenditures)
+<ul>
+<li>series_id: PCEPI</li>
+</ul></li>
+<li>미국 생산자 물가 지수 PPI(Producer Price Index)
+<ul>
+<li>series_id: PPIFID</li>
+</ul></li>
+<li>미국 연준 기준금리
+<ul>
+<li>series_id: DFEDTARU</li>
+</ul></li>
+<li>케이스-쉴러 미국 주택 가격 지수 Case-Shiller U.S. Home Price Index
+<ul>
+<li>series_id: CSUSHPISA</li>
+</ul></li>
+<li>미국 경제 성장률(직전 분기 대비 GDP 성장률(연율))</li>
+<li>series_id: A191RL1Q225SBEA</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="총평" class="section level1">
+<h1>총평</h1>
+<p>Airflow를 사용하여 데이터 파이프라인을 만들고 있는 와중 유독 S&amp;P500 데이터가 빈약해 보이는 느낌을 받았다. 그래서 찾던 도중 PublicDataReader 라이브러리의 FRED였다. 이제야 S&amp;P500 뿐만 아니라 조금 풍부하게 데이터를 수집하게 되었으니 이또한 Airflow 데이터 수집 파이프라인에 넣어야 겠다.</p>
+</div>
