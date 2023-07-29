@@ -16,6 +16,8 @@ tags:
 이번에는 그동안 배웠던 것들을 응용 해보려고 한다. 그동안 GCP환경을 공부 하면서 Bigquery, Storage, SQL에 대해 배웠으니 우리는 이제 DB와 Storage라는 저장소의 개념에 대해 알게 되었다. 그리고 나서 Cron, Airflow, Google Cloud Function 중에 Cron과 Airflow를 배웠으며 이번에는 Airflow를 사용한 데이터 수집 파이프라인을 구축 하려고 한다. 그중에서도 또 오늘 진행할 내용은 국내 주식에 대한 내용을 자동화 할 예정이다. 앞으로 당분간 복잡해질 예정인데 그동안의 전반적인 개요를 정리해보자면 다음과 같다.
 
 # 전반적인 개요
+ 
+GCP와 파이썬을 사용한 주식 데이터 파이프라인에 대한 전반적인 개요는 다음과 같다.
 
 <div class="container">
   <div class="col-sm">
