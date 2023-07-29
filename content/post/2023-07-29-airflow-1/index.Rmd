@@ -241,7 +241,7 @@ df_raw['날짜'] = today_date2
 df_raw = df_raw[['날짜', '시가', '고가', '저가', '종가', '거래량', '거래대금', '등락률', '티커']]
 df_raw.columns = ['date', 'open', 'high', 'low', 'close', 'volume', 'trading_value', 'price_change_percentage', 'ticker']
 
-file_name = 'kor_stock_ohlcv_1'
+file_name = 'kor_stock_ohlcv'
 
 now1 = datetime.now()
 time_line = now1.strftime("%Y%m%d_%H:%M:%S")  
@@ -261,7 +261,7 @@ df_raw = df_raw[['날짜', '시가총액', '상장주식수', '티커']]
 df_raw.columns = ['date', 'market_cap', 'outstanding_shares', 'ticker']
 
 
-file_name = 'kor_market_cap_1'
+file_name = 'kor_market_cap'
 
 now1 = datetime.now()
 time_line = now1.strftime("%Y%m%d_%H:%M:%S")  
@@ -284,7 +284,7 @@ df_raw['날짜'] = today_date2
 df_raw = df_raw[['날짜', 'BPS', 'PER','PBR', 'EPS', 'DIV', 'DPS', '티커']]
 df_raw.columns = ['date', 'bps', 'per', 'pbr', 'eps', 'div', 'dps', 'ticker']  
 
-file_name = 'kor_stock_fundamental_1'
+file_name = 'kor_stock_fundamental'
 
 now1 = datetime.now()
 time_line = now1.strftime("%Y%m%d_%H:%M:%S")  
@@ -301,7 +301,7 @@ print(f'DIV/BPS/PER/EPS 완료_{time_line}')
 ```python
 # 일자별 거래실적 추이 (거래대금)
 print(f'일자별 거래실적 추이 (거래대금) 시작')
-file_name = 'kor_stock_trading_value_by_investor_1'
+file_name = 'kor_stock_trading_value_by_investor'
 buy_sell_type_list = ['순매수', '매수', '매도']
 df_raw_total = pd.DataFrame()
 for buy_sell_type in buy_sell_type_list:
@@ -348,7 +348,7 @@ print(f'일자별 거래실적 추이 (거래대금) 시작')
 ```python
 # 일자별 거래실적 추이 (거래량)
 print(f'일자별 거래실적 추이 (거래량) 시작')
-file_name = 'kor_stock_trading_volume_by_date_1'
+file_name = 'kor_stock_trading_volume_by_date'
 buy_sell_type_list = ['순매수', '매수', '매도']
 df_raw_total = pd.DataFrame()
 for buy_sell_type in buy_sell_type_list:
@@ -412,7 +412,7 @@ for market_nm in market_list:
         
 kor_index_list_df = kor_index_list_df.reset_index(drop = True)
 
-file_name = 'kor_index_list_df_1'
+file_name = 'kor_index_list_df'
 
 now1 = datetime.now()
 time_line = now1.strftime("%Y%m%d_%H:%M:%S")  
@@ -432,7 +432,7 @@ kor_index_code_list  = kor_index_list_df['index_code']
 # 인덱스 OHLCV 조회
 print(f'인덱스 OHLCV 시작')
 
-file_name = 'kor_index_ohlcv_1'
+file_name = 'kor_index_ohlcv'
 df_raw_total = pd.DataFrame()
 
 for index_code in kor_index_code_list:
@@ -463,7 +463,7 @@ print(f'인덱스 OHLCV 완료_{time_line}')
 ```python
 # 인덱스 등락률
 print(f'인덱스 등락률 시작')
-file_name = 'kor_index_code_fundamental_1'
+file_name = 'kor_index_code_fundamental'
 df_raw_total = pd.DataFrame()
 
 for index_code in kor_index_code_list:
@@ -516,7 +516,7 @@ index_code_master  = pd.merge(index_code_info_2, kor_ticker_list_df[['ticker','c
         how = 'left',
         on = 'ticker')
         
-file_name = 'index_code_master_1'
+file_name = 'index_code_master'
 
 
 

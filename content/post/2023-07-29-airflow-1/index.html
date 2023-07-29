@@ -232,7 +232,7 @@ df_raw[&#39;날짜&#39;] = today_date2
 df_raw = df_raw[[&#39;날짜&#39;, &#39;시가&#39;, &#39;고가&#39;, &#39;저가&#39;, &#39;종가&#39;, &#39;거래량&#39;, &#39;거래대금&#39;, &#39;등락률&#39;, &#39;티커&#39;]]
 df_raw.columns = [&#39;date&#39;, &#39;open&#39;, &#39;high&#39;, &#39;low&#39;, &#39;close&#39;, &#39;volume&#39;, &#39;trading_value&#39;, &#39;price_change_percentage&#39;, &#39;ticker&#39;]
 
-file_name = &#39;kor_stock_ohlcv_1&#39;
+file_name = &#39;kor_stock_ohlcv&#39;
 
 now1 = datetime.now()
 time_line = now1.strftime(&quot;%Y%m%d_%H:%M:%S&quot;)  
@@ -250,7 +250,7 @@ df_raw = df_raw[[&#39;날짜&#39;, &#39;시가총액&#39;, &#39;상장주식수&
 df_raw.columns = [&#39;date&#39;, &#39;market_cap&#39;, &#39;outstanding_shares&#39;, &#39;ticker&#39;]
 
 
-file_name = &#39;kor_market_cap_1&#39;
+file_name = &#39;kor_market_cap&#39;
 
 now1 = datetime.now()
 time_line = now1.strftime(&quot;%Y%m%d_%H:%M:%S&quot;)  
@@ -270,7 +270,7 @@ df_raw[&#39;날짜&#39;] = today_date2
 df_raw = df_raw[[&#39;날짜&#39;, &#39;BPS&#39;, &#39;PER&#39;,&#39;PBR&#39;, &#39;EPS&#39;, &#39;DIV&#39;, &#39;DPS&#39;, &#39;티커&#39;]]
 df_raw.columns = [&#39;date&#39;, &#39;bps&#39;, &#39;per&#39;, &#39;pbr&#39;, &#39;eps&#39;, &#39;div&#39;, &#39;dps&#39;, &#39;ticker&#39;]  
 
-file_name = &#39;kor_stock_fundamental_1&#39;
+file_name = &#39;kor_stock_fundamental&#39;
 
 now1 = datetime.now()
 time_line = now1.strftime(&quot;%Y%m%d_%H:%M:%S&quot;)  
@@ -284,7 +284,7 @@ print(f&#39;DIV/BPS/PER/EPS 완료_{time_line}&#39;)</code></pre>
 <p>이번에는 일자별 거래실적 추이 (거래대금) 데이터를 수집해주자. 위의 다른 함수와 달리 stock.get_market_trading_value_by_date()는 시작날짜와 끝날짜가 동시에 있어야 하고, ticker를 불러와야 하기 때문에 이는 반복문을 사용해준다.</p>
 <pre class="python"><code># 일자별 거래실적 추이 (거래대금)
 print(f&#39;일자별 거래실적 추이 (거래대금) 시작&#39;)
-file_name = &#39;kor_stock_trading_value_by_investor_1&#39;
+file_name = &#39;kor_stock_trading_value_by_investor&#39;
 buy_sell_type_list = [&#39;순매수&#39;, &#39;매수&#39;, &#39;매도&#39;]
 df_raw_total = pd.DataFrame()
 for buy_sell_type in buy_sell_type_list:
@@ -328,7 +328,7 @@ print(f&#39;일자별 거래실적 추이 (거래대금) 시작&#39;)</code></pr
 <p>일자별 거래실적 추이의 거래 대금과 동일하다.</p>
 <pre class="python"><code># 일자별 거래실적 추이 (거래량)
 print(f&#39;일자별 거래실적 추이 (거래량) 시작&#39;)
-file_name = &#39;kor_stock_trading_volume_by_date_1&#39;
+file_name = &#39;kor_stock_trading_volume_by_date&#39;
 buy_sell_type_list = [&#39;순매수&#39;, &#39;매수&#39;, &#39;매도&#39;]
 df_raw_total = pd.DataFrame()
 for buy_sell_type in buy_sell_type_list:
@@ -389,7 +389,7 @@ for market_nm in market_list:
         
 kor_index_list_df = kor_index_list_df.reset_index(drop = True)
 
-file_name = &#39;kor_index_list_df_1&#39;
+file_name = &#39;kor_index_list_df&#39;
 
 now1 = datetime.now()
 time_line = now1.strftime(&quot;%Y%m%d_%H:%M:%S&quot;)  
@@ -406,7 +406,7 @@ kor_index_code_list  = kor_index_list_df[&#39;index_code&#39;]</code></pre>
 <pre class="python"><code># 인덱스 OHLCV 조회
 print(f&#39;인덱스 OHLCV 시작&#39;)
 
-file_name = &#39;kor_index_ohlcv_1&#39;
+file_name = &#39;kor_index_ohlcv&#39;
 df_raw_total = pd.DataFrame()
 
 for index_code in kor_index_code_list:
@@ -434,7 +434,7 @@ print(f&#39;인덱스 OHLCV 완료_{time_line}&#39;)</code></pre>
 <h3>2-9. 인덱스 등락률</h3>
 <pre class="python"><code># 인덱스 등락률
 print(f&#39;인덱스 등락률 시작&#39;)
-file_name = &#39;kor_index_code_fundamental_1&#39;
+file_name = &#39;kor_index_code_fundamental&#39;
 df_raw_total = pd.DataFrame()
 
 for index_code in kor_index_code_list:
@@ -484,7 +484,7 @@ index_code_master  = pd.merge(index_code_info_2, kor_ticker_list_df[[&#39;ticker
         how = &#39;left&#39;,
         on = &#39;ticker&#39;)
         
-file_name = &#39;index_code_master_1&#39;
+file_name = &#39;index_code_master&#39;
 
 
 
