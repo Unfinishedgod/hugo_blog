@@ -1,8 +1,8 @@
 ---
-title: '[Airflow] 주가 데이터 수집 파이프라인 2 (S&P500 편)'
+title: '[Airflow] 주가 데이터 수집 파이프라인 3 (비트코인 편)'
 author: 최의용
-date: '2023-08-04'
-slug: airflow-2-s-p500
+date: '2023-08-07'
+slug: airflow-3
 categories:
   - Airflow
 tags:
@@ -14,7 +14,8 @@ tags:
 ![](images/airflow_pipeline_1.png){width=80%}
 </center>
 
-지난번에 이어 이번에는 S&P 500 데이터 파이프라인을 구성 해보자. 앞으로 이러한 반복 작업이 진행 될 예정이다. 우리가 수집하려는 데이터에 따라 수집되는 시기와 전처리하는 방식디 다 다르기 때문에 이렇게 쪼개서 작업을 진행할 예정.
+
+이번에는 비트코인 파이프라인을 구성해보자. 아주 지겨운 반복 작업이다. 이제 수집하는 방식과, 수집 날짜와 Airflow DAG만 조금씩 바꿔주면 된다.
 
 
 # 전반적인 개요
@@ -81,7 +82,7 @@ GCP와 파이썬을 사용한 주식 데이터 파이프라인에 대한 전반�
 
 ## 1. Airflow pipeline 구축
 
-그럼 이제부터 본격적으로 파이프라인을 구축 해보자. 참고해야할 사항이 있다면 위의 가이드에서 'Step 4' 부분을 참고 하면 된다. 우선 파이썬 파일을 하나 생성해주자. python_file이라는 폴더에 snp500_cralwer.py 라는 파일을 생성 해주었다.
+그럼 이제부터 본격적으로 파이프라인을 구축 해보자. 참고해야할 사항이 있다면 위의 가이드에서 'Step 4' 부분을 참고 하면 된다. 우선 파이썬 파일을 하나 생성해주자. python_file이라는 폴더에 bitcoin_cralwer.py 라는 파일을 생성 해주었다.
 
 ### 1-1. 라이브러리 호출
 
@@ -190,13 +191,12 @@ def upload_df(data, file_name, project_id, dataset_id, time_line):
 
 ### 1-4. 날짜 옵션
 
-이번에는 날짜에 대한 세팅을 해주도록 하자. datetime.now()를 사용하여 오늘 날짜를 가져와야지 자동으로 데이터를 수집이 가능하다. 특이한점이 있다면 `now = now + timedelta(days=-1)` 코드가 들어가는데 한국 시간 기준으로 아침 9시는 미국에서 전날이다. 그래서 현재 날짜를 기준으로 하나 빼준다. 또한 start_date2를 today_date2와 동일하게 해주었다. 이는 `fdr.DataReader()` 함수의 경우 시작날짜와 종료날짜가 모두 있어야 하기 때문이다.
+이번에는 날짜에 대한 세팅을 해주도록 하자. 비트코인은 월~일요일 모든 요일 오전 9시에 수집이 될 예정이다. 그리고 start_date2를 today_date2와 동일하게 해주었다. 이는 `fdr.DataReader()` 함수의 경우 시작날짜와 종료날짜가 모두 있어야 하기 때문이다.
 
 
 ```python
 # ### 날짜 설정
 now = datetime.datetime.now()
-now = now + timedelta(days=-1)
 
 today_date1 = now.strftime('%Y%m%d')
 today_date2 = now.strftime('%Y-%m-%d')
@@ -204,70 +204,44 @@ start_date2 = today_date2
 today_date_time_csv = now.strftime("%Y%m%d_%H%M")
 ```
 
-## 2. 주가 데이터 수집
+## 2. 데이터 수집
 
 그럼 이제부터 그동안 수집했던 데이터 수집 코드를 만들어 보자. 
 
-### 2-1. 티커 리스트
+### 2-1. 비트코인 수집
 
-우선 국내 주식의 티커 리스트를 불러와서 저장 해주자. 한켠으로는 매일 수집을 하지 않아도 되는 양이지만, 상장 및 상폐 되는 데이터를 맞춰주기 위해서는 계속 수집을 해두어서 ticker를 최신화 해주자.
-
-```python
-# ### S&P 500 종목 리스트 
-
-# S&P 500 symbol list
-snp500 = fdr.StockListing('S&P500')
-snp500.columns = ['ticker', 'corp_name', 'sector', 'industry']
-
-now1 = datetime.now()
-time_line = now1.strftime("%Y%m%d_%H:%M:%S")  
-file_name = 'snp500_ticker_list'
-upload_df(snp500, file_name, project_id, dataset_id, time_line, today_date1)
-sp500_ticker_list = snp500['ticker']
-```
-
-### 2-2. 주가정보
-
-주가 정보를 수집 해주자. fdr의 fdr.DataReader()함수를 사용 했다. 
+비트코인 데이터를 수집 해주자. fdr의 fdr.DataReader()함수를 사용 했다. 기존 S&P 500 데이터를 수집할 때 `fdr.DataReader()`에서 ticker를 넣어 주었지만 이번에는 'BTC/KRW' 옵션을 넣어 주면 된다.
 
 ```python
-file_name = 'snp500_daily'
-df_raw_total = pd.DataFrame()
-for ticker_nm in sp500_ticker_list:
-    try:
-        now1 = datetime.now()
-        
-        time_line = now1.strftime("%Y%m%d_%H:%M:%S")
-        time.sleep(1)
-        # Apple(AAPL), 2017-01-01 ~ Now
-        df_raw = fdr.DataReader(ticker_nm, start_date2,today_date2)
-        df_raw['ticker'] = ticker_nm
-        df_raw = df_raw.reset_index()
-        df_raw.columns = ['date', 'open','high','low','close','adj_close','volume','ticker']
+file_name = 'bitcoin'
+try:
+    now1 = datetime.now()
 
-        df_raw_total = pd.concat([df_raw_total,df_raw])
+    time_line = now1.strftime("%Y%m%d_%H:%M:%S")
+    df_raw = fdr.DataReader('BTC/KRW', start_date2,today_date2)
+    df_raw['ticker'] = 'btc_krw'
+    df_raw = df_raw.reset_index()
+    df_raw.columns = ['date', 'open','high','low','close','adj_close','volume','ticker']
+
+    print(f'{ticker_nm} success_{time_line}')   
+except:
+    print(f'{ticker_nm} fail_{time_line}')
         
-        print(f'{ticker_nm} success_{time_line}')   
-    except:
-        print(f'{ticker_nm} fail_{time_line}')
-        
-df_raw_total['date'] = pd.to_datetime(df_raw_total['date'])
+df_raw.columns['date'] = pd.to_datetime(df_raw.columns['date'])
 now1 = datetime.now()
 time_line = now1.strftime("%Y%m%d_%H:%M:%S")
-upload_df(df_raw_total, file_name, project_id, dataset_id, time_line, today_date1)        
+upload_df(df_raw, file_name, project_id, dataset_id, time_line, today_date1)        
 ```
-
-
 
 ## 최종 코드
 
 최종 코드는 다음의 git 링크를 참고 하자.
 
-- [finance_mlops/python_file/snp500_crawler.py](https://github.com/Unfinishedgod/finance_mlops/blob/main/python_file/snp500_crawler.py)
+- [finance_mlops/python_file/bitcoin_crawler.py](https://github.com/Unfinishedgod/finance_mlops/blob/main/python_file/bitcoin_crawler.py)
 
 ## 3. Airflow DAG 
 
-이렇게 python_file 경로에 snp500_crawler.py를 잘 생성 했으면 이제 Airflow DAG를 추가 하자. 그리고 이를 평일 09시 1분에 시작하도록 설정 해주었다. 그리고 요일 옵션에는 'TUE-SAT'를 해주어 한국시간을 화요일~토요일로 지정 해준다. 추가로 t1이라는 DAG는 앞으로 t2, t3으로 파이프라인이 추가될 예정이다.
+이렇게 python_file 경로에 bitcoin_crawler.py를 잘 생성 했으면 이제 Airflow DAG를 추가 하자. 그리고 이를 일주일 전부 09시 1분에 시작하도록 설정 해주었다. 추가로 t1이라는 DAG는 앞으로 t2, t3으로 파이프라인이 추가될 예정이다.
 
 ```python
 from datetime import datetime, timedelta
@@ -293,17 +267,17 @@ default_args = {
 }
 
 with DAG(
-	'kor_stock',
+	'bitcoin',
 	default_args=default_args,
-	description='S&P500 crawler',
-	schedule_interval = '01 09 * * TUE-SAT',
-	tags=['S&P500'],
+	description='bitcoin crawler',
+	schedule_interval = '01 09 * * *',
+	tags=['bitcoin'],
 ) as dag:
 
 
     t1 = BashOperator(
-        task_id='snp500_crawler',
-        bash_command = f'{python_dir} {file_dir}/python_file/snp500_crawler.py'
+        task_id='bitcoin_crawler',
+        bash_command = f'{python_dir} {file_dir}/python_file/bitcoin_crawler.py'
     )
 
     t1
