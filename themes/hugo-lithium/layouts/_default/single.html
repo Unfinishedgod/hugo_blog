@@ -17,6 +17,8 @@
     <div class="article-content">
       {{ .Content }}
     </div>
+    
+    {{ partial "disqus.html" .}}
   </article>
   
   <aside id = 'aside'>
@@ -24,7 +26,7 @@
   </aside>
   
 
-  {{ partial "disqus.html" .}}
+  
 
 </main>
 
