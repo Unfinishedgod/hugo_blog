@@ -1,7 +1,20 @@
 {{ partial "header.html" . }}
 
 <main class="content" role="main">
-
+  <style>
+      main {
+          padding: 30px;
+          margin: 10px;
+      }
+  
+      aside {
+          width: 200px;
+          border: 1px solid black;
+          padding: 10px;
+          margin: 10px;
+          float: right;
+      }
+  </style>
 
   <article class="article">
     {{ if eq .Section "post" }}
@@ -23,6 +36,9 @@
   
   {{ partial "disqus.html" .}}
   
+
+  
+
 </main>
 
 
