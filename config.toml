@@ -37,11 +37,6 @@ filename = "sitemap.xml"
     name = "Book"
     url = "https://medium.com/@owen_book"    
 
-[markup]
-  [markup.tableOfContents]
-    endLevel = 3
-    ordered = false
-    startLevel = 2
     
 [params]
     description = "A website built through Hugo and blogdown."
