@@ -1,0 +1,279 @@
+---
+title: '[Airflow] 주가 데이터 수집 파이프라인 4 (환율 편)'
+author: 최의용
+date: '2023-08-09'
+slug: airflow-4
+categories:
+  - Airflow
+tags:
+  - Airflow
+---
+
+
+
+<center>
+<img src="images/airflow_pipeline_1.png" style="width:80.0%" />
+</center>
+<p>이번에는 환율 정보의 파이프라인을 구성해보자. 지난번 블로그의 비트코인과 조건 빼고 모두 동일하다.</p>
+<div id="전반적인-개요" class="section level1">
+<h1>전반적인 개요</h1>
+<p>GCP와 파이썬을 사용한 주식 데이터 파이프라인에 대한 전반적인 개요는 다음과 같다.</p>
+<div class="container">
+<div class="col-sm">
+<img src="images/white_blank.PNG" style="width:33.0%" />
+<h2>
+Step 1
+</h2>
+<ul>
+<li><a href="https://unfinishedgod.netlify.app/2023/06/10/gcp-gcp/">1-1. GCP Compute Engine 구축</a> <br></li>
+<li><a href="https://unfinishedgod.netlify.app/2023/06/11/gcp-compute-engine-mobaxterm/">1-2. Compute Engine 방화벽 및 MobaXterm 연결</a> <br>
+</div>
+<div class="col-sm">
+<img src="images/white_blank.PNG" style="width:33.0%" />
+<h2>
+Step 4
+</h2></li>
+<li><a href="https://unfinishedgod.netlify.app/2023/07/18/airflow-airflow-1/">4-1. Airflow 1. 설치</a> <br></li>
+<li><a href="https://unfinishedgod.netlify.app/2023/07/20/airflow-airflow-2-dag/">4-2. Airflow 2. 기본 세팅(예제 제거, PostgreSQL 연결)</a> <br></li>
+<li><a href="https://unfinishedgod.netlify.app/2023/07/22/airflow-airflow-3-timezone-dag/">4-3. Airflow 3. Timezone 설정 및 DAG 테스트</a> <br></li>
+<li><a href="https://unfinishedgod.netlify.app/2023/07/29/airflow-1/">4-4. 주가 데이터 수집 파이프라인 1 (국내주식편)</a></li>
+<li><a href="https://unfinishedgod.netlify.app/2023/08/04/airflow-2-s-p500/">4-5. 주가 데이터 수집 파이프라인 2 (S&amp;P 500 편)</a>
+</div>
+<div class="col-sm">
+<img src="images/white_blank.PNG" style="width:33.0%" />
+<h2>
+Step 6
+</h2></li>
+</ul>
+<p>파이썬을 사용한 대시보드 구축</p>
+</div>
+</div>
+<center>
+<img src="images/Total_Architecture_1.png" style="width:100.0%" />
+</center>
+<div class="container">
+<div class="col-sm">
+<h2>
+Step 2
+</h2>
+<ul>
+<li><a href="https://unfinishedgod.netlify.app/2023/07/03/python-pykrk-part-1/">2-1. Pykrk를 사용한 금융데이터 수집 PART 1</a> <br></li>
+<li><a href="https://unfinishedgod.netlify.app/2023/07/09/python-pykrk-part-2/">2-2. Pykrk를 사용한 금융데이터 수집 PART 2</a> <br></li>
+<li><a href="https://unfinishedgod.netlify.app/2023/07/11/python-financedatareader-s-p500/">2-3. FinanceDataReader을 사용한 금융 데이터 수집 (S&amp;P500, 비트코인)</a> <br></li>
+<li><a href="https://unfinishedgod.netlify.app/2023/07/26/python-publicdatareader-fred/">2-4. PublicDataReader 라이브러리를 사용한 FRED 데이터 수집</a> <br></li>
+<li><a href="https://unfinishedgod.netlify.app/2023/07/14/python-chatgpt-api/">2-5. Chatgpt API 사용 및 네이버 뉴스 요약 응용</a> <br>
+<img src="images/white_blank.PNG" style="width:33.0%" />
+</div></li>
+</ul>
+<div class="col-sm">
+<h2>
+Step 3
+</h2>
+<ul>
+<li><a href="https://unfinishedgod.netlify.app/2023/06/13/postgresql-ubuntu-postgresql/">3-1. ubuntu에 postgresql 설치 및 vscode 연결</a> <br></li>
+<li><a href="https://unfinishedgod.netlify.app/2023/06/15/gcp-cloud-sql-db/">3-2. Cloud SQL DB 구축</a> <br></li>
+<li><a href="https://unfinishedgod.netlify.app/2023/06/20/gcp-bigquery-storage-python/">3-3. BigQuery, Storage - Python 연동</a> <br></li>
+<li><a href="https://unfinishedgod.netlify.app/2023/05/20/cloud-storage/">3-4 Cloud Storage를 통한 빅쿼리 테이블 생성</a> <br>
+<img src="images/white_blank.PNG" style="width:33.0%" />
+</div>
+<div class="col-sm">
+<h2>
+Step 5
+</h2></li>
+</ul>
+<p>파이썬을 사용한 데이터 시각화</p>
+<img src="images/white_blank.PNG" style="width:33.0%" />
+</div>
+</div>
+</div>
+<div id="airflow-pipeline-구축" class="section level2">
+<h2>1. Airflow pipeline 구축</h2>
+<p>그럼 이제부터 본격적으로 파이프라인을 구축 해보자. 참고해야할 사항이 있다면 위의 가이드에서 ‘Step 4’ 부분을 참고 하면 된다. 우선 파이썬 파일을 하나 생성해주자. python_file이라는 폴더에 usd_krw_cralwer.py 라는 파일을 생성 해주었다.</p>
+<div id="라이브러리-호출" class="section level3">
+<h3>1-1. 라이브러리 호출</h3>
+<pre class="python"><code>#!/usr/bin/env python
+# coding: utf-8
+
+import pandas as pd
+import pandas_gbq
+from pykrx import stock
+from pykrx import bond
+import FinanceDataReader as fdr
+from datetime import timedelta
+
+from time import sleep
+
+import psycopg2 as pg2
+from sqlalchemy import create_engine
+
+from datetime import datetime
+import os
+import time
+
+import glob
+from google.cloud import bigquery
+from google.oauth2 import service_account
+from google.cloud import storage</code></pre>
+</div>
+<div id="기본-세팅bigquery-cloud-storage-cloud-sql" class="section level3">
+<h3>1-2. 기본 세팅(Bigquery, Cloud Storage, Cloud SQL)</h3>
+<p>이제 기본 세팅을 해주자. 파이썬에서 각각 Bigquery, Cloud Storage, Cloud SQL에 접근 하기 위한 장치 이다.</p>
+<pre class="python"><code># 경로 변경
+os.chdir(&#39;/home/owenchoi07/finance_mlops&#39;)
+
+# 서비스 계정 키 JSON 파일 경로
+key_path = glob.glob(&quot;key_value/*.json&quot;)[0]
+
+# Credentials 객체 생성
+credentials = service_account.Credentials.from_service_account_file(key_path)
+
+# 빅쿼리 정보
+project_id = &#39;owen-389015&#39;
+dataset_id = &#39;finance_mlops&#39;
+
+# GCP 클라이언트 객체 생성
+storage_client = storage.Client(credentials = credentials, 
+                         project = credentials.project_id)
+bucket_name = &#39;finance-mlops&#39;    # 서비스 계정 생성한 bucket 이름 입력
+
+# Postgresql 연결
+db_connect_info = pd.read_csv(&#39;key_value/db_connect_info.csv&#39;)
+username = db_connect_info[&#39;username&#39;][0]
+password = db_connect_info[&#39;password&#39;][0]
+host = db_connect_info[&#39;host&#39;][0]
+database = db_connect_info[&#39;database&#39;][0]
+engine = create_engine(f&#39;postgresql+psycopg2://{username}:{password}@{host}:5432/{database}&#39;)</code></pre>
+</div>
+<div id="업로드-함수-생성" class="section level3">
+<h3>1-3. 업로드 함수 생성</h3>
+<p>그리고 나서 이번에는 업로드 함수를 만들어 주자. 다음의 코드는 각각 Bigquery, Cloud Storage, Cloud SQL에 우리가 수집한 데이터를 업로드 하기위한 함수이다. 이는 지난 블로그를 참고 하고 응용한 것이며 앞으로 일별로 수집한 객체는 다음의 함수로 한꺼번에 업로드 될 예정이다.</p>
+<pre class="python"><code>def upload_df(data, file_name, project_id, dataset_id, time_line):
+    if not os.path.exists(f&#39;data_crawler/{file_name}&#39;):
+        os.makedirs(f&#39;data_crawler/{file_name}&#39;)
+
+    try:
+        if not os.path.exists(f&#39;data_crawler/{file_name}/{file_name}_{today_date1}.csv&#39;):
+            data.to_csv(f&#39;data_crawler/{file_name}/{file_name}_{today_date1}.csv&#39;, index=False, mode=&#39;w&#39;)
+        else:
+            data.to_csv(f&#39;data_crawler/{file_name}/{file_name}_{today_date1}.csv&#39;, index=False, mode=&#39;a&#39;, header=False)
+        print(f&#39;{file_name}_로컬CSV저장_success_{time_line}&#39;)    
+    except:
+        print(f&#39;{file_name}_로컬CSV저장_fail_{time_line}&#39;)
+    
+    
+    # Google Storage 적재
+    source_file_name = f&#39;data_crawler/{file_name}/{file_name}_{today_date1}.csv&#39;    # GCP에 업로드할 파일 절대경로
+    destination_blob_name = f&#39;data_crawler/{file_name}/{file_name}_{today_date1}.csv&#39;    # 업로드할 파일을 GCP에 저장할 때의 이름
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(destination_blob_name)
+    blob.upload_from_filename(source_file_name)      
+    
+    try:
+        # 빅쿼리 데이터 적재
+        data.to_gbq(destination_table=f&#39;{project_id}.{dataset_id}.{file_name}&#39;,
+          project_id=project_id,
+          if_exists=&#39;append&#39;,
+          credentials=credentials)
+        print(f&#39;{file_name}_빅쿼리저장_success_{time_line}&#39;)    
+    except:
+        print(f&#39;{file_name}_빅쿼리저장_fail_{time_line}&#39;)  
+    
+    
+    try:
+        # Postgresql 적재
+        data.to_sql(f&#39;{file_name}&#39;,if_exists=&#39;append&#39;, con=engine,  index=False)
+        print(f&#39;{file_name}_Postgresql저장_success_{time_line}&#39;)    
+    except:
+        print(f&#39;{file_name}_Postgresql저장_fail_{time_line}&#39;)</code></pre>
+</div>
+<div id="날짜-옵션" class="section level3">
+<h3>1-4. 날짜 옵션</h3>
+<p>이번에는 날짜에 대한 세팅을 해주도록 하자. 환율 정보는 월~금요일 오전 9시에 수집이 될 예정이다. 그리고 start_date2를 today_date2와 동일하게 해주었다. 이는 <code>fdr.DataReader()</code> 함수의 경우 시작날짜와 종료날짜가 모두 있어야 하기 때문이다.</p>
+<pre class="python"><code># ### 날짜 설정
+now = datetime.datetime.now()
+
+today_date1 = now.strftime(&#39;%Y%m%d&#39;)
+today_date2 = now.strftime(&#39;%Y-%m-%d&#39;)
+start_date2 = today_date2
+today_date_time_csv = now.strftime(&quot;%Y%m%d_%H%M&quot;)</code></pre>
+</div>
+</div>
+<div id="데이터-수집" class="section level2">
+<h2>2. 데이터 수집</h2>
+<p>그럼 이제부터 그동안 수집했던 데이터 수집 코드를 만들어 보자.</p>
+<div id="환율-수집" class="section level3">
+<h3>2-1. 환율 수집</h3>
+<p>환율 데이터를 수집 해주자. fdr의 fdr.DataReader()함수를 사용 했다. 기존 S&amp;P 500 데이터를 수집할 때 <code>fdr.DataReader()</code>에서 ticker를 넣어 주었지만 이번에는 ‘USD/KRW’ 옵션을 넣어 주면 된다.</p>
+<pre class="python"><code>file_name = &#39;usd_krw&#39;
+try:
+    now1 = datetime.now()
+
+    time_line = now1.strftime(&quot;%Y%m%d_%H:%M:%S&quot;)
+    df_raw = fdr.DataReader(&#39;USD/KRW&#39;, start_date2,today_date2)
+    df_raw[&#39;ticker&#39;] = &#39;usd_krw&#39;
+    df_raw = df_raw.reset_index()
+    df_raw.columns = [&#39;date&#39;, &#39;open&#39;,&#39;high&#39;,&#39;low&#39;,&#39;close&#39;,&#39;adj_close&#39;,&#39;volume&#39;,&#39;ticker&#39;]
+
+    print(f&#39;{ticker_nm} success_{time_line}&#39;)   
+except:
+    print(f&#39;{ticker_nm} fail_{time_line}&#39;)
+        
+df_raw.columns[&#39;date&#39;] = pd.to_datetime(df_raw.columns[&#39;date&#39;])
+now1 = datetime.now()
+time_line = now1.strftime(&quot;%Y%m%d_%H:%M:%S&quot;)
+upload_df(df_raw, file_name, project_id, dataset_id, time_line, today_date1)        </code></pre>
+</div>
+</div>
+<div id="최종-코드" class="section level2">
+<h2>최종 코드</h2>
+<p>최종 코드는 다음의 git 링크를 참고 하자.</p>
+<ul>
+<li><a href="https://github.com/Unfinishedgod/finance_mlops/blob/main/python_file/usd_krw_crawler.py">finance_mlops/python_file/usd_krw_crawler.py</a></li>
+</ul>
+</div>
+<div id="airflow-dag" class="section level2">
+<h2>3. Airflow DAG</h2>
+<p>이렇게 python_file 경로에 usd_krw_crawler.py를 잘 생성 했으면 이제 Airflow DAG를 추가 하자. 그리고 이를 일주일 전부 09시 1분에 시작하도록 설정 해주었다. 추가로 t1이라는 DAG는 앞으로 t2, t3으로 파이프라인이 추가될 예정이다.</p>
+<pre class="python"><code>from datetime import datetime, timedelta
+from airflow import DAG
+from airflow.operators.bash_operator import BashOperator
+from datetime import timedelta
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from airflow.utils.dates import days_ago
+
+import pendulum
+## 로컬 타임존 생성
+local_tz = pendulum.timezone(&quot;Asia/Seoul&quot;)
+
+python_dir = &#39;/home/owenchoi07/anaconda3/bin/python3&#39;
+file_dir = &#39;/home/owenchoi07/finance_mlops&#39;
+
+default_args = {
+	&#39;owner&#39;: &#39;airflow&#39;,
+	&#39;start_date&#39;: datetime(2023, 7, 11, tzinfo=local_tz),
+	&#39;retries&#39;: 0,
+	&#39;catchup&#39;: False
+}
+
+with DAG(
+	&#39;usd_krw&#39;,
+	default_args=default_args,
+	description=&#39;usd/krw crawler&#39;,
+	schedule_interval = &#39;01 09 * * MON-FRI&#39;,
+	tags=[&#39;urd_krw&#39;],
+) as dag:
+
+
+    t1 = BashOperator(
+        task_id=&#39;usd_krw_crawler&#39;,
+        bash_command = f&#39;{python_dir} {file_dir}/python_file/usd_krw_crawler.py&#39;
+    )
+
+    t1</code></pre>
+</div>
+</div>
+<div id="총평" class="section level1">
+<h1>총평</h1>
+<p>이번엔 S&amp;P500 데이터 수집 파이프라인을 만들어 보았다. 당분간 이렇게 잘 쪼개서 비슷한 종류에 내용이 올라갈 예정이다.</p>
+</div>
