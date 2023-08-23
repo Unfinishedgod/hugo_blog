@@ -118,7 +118,19 @@ sudo service postgresql restart
 executor = LocalExecutor
 ```
  
-### 2-3. DB 초기화
+### 2-3. DB 접속 정보 변경
+
+그리고 이번에는 DB 접속 정보를 변경 해주자. 약 426번째 라인에서 확인이 가능하다. 우리는 postgresql이므로 다음의 형식을 따라 줘야 한다.
+
+```
+# sql_alchemy_conn = sqlite:////home/{계정명}/airflow/airflow.db
+sql_alchemy_conn = postgresql+psycopg2://{DB 계정}:{DB 비밀번호}@{IP 주소}/{DB 이름}
+```
+
+
+
+ 
+### 2-4. DB 초기화
 
 DB를 초기화 해주자. SQLite에서 PostgreSQL로 바꾸었으니 DB를 초기화 해주어야 한다.
 
