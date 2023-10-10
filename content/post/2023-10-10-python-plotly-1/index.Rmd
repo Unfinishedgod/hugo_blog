@@ -1,0 +1,426 @@
+---
+title: '[Python] Plotly와 주식 보조지표로 보는 주식 데이터 시각화 1'
+author: 최의용
+date: '2023-10-10'
+slug: python-plotly-1
+categories:
+  - Python
+tags:
+  - Plotly
+  - Python
+  - 주식
+---
+
+
+```{r, setup, echo=FALSE}
+library(reticulate)
+use_python("/home/ubuntu/anaconda3/bin/python3")
+# matplotlib <- import("matplotlib") 
+# matplotlib$use("Agg", force = TRUE)
+```
+
+```{python echo = FALSE}
+import plotly.graph_objects as go
+
+from ta.trend import MACD
+from ta.momentum import StochasticOscillator
+
+import numpy as np
+import pandas as pd
+from pykrx import stock
+from pykrx import bond
+from time import sleep
+
+from datetime import datetime
+import os
+import time
+from plotly.subplots import make_subplots
+import glob
+
+ticker_nm = '005930'
+start_date  = '20190101'
+today_date1 = '20231006'
+
+df_raw = stock.get_market_ohlcv(start_date, today_date1, ticker_nm)
+df_raw = df_raw.reset_index()
+df_raw['ticker'] = ticker_nm
+
+df_raw.columns = ['date', 'open', 'high', 'low', 'close', 'volume','trading_value','price_change_percentage', 'ticker']
+
+kor_stock_ohlcv_095570_total = df_raw
+
+kor_stock_ohlcv_095570_total['MA5'] = kor_stock_ohlcv_095570_total['close'].rolling(window=5).mean()
+kor_stock_ohlcv_095570_total['MA20'] = kor_stock_ohlcv_095570_total['close'].rolling(window=20).mean()
+kor_stock_ohlcv_095570_total['MA60'] = kor_stock_ohlcv_095570_total['close'].rolling(window=60).mean()
+kor_stock_ohlcv_095570_total['MA120'] = kor_stock_ohlcv_095570_total['close'].rolling(window=120).mean()
+
+# MACD
+kor_stock_ohlcv_095570_total['ema_short'] = kor_stock_ohlcv_095570_total['close'].rolling(window=12).mean()
+kor_stock_ohlcv_095570_total['ema_long'] = kor_stock_ohlcv_095570_total['close'].rolling(window=26).mean()
+kor_stock_ohlcv_095570_total['macd'] = kor_stock_ohlcv_095570_total['ema_short'] - kor_stock_ohlcv_095570_total['ema_long']
+
+
+std = kor_stock_ohlcv_095570_total['close'].rolling(20).std(ddof=0)
+
+kor_stock_ohlcv_095570_total['upper'] = kor_stock_ohlcv_095570_total['MA20'] + 2 * std
+kor_stock_ohlcv_095570_total['lower'] = kor_stock_ohlcv_095570_total['MA20'] - 2 * std
+
+kor_stock_ohlcv_095570_total['변화량'] = kor_stock_ohlcv_095570_total['close'] - kor_stock_ohlcv_095570_total['close'].shift(1)
+kor_stock_ohlcv_095570_total['상승폭'] = np.where(kor_stock_ohlcv_095570_total['변화량']>=0, kor_stock_ohlcv_095570_total['변화량'], 0)
+kor_stock_ohlcv_095570_total['하락폭'] = np.where(kor_stock_ohlcv_095570_total['변화량'] <0, kor_stock_ohlcv_095570_total['변화량'].abs(), 0)
+
+# welles moving average
+kor_stock_ohlcv_095570_total['AU'] = kor_stock_ohlcv_095570_total['상승폭'].ewm(alpha=1/14, min_periods=14).mean()
+kor_stock_ohlcv_095570_total['AD'] = kor_stock_ohlcv_095570_total['하락폭'].ewm(alpha=1/14, min_periods=14).mean()
+#kor_stock_ohlcv_095570_total['RS'] = kor_stock_ohlcv_095570_total['AU'] / kor_stock_ohlcv_095570_total['AD']
+#kor_stock_ohlcv_095570_total['RSI'] = 100 - (100 / (1 + kor_stock_ohlcv_095570_total['RS']))
+kor_stock_ohlcv_095570_total['RSI'] = kor_stock_ohlcv_095570_total['AU'] / (kor_stock_ohlcv_095570_total['AU'] + kor_stock_ohlcv_095570_total['AD']) * 100
+# kor_stock_ohlcv_095570_total[['RSI']].tail(n=10)
+
+
+# RSI signal
+kor_stock_ohlcv_095570_total['RSI_signal'] = kor_stock_ohlcv_095570_total['RSI'].rolling(window=9).mean()
+
+# MACD 
+macd = MACD(close=kor_stock_ohlcv_095570_total['close'], 
+            window_slow=26,
+            window_fast=12, 
+            window_sign=9)
+# Stochastic
+stoch = StochasticOscillator(high=kor_stock_ohlcv_095570_total['high'],
+                             close=kor_stock_ohlcv_095570_total['close'],
+                             low=kor_stock_ohlcv_095570_total['low'],
+                             window=14, 
+                             smooth_window=3)
+
+
+kor_stock_ohlcv_095570_total['MACD_DIFF'] = macd.macd_diff()
+kor_stock_ohlcv_095570_total['MACD'] = macd.macd()
+kor_stock_ohlcv_095570_total['MACD_Signal'] = macd.macd_signal()
+
+
+kor_stock_ohlcv_095570_total['Stoch'] = stoch.stoch()
+kor_stock_ohlcv_095570_total['Stoch_Signal'] = stoch.stoch_signal()
+
+kor_stock_ohlcv_095570_total = kor_stock_ohlcv_095570_total[kor_stock_ohlcv_095570_total['date'] > '2023-01-01']
+
+
+def func1(data):
+    fig = make_subplots(rows=5, cols=1, shared_xaxes=True, vertical_spacing=0.01, row_heights=[0.4,0.15,0.15,0.15, 0.15])
+
+    # Row 1
+    fig.add_trace(go.Candlestick(
+        x=data['date'],
+        open=data['open'],
+        high=data['high'],
+        low=data['low'],
+        close=data['close'],
+        increasing_line_color= 'red', decreasing_line_color= 'blue', 
+        name = '')
+    , row=1, col=1)
+    
+    
+    fig.add_trace(go.Scatter(
+        x=data['date'],
+        y=data['MA5'],
+        opacity=0.7,
+        line=dict(color='blue', width=2),
+        name='MA 5'))
+    
+    fig.add_trace(go.Scatter(
+        x=data['date'],
+        y=data['MA20'],
+        opacity=0.7,
+        line=dict(color='orange', width=2),
+        name='MA 20'))
+    
+    fig.add_trace(go.Scatter(
+        x=pd.concat([data['date'], data['date'][::-1]]),
+        y=pd.concat([data['upper'], data['lower'][::-1]]),
+        fill='toself',
+        fillcolor='rgba(255,255,0,0.1)',
+        line=dict(color='rgba(255,255,255,0.2)', width=2),
+        name='Bollinger Band',
+    ))
+    
+    
+    # Row 2
+    colors = ['blue' if row['open'] - row['close'] >= 0 
+              else 'red' for index, row in data.iterrows()]
+    
+    fig.add_trace(go.Bar(x=data['date'], 
+                         y=data['volume'],
+                         marker_color=colors,
+                         name = 'Volume'
+                        ), row=2, col=1)
+    
+    
+    # Row 3
+    colors = ['blue' if val >= 0 
+              else 'red' for val in data['MACD_DIFF']]
+    fig.add_trace(go.Bar(x=data['date'], 
+                         y=data['MACD_DIFF'],
+                         marker_color=colors,
+                         name =  'MACD DIFF'
+                        ), row=3, col=1)
+    
+    fig.add_trace(go.Scatter(x=data['date'],
+                             y=data['MACD'],
+                             line=dict(color='green', width=2),
+                             name = 'MACD'
+                            ), row=3, col=1)
+    fig.add_trace(go.Scatter(x=data['date'],
+                             y=data['MACD_Signal'],
+                             line=dict(color='orange', width=1),
+                             name = 'MACD Signal'
+                            ), row=3, col=1)
+    
+    # Row 4
+    fig.add_trace(go.Scatter(x=data['date'],
+                             y=data['Stoch'],
+                             line=dict(color='green', width=1),
+                             name = 'Stoch'
+                            ), row=4, col=1)
+    fig.add_trace(go.Scatter(x=data['date'],
+                             y=data['Stoch_Signal'],
+                             line=dict(color='orange', width=1),
+                             name = 'Stoch Signal'
+                            ), row=4, col=1)
+    
+    # Row 5
+    # RSI
+    fig.add_trace(go.Scatter(x=data['date'],
+                             y=data['RSI'],
+                             line=dict(color='red', width=1),
+                             name = 'RSI'
+                            ), row=5, col=1)
+    
+    # 수평 사각 영역 추가하기
+    
+    fig.add_hrect(y0=30, y1=70, line_width=0, fillcolor="white", opacity=0.1,
+                  annotation_text=" ", 
+                  annotation_position="top left",
+                  annotation_font_size=20,
+                  annotation_font_color="red",
+                  annotation_font_family="Times New Roman", row=5, col=1)
+    
+    fig.add_hrect(y0=40, y1=60, line_width=1, fillcolor="blue", opacity=0.1,
+                  annotation_text=" ", 
+                  annotation_position="top left",
+                  annotation_font_size=20,
+                  annotation_font_color="red",
+                  annotation_font_family="Times New Roman", row=5, col=1)
+        
+    # Rayout
+    fig.update_layout(
+        title = '삼성전자 주가',
+        title_font_family="맑은고딕",
+        title_font_size = 18,
+        hoverlabel=dict(
+            bgcolor='black',
+            font_size=15,
+        ),
+        hovermode="x unified",
+        template='plotly_dark',
+        xaxis_tickangle=90,
+        yaxis_tickformat = ',',
+        legend = dict(orientation = 'h', xanchor = "center", x = 0.85, y= 1.1), 
+        barmode='group',
+        margin=go.layout.Margin(
+            l=10, #left margin
+            r=10, #right margin
+            b=10, #bottom margin
+            t=50  #top margin
+        ),
+        height=600, width=800, 
+        showlegend=False, 
+        xaxis_rangeslider_visible=False
+    )
+        
+    
+    
+    # update y-axis label
+    fig.update_yaxes(title_text="Price", row=1, col=1)
+    fig.update_yaxes(title_text="Volume", row=2, col=1)
+    fig.update_yaxes(title_text="MACD", showgrid=False, row=3, col=1)
+    fig.update_yaxes(title_text="Stoch", row=4, col=1)
+    fig.update_yaxes(title_text="RSI", row=5, col=1)
+    
+    fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"])], row = 1, col = 1)
+
+    return fig
+
+
+func1(kor_stock_ohlcv_095570_total)
+```
+
+주식 데이터를 사용하는 프로젝트를 생각한 큰 키워드는 다음과 같다.
+
+ - GCP
+ - 데이터 수집 자동화
+ - 주식 데이터 시각화 (Plotly)
+ - 주식 데이터 분석
+ - 대시보드 (Streamlit)
+
+그동안 GCP를 사용하여 주식 데이터를 수집 했으니 이를 분석하고 사용해보려고 한다. 주가를 분석하고 시각화를 하려는것이 목적이다. 동시에 Plotly 에 대한 여러 가지 기능과, 주가의 보조지표의 여러가지를 한번 다뤄 보려고 한다. 이번 블로그는 Plotly 시각화의 개요 느낌으로 작성할 예정이며 앞으로 최상단에 나오는 시각화를 구현 하기 위한 여러가지 Plotly에 대한 기능과, 주식의 보조지표에 대해 블로그를 할 예정이다. 시작 하기에 앞서, 이번 주가 데이터 시각화와 분석을 하면서 도움이 되는 링크를 먼저 소개 해보려고 한다. 
+
+# 대시보드 
+
+우선 대시보드먼저 보자. 우리가 무엇을 해야 할까? 감이 잡히지 않는다면 유명한 대시보드를 여러개 참고 해가면서 감을  익히는게 좋겠다. 물론 여러가지 뛰어난 차트들이 많지만 자주 보면서 추리고 있는건 하단의 5개 이다.
+
+- [네이버 증권 - 차트](https://finance.naver.com/item/fchart.naver?code=005930)
+- [다음 증권 - 차트](https://finance.daum.net/quotes/A005930#home)
+- [finvis - 차트](https://finviz.com/)
+- [tradingview- 차트](https://www.tradingview.com/symbols/BTCUSD/?exchange=CRYPTO)
+- [알파스퀘어 - 차트](https://www.alphasquare.co.kr/home/market-summary?code=005930)
+
+# Plotly 공식 문서
+
+- [Plotly - financial charts](https://plotly.com/python/ohlc-charts/)
+
+Plotly의 공식 문서이다. 검색창에 `plotly python`을 진행하면 파이썬을 사용한 plotly에 대한 여러 정보들이 나오는데 plotly에 대한 정보는 이곳을 참고 하면 된다.
+
+
+# Plotly 정리 (by 쭌랩님)
+
+- [쭌랩님의 Plotly Tutorial - 파이썬 시각화의 끝판왕 마스터하기](https://wikidocs.net/book/8909)
+
+공식문서를 통해 Plotly를 접하고 사용하는게 가장 정확하다. 그러나 Plotly를 커스터마이징 하는데 있어서, 모르는 용어나 어려운 부분이 처음에는 상당히 많이 존재한다. 공식문서에는 존재 하지만 어떻게 검색을 하지 못하는 경우가 있는데 그전에 하단의 블로그를 참고 하면 아주 강력한 무기가 될 수 있다.
+
+# 기술적 지표
+
+시각화는 어찌저찌 알겠는데, 이제 주식의 기술적 지표를 알아야 한다. 당장 기술적 지표를 검색만 해도 여러 블로그가 나오는데 뭔가 한꺼번에 정리가 되어 있는 느낌이 없다. **물론 전문 서적을 참고하는게 가장 강력하지만,** 알파스퀘어라는 곳에서 깔끔하게 정리 되어 있는곳을 참고 하는것도 아주 큰 도움이 된다.
+
+- [알파스퀘어 기술적지표](https://alphasquare.oopy.io/board/technical-indicator)
+
+
+# 금융 데이터 시각화
+
+그럼 이제 plotly 를 사용한 금융 데이터 분석을 진행 해보자. 필요한 라이브러리는 다음과 같으니 다음을 참고 하고 설치 해두면 된다. (2023-10-09기준)
+
+```{python}
+import plotly.graph_objects as go
+
+from ta.trend import MACD
+from ta.momentum import StochasticOscillator
+
+import numpy as np
+import pandas as pd
+from pykrx import stock
+from pykrx import bond
+from time import sleep
+
+from datetime import datetime
+import os
+import time
+from plotly.subplots import make_subplots
+import glob
+```
+
+## 데이터 수집
+
+시각화를 위한 데이터 샘플을 우선 수집 해주자. pykrx를 사용했으며 삼성전자(005930)의 2020년 1월 부터 2023년 10월 6일까지의 데이터를 수집 해두었다. 
+
+```{python}
+ticker_nm = '005930'
+start_date  = '20200101'
+today_date1 = '20231006'
+
+df_raw = stock.get_market_ohlcv(start_date, today_date1, ticker_nm)
+df_raw = df_raw.reset_index()
+df_raw['ticker'] = ticker_nm
+
+df_raw.columns = ['date', 'open', 'high', 'low', 'close', 'volume','trading_value','price_change_percentage', 'ticker']
+
+df_raw.head(3)
+```
+
+## plotly 를 사용한 시각화
+
+이제 plotly를 사용하여 기본적인 캔들 차트를 만들어 보자. 가장 기본 적인 캔들 차트 이다. 그러나 마우스를 갖다 대어서 확인하기 하기엔 너무도 부족함이 보인다. 이번에는 이에 대해 옵션을 넣어 주어 확장 해보자.
+
+```{python}
+fig = go.Figure(
+    data=go.Candlestick(
+        x=df_raw['date'],
+        open=df_raw['open'],
+        high=df_raw['high'],
+        low=df_raw['low'],
+        close=df_raw['close'],
+        increasing_line_color= 'red', decreasing_line_color= 'blue')
+)
+
+fig.show() 
+```
+
+
+## plotly layout 추가
+
+이번에는 기본적인 Layout을 추가 해보자. `fig.update_layout()`를 사용하여 추가로 옵션을 지정해준다. 그리고 옵션 목록에서 커스터 마이징 해준것은 제목, hover 배경, hover mode 제목, 테마 등등 기타 이다. 앞으로 기본적으로는 이 옵션을 사용할 예정이다. 
+
+```{python}
+fig = go.Figure(
+    data=go.Candlestick(
+        x=df_raw['date'],
+        open=df_raw['open'],
+        high=df_raw['high'],
+        low=df_raw['low'],
+        close=df_raw['close'],
+        increasing_line_color= 'red', decreasing_line_color= 'blue')
+)
+
+# Rayout
+fig.update_layout(
+  
+    # 제목  
+    title = '삼성전자 주가',
+    title_font_family="맑은고딕",
+    title_font_size = 18,
+    
+    # hover 배경
+    hoverlabel=dict(
+        bgcolor='black',
+        font_size=15,
+    ),
+    
+    # hover mode 변경
+    hovermode="x unified",
+    
+    # 테마
+    template='plotly_dark',
+    
+    # X축 각도
+    xaxis_tickangle=90,
+    
+    # Y 축 포맷
+    yaxis_tickformat = ',',
+    
+    # 범례
+    legend = dict(orientation = 'h', xanchor = "center", x = 0.85, y= 1.1), 
+    
+    barmode='group',
+    
+    # 여백
+    margin=go.layout.Margin(
+        l=10, #left margin
+        r=10, #right margin
+        b=10, #bottom margin
+        t=50  #top margin
+    ),
+    
+    # 길이
+    height=600, width=800, 
+    
+    showlegend=False, 
+    xaxis_rangeslider_visible=False
+) 
+```
+
+
+# 총평
+
+이렇게 Plotly와 주식 보조지표에 대한 첫번째 블로그를 마무리 했다. 앞으로는 맨 처음에 나온 대시보드를 참고하여 Streamlit을 사용한 대시보드를 만들기 위한 블로그가 계속 될 예정이다
+
+
+
+
