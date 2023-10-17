@@ -1,0 +1,806 @@
+---
+title: '[Python] Plotly와 주식 보조지표로 보는 주식 데이터 시각화 2 (이동평균선)'
+author: 최의용
+date: '2023-10-13'
+slug: python-plotly-2
+categories:
+  - Python
+tags:
+  - plotly
+---
+
+
+
+```{r, setup, echo=FALSE}
+library(reticulate)
+use_python("/home/ubuntu/anaconda3/bin/python3")
+```
+
+```{python echo = FALSE}
+import plotly.graph_objects as go
+
+from ta.trend import MACD
+from ta.momentum import StochasticOscillator
+
+import numpy as np
+import pandas as pd
+from pykrx import stock
+from pykrx import bond
+from time import sleep
+ 
+from datetime import datetime
+from datetime import timedelta
+import os
+import time
+from plotly.subplots import make_subplots
+import glob
+
+
+ticker_nm = '005930'
+# ticker_nm = '247540'
+start_date  = '20190101'
+today_date1 = '20231006'
+
+df_raw = stock.get_market_ohlcv(start_date, today_date1, ticker_nm)
+df_raw = df_raw.reset_index()
+df_raw['ticker'] = ticker_nm
+ 
+# df_raw.columns = ['date', 'open', 'high', 'low', 'close', 'volume','price_change_percentage', 'ticker']
+
+df_raw.columns = ['date', 'open', 'high', 'low', 'close', 'volume','trading_value','price_change_percentage', 'ticker']
+ 
+
+kor_stock_ohlcv_095570_total = df_raw
+
+
+
+kor_stock_ohlcv_095570_total['MA5'] = kor_stock_ohlcv_095570_total['close'].rolling(window=5).mean()
+kor_stock_ohlcv_095570_total['MA20'] = kor_stock_ohlcv_095570_total['close'].rolling(window=20).mean()
+kor_stock_ohlcv_095570_total['MA60'] = kor_stock_ohlcv_095570_total['close'].rolling(window=60).mean()
+kor_stock_ohlcv_095570_total['MA120'] = kor_stock_ohlcv_095570_total['close'].rolling(window=120).mean()
+
+
+now = datetime.now()
+now = now + timedelta(days=-300)
+today_date2 = now.strftime('%Y-%m-%d')
+
+
+# kor_stock_ohlcv_095570_total = kor_stock_ohlcv_095570_total[kor_stock_ohlcv_095570_total['date'] > '2023-03-01']
+kor_stock_ohlcv_095570_total = kor_stock_ohlcv_095570_total[kor_stock_ohlcv_095570_total['date'] > today_date2]
+kor_stock_ohlcv_095570_total = kor_stock_ohlcv_095570_total.reset_index(drop = True)
+
+
+
+kor_stock_ohlcv_095570_total['MA5-20'] = kor_stock_ohlcv_095570_total['MA5'] - kor_stock_ohlcv_095570_total['MA20']
+kor_stock_ohlcv_095570_total['MA20-60'] = kor_stock_ohlcv_095570_total['MA20'] - kor_stock_ohlcv_095570_total['MA60']
+kor_stock_ohlcv_095570_total['MA60-120'] = kor_stock_ohlcv_095570_total['MA60'] - kor_stock_ohlcv_095570_total['MA120']
+
+
+# 골든 크로스 5-20
+# 음수에서 양수로 바뀌는 모든 인덱스 찾기
+idx_5_20_gold_cross = [idx for idx in range(len(kor_stock_ohlcv_095570_total)) if kor_stock_ohlcv_095570_total["MA5-20"].iloc[idx] > 0 and kor_stock_ohlcv_095570_total["MA5-20"].iloc[idx - 1] <= 0]
+idx_5_20_gold_cross_df = pd.DataFrame({
+    'index':idx_5_20_gold_cross,
+    'name':'5-20 -><br> 골든크로스',
+    'color':'red',
+    'position':'top left'})
+
+
+# 데드 크로스 5-20
+# 양수에서 음수로 바뀌는 모든 인덱스 찾기
+idx_5_20_dead_cross = [idx for idx in range(len(kor_stock_ohlcv_095570_total)) if kor_stock_ohlcv_095570_total["MA5-20"].iloc[idx] < 0 and kor_stock_ohlcv_095570_total["MA5-20"].iloc[idx - 1] >= 0]
+idx_5_20_dead_cross_df = pd.DataFrame({
+    'index':idx_5_20_dead_cross,
+    'name':'5-20 -> <br>  데드크로스',
+    'color':'blue',
+    'position':'bottom left'})
+
+
+# 골든 크로스 20-60
+# 음수에서 양수로 바뀌는 모든 인덱스 찾기
+idx_20_60_gold_cross = [idx for idx in range(len(kor_stock_ohlcv_095570_total)) if kor_stock_ohlcv_095570_total["MA20-60"].iloc[idx] > 0 and kor_stock_ohlcv_095570_total["MA20-60"].iloc[idx - 1] <= 0]
+idx_20_60_gold_cross_df = pd.DataFrame({
+    'index':idx_20_60_gold_cross,
+    'name':'20-60 -> <br> 골든크로스',
+    'color':'orange',
+    'position':'top left'})
+
+
+# 골든 크로스 20-60
+# 음수에서 양수로 바뀌는 모든 인덱스 찾기
+idx_20_60_dead_cross = [idx for idx in range(len(kor_stock_ohlcv_095570_total)) if kor_stock_ohlcv_095570_total["MA20-60"].iloc[idx] < 0 and kor_stock_ohlcv_095570_total["MA20-60"].iloc[idx - 1] >= 0]
+idx_20_60_dead_cross_df = pd.DataFrame({
+    'index':idx_20_60_dead_cross,
+    'name':'20-60 -> <br>  데드크로스',
+    'color':'purple',
+    'position':'bottom left'})
+
+
+
+
+# 골든 크로스 20-60
+# 음수에서 양수로 바뀌는 모든 인덱스 찾기
+idx_60_120_gold_cross = [idx for idx in range(len(kor_stock_ohlcv_095570_total)) if kor_stock_ohlcv_095570_total["MA60-120"].iloc[idx] > 0 and kor_stock_ohlcv_095570_total["MA60-120"].iloc[idx - 1] <= 0]
+idx_60_120_gold_cross_df = pd.DataFrame({
+    'index':idx_60_120_gold_cross,
+    'name':'60-120 골든크로스',
+    'color':'orange',
+    'position':'top'})
+
+
+# 골든 크로스 20-60
+# 음수에서 양수로 바뀌는 모든 인덱스 찾기
+idx_60_120_dead_cross = [idx for idx in range(len(kor_stock_ohlcv_095570_total)) if kor_stock_ohlcv_095570_total["MA60-120"].iloc[idx] < 0 and kor_stock_ohlcv_095570_total["MA60-120"].iloc[idx - 1] >= 0]
+idx_60_120_dead_cross_df = pd.DataFrame({
+    'index':idx_60_120_dead_cross,
+    'name':'60-120 데드크로스',
+    'color':'purple',
+    'position':'bottom left'})
+    
+    
+cross_df = pd.concat([idx_5_20_gold_cross_df, idx_5_20_dead_cross_df,
+                      idx_20_60_gold_cross_df, idx_20_60_dead_cross_df])
+cross_df = cross_df.reset_index(drop = True)
+
+
+ascending_sq  = (kor_stock_ohlcv_095570_total['MA5-20'] > 0) & \
+(kor_stock_ohlcv_095570_total['MA20-60'] > 0) & \
+(kor_stock_ohlcv_095570_total['MA60-120'] > 0) 
+
+descending_sq  = (kor_stock_ohlcv_095570_total['MA5-20'] < 0) & \
+(kor_stock_ohlcv_095570_total['MA20-60'] < 0) & \
+(kor_stock_ohlcv_095570_total['MA60-120'] < 0) 
+
+
+
+ascending_intervals = []
+i = 0
+while i < len(ascending_sq):
+    if ascending_sq[i]:
+        start_index = i
+        while i < len(ascending_sq) and ascending_sq[i]:
+            i += 1
+        end_index = i - 1
+        ascending_intervals.append((start_index, end_index))
+
+    else:
+        i += 1
+        
+        
+descending_intervals = []
+i = 0
+while i < len(descending_sq):
+    if descending_sq[i]:
+        start_index = i
+        while i < len(descending_sq) and descending_sq[i]:
+            i += 1
+        end_index = i - 1
+        descending_intervals.append((start_index, end_index))
+
+    else:
+        i += 1
+        
+
+def ma_vis(data):
+    fig = go.Figure()
+#     fig = make_subplots(rows=1, cols=1, shared_xaxes=True, vertical_spacing=0.01, row_heights=[1])
+
+    # 캔들스틱차트
+    fig.add_trace(go.Candlestick(
+        x=kor_stock_ohlcv_095570_total['date'],
+        open=kor_stock_ohlcv_095570_total['open'],
+        high=kor_stock_ohlcv_095570_total['high'],
+        low=kor_stock_ohlcv_095570_total['low'],
+        close=kor_stock_ohlcv_095570_total['close'],
+        increasing_line_color= 'red', decreasing_line_color= 'blue', 
+        name = ''))
+
+    # MA 5 
+    fig.add_trace(go.Scatter(
+        x=kor_stock_ohlcv_095570_total['date'],
+        y=kor_stock_ohlcv_095570_total['MA5'],
+        opacity=0.7,
+        line=dict(color='blue', width=2),
+        name='MA 5'))
+
+    # MA 20
+    fig.add_trace(go.Scatter(
+        x=kor_stock_ohlcv_095570_total['date'],
+        y=kor_stock_ohlcv_095570_total['MA20'],
+        opacity=0.7,
+        line=dict(color='orange', width=2),
+        name='MA 20'))
+
+    # MA 60
+    fig.add_trace(go.Scatter(
+        x=kor_stock_ohlcv_095570_total['date'],
+        y=kor_stock_ohlcv_095570_total['MA60'],
+        opacity=0.7,
+        line=dict(color='purple', width=2),
+        name='MA 60'))
+
+    # MA 120
+    fig.add_trace(go.Scatter(
+        x=kor_stock_ohlcv_095570_total['date'],
+        y=kor_stock_ohlcv_095570_total['MA120'],
+        opacity=0.7,
+        line=dict(color='green', width=2),
+        name='MA 120'))
+
+    # 골든, 데드 크로스
+    for i in range(len(cross_df)):
+        cross_index = cross_df['index'][i]
+        cross_color = cross_df['color'][i]
+        cross_name = cross_df['name'][i]
+        cross_position = cross_df['position'][i]
+
+        cross_date = kor_stock_ohlcv_095570_total['date'][cross_index]
+
+        fig.add_vline(
+            x=pd.to_datetime(cross_date).timestamp() * 1000,
+            line_dash="dot",
+            line_color = cross_color,
+                annotation_text = cross_name,
+                annotation_position = cross_position
+        )
+
+    # 정배열, 역배열
+    # 정배열
+    for i in range(len(ascending_intervals)):
+        start_date = ascending_intervals[i][0]
+        end_date = ascending_intervals[i][1]
+
+        fig.add_vrect(
+            x0=kor_stock_ohlcv_095570_total['date'][start_date], 
+            x1=kor_stock_ohlcv_095570_total['date'][end_date], 
+            annotation_text=" ", annotation_position="top left",
+                      fillcolor="red", opacity=0.1, line_width=0)
+
+    # 역배열
+    for i in range(len(descending_intervals)):
+        start_date = descending_intervals[i][0]
+        end_date = descending_intervals[i][1]
+
+        fig.add_vrect(
+            x0=kor_stock_ohlcv_095570_total['date'][start_date], 
+            x1=kor_stock_ohlcv_095570_total['date'][end_date], 
+            annotation_text=" ", annotation_position="top left",
+                      fillcolor="blue", opacity=0.1, line_width=0)    
+
+    # Rayout
+    fig.update_layout(
+        title = '삼성전자 주가',
+        title_font_family="맑은고딕",
+        title_font_size = 18,
+        hoverlabel=dict(
+            bgcolor='black',
+            font_size=15,
+        ),
+        hovermode="x unified",
+        template='plotly_dark',
+        xaxis_tickangle=90,
+        yaxis_tickformat = ',',
+        legend = dict(orientation = 'h', xanchor = "center", x = 0.5, y= 1.2),
+        barmode='group',
+        margin=go.layout.Margin(
+            l=10, #left margin
+            r=10, #right margin
+            b=10, #bottom margin
+            t=100  #top margin
+        ),
+        height=400, width=900, 
+    #         showlegend=False, 
+        xaxis_rangeslider_visible=False
+    )
+
+
+    # update y-axis label
+    fig.update_yaxes(title_text="Price")
+
+    fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"])])
+
+    return fig
+
+
+
+
+
+ma_vis(kor_stock_ohlcv_095570_total)
+```
+
+
+이번엔 Plotly로 만든 주식 시각화에 이동평균선을 추가 해보자. 그리고 이동평균선에 대해서도 알아보려고 한다. 여기서 이동평균선은 알파스퀘어 에서 **잘 정리** 해둔 내용을 참고 하려고 한다. 
+
+# 알파스퀘어 기술적 지표
+
+- [알파스퀘어-이동평균선](https://alphasquare.oopy.io/board/technical-indicator/sma)
+
+# 이동평균선(Moving Average)
+
+차트의 기술적 분석을 할 때 쓰이는 가장 기본적인 보조 지표이다. 이평선이라고도 부르며 이는 일정 기간 동안의 가격의 평균을 나타낸다. 특정 기간동안 가격의 평균을 이어서 그렸기 때문에 주식의 불규칙적인 변화를 완만하게 변화시켜서 파악하기 용이하다. 이동평균의 종류에는 크게 단순이동평균(SMA), 가중이동평균(WMA), 지수이동평균(EMA)가 있으며, 이번에 우리가 사용하게 될 지표는 단순이동평균(SMA)이다.
+
+## 기간
+
+일반적으로 이동평균선은 5일, 20일, 60일, 120일, 240일을 사용한다. 각각의 의미는 다음과 같다.
+
+- 5일: 일주일을 나타낸다. 7일중 토,일은 빠지기 때문 
+- 20일: 한달을 나타낸다. 역시 한달 중에 주말을 제외 하면 20일이 평일 이기 때문
+- 60일: 한 분기를 나타낸다.
+- 120일: 반년을 나타낸다. 
+- 240일: 1년을 의미한다.
+
+## 이동평균선의 한계
+
+가장 쉽게 접할수 있는 보조지표이지만 한계는 뚜렷하다. 과거의 평균을 냈기 때문에 앞으로 예측에 대한 기대가 떨어진다. 이를 수행성 지표라고 하는데, 이 이동평균선의 약점을 많이 보완한 것이 앞으로 자주 나올 예정이다.
+
+# 분석방법 
+
+## 골든크로스, 데드크로스
+
+이동평균선을 사용한 분석방법중 골든크로스, 데드크로스 라느 전략이 있다. 단기이동평균선이 장기 이동평균선을 돌파 하는 시점대 매수 또는 매도 신호로 파악 하는 것이며 이는 다음과 같다.
+
+ - 골든크로스: 단기 이동평균선이 장기 이동평균선 상향 돌파 (매수 신호)
+ - 데드크로스: 단기 이동평균선이 장기 이동평균선 하향 돌파 (매도 신호)
+ 
+ 
+## 정배열, 역배열
+
+이번에는 배열에 대해 알아보자. 각각의 의미는 다음과 같다.
+
+ - 정배열: 단기 이동평균선 > 중기 이동평균선 > 장기 이동평균선
+ - 역배열: 단기 이동평균선 < 중기 이동평균선 < 장기 이동평균선
+
+위의 의미를 파악해보면 정배열은 단기 이동평균선이 가장 높기 때문에 매수를 하기 적절한 시점으로 여겨진다고 한다. 반대로 역배열에서는 단기 이동평균선이 가장 떨어 지기 때문에 매도하는것으로 권장된다고 한다.
+
+# 파이썬을 사용한 시각화
+
+이제 Plotly를 사용하여 이를 구현 해보도록 하자. 
+
+## 데이터 수집
+
+데이터 수집 부분은 다음과 같다. 앞으로 수집은 이 기본 코드를 사용할 예정
+
+```{python}
+import plotly.graph_objects as go
+
+from ta.trend import MACD
+from ta.momentum import StochasticOscillator
+
+import numpy as np
+import pandas as pd
+from pykrx import stock
+from pykrx import bond
+from time import sleep
+
+from datetime import datetime
+from datetime import timedelta
+import os
+import time
+from plotly.subplots import make_subplots
+import glob
+
+
+ticker_nm = '005930'
+start_date  = '20200101'
+today_date1 = '20231006'
+
+df_raw = stock.get_market_ohlcv(start_date, today_date1, ticker_nm)
+df_raw = df_raw.reset_index()
+df_raw['ticker'] = ticker_nm
+
+df_raw.columns = ['date', 'open', 'high', 'low', 'close', 'volume','trading_value','price_change_percentage', 'ticker']
+```
+
+## 전처리
+
+### 이동평균선
+
+우선 이동평균선을 추가 해주자. 종가(close)를 기준으로 rolling() 함수를 사용하여 계산해준다. 그리고 이를 각각 MA5, MA20, MA60, MA120으로 만들어 준다. 추가로 이 전처리한 데이터들은 Airflow에서 처리 하는 과정은 나중에 업로드 할 예정이다.
+
+```{python}
+df_raw['MA5'] = df_raw['close'].rolling(window=5).mean()
+df_raw['MA20'] = df_raw['close'].rolling(window=20).mean()
+df_raw['MA60'] = df_raw['close'].rolling(window=60).mean()
+df_raw['MA120'] = df_raw['close'].rolling(window=120).mean()
+```
+
+### 날짜 
+
+데이터는 2019년도 부터 수집 되어있지만 이동평균 120일을 하게 되면 NA가 생긴다 (처음 120일 정도) 따라서 이는 미리 처리하고 2023년 3월 부터 시각화에 볼 수 있도록 처리 해주었다.
+
+```{python}
+df_raw = df_raw[df_raw['date'] > '2023-03-01']
+df_raw = df_raw.reset_index(drop = True)
+```
+
+
+### 골든크로스, 데드크로스 
+
+이제 골든크로스와, 데드크로스를 구현하기위한 작업을 진행 해보자. 골든크로스와 데드크로스를 구분하기 위한 이동평균선 교차점은 5,20,60만 사용해주었다. 
+
+```{python}
+df_raw['MA5-20'] = df_raw['MA5'] - df_raw['MA20']
+df_raw['MA20-60'] = df_raw['MA20'] - df_raw['MA60']
+df_raw['MA60-120'] = df_raw['MA60'] - df_raw['MA120']
+```
+
+이렇게 구한 각각의 MA5-20, MA20-60을 가지고 양수에서 음수 그리고 음수에서 양수로 바뀌는 인덱스를 구해 보자. 각각의 인덱스는 다음과 같이 지정 해주었다. 
+idx_5_20_gold_cross, idx_5_20_dead_cross, idx_20_60_gold_cross, idx_20_60_dead_cross 
+
+```{python}
+# 골든 크로스 5-20
+# 음수에서 양수로 바뀌는 모든 인덱스 찾기
+idx_5_20_gold_cross = [idx for idx in range(len(df_raw)) if df_raw["MA5-20"].iloc[idx] > 0 and df_raw["MA5-20"].iloc[idx - 1] <= 0]
+
+# 데드 크로스 5-20
+# 양수에서 음수로 바뀌는 모든 인덱스 찾기
+idx_5_20_dead_cross = [idx for idx in range(len(df_raw)) if df_raw["MA5-20"].iloc[idx] < 0 and df_raw["MA5-20"].iloc[idx - 1] >= 0]
+
+# 골든 크로스 20-60
+# 음수에서 양수로 바뀌는 모든 인덱스 찾기
+idx_20_60_gold_cross = [idx for idx in range(len(df_raw)) if df_raw["MA20-60"].iloc[idx] > 0 and df_raw["MA20-60"].iloc[idx - 1] <= 0]
+
+# 골든 크로스 20-60
+# 음수에서 양수로 바뀌는 모든 인덱스 찾기
+idx_20_60_dead_cross = [idx for idx in range(len(df_raw)) if df_raw["MA20-60"].iloc[idx] < 0 and df_raw["MA20-60"].iloc[idx - 1] >= 0]
+```
+
+이렇게 지정 해주었던 교차점 인덱스는 정리해서 cross_df로 만들어 주자. 이는 Plotly시각화에 적용할 색상등등을 설정해줄 예정이다.
+
+```{python}
+idx_5_20_gold_cross_df = pd.DataFrame({
+    'index':idx_5_20_gold_cross,
+    'name':'5-20 -><br> 골든크로스',
+    'color':'red',
+    'position':'top left'})
+
+idx_5_20_dead_cross_df = pd.DataFrame({
+    'index':idx_5_20_dead_cross,
+    'name':'5-20 -> <br>  데드크로스',
+    'color':'blue',
+    'position':'bottom left'})
+
+idx_20_60_gold_cross_df = pd.DataFrame({
+    'index':idx_20_60_gold_cross,
+    'name':'20-60 -> <br> 골든크로스',
+    'color':'orange',
+    'position':'top left'})
+
+idx_20_60_dead_cross_df = pd.DataFrame({
+    'index':idx_20_60_dead_cross,
+    'name':'20-60 -> <br>  데드크로스',
+    'color':'purple',
+    'position':'bottom left'})
+    
+cross_df = pd.concat([idx_5_20_gold_cross_df, idx_5_20_dead_cross_df,
+                      idx_20_60_gold_cross_df, idx_20_60_dead_cross_df])
+cross_df = cross_df.reset_index(drop = True)
+```
+
+
+### 정배열, 역배열
+
+이번에는 정배열과 역배열 구간에 대해 만들어 주자. 앞서 만들었던 MA5-20, MA20-60, MA60-120들을 0보다 모두 크거다 모두 작은 구간을 만들어 주었다. 정배열의 경우 모두 0보다 크면 True, 역배열의 경우 모두 0보다 작으면 True가 된다.
+
+```{python}
+ascending_sq  = (df_raw['MA5-20'] > 0) & \
+(df_raw['MA20-60'] > 0) & \
+(df_raw['MA60-120'] > 0) 
+
+descending_sq  = (df_raw['MA5-20'] < 0) & \
+(df_raw['MA20-60'] < 0) & \
+(df_raw['MA60-120'] < 0) 
+```
+
+그리고 나서 이 각각의 True, False값에 대해 True 부분의 첫번째와 마지막 부분을 찾아준다. 이렇게 정배열 하는 구간의 첫번째와 마지막 인덱스를 찾았다.
+
+```{python}
+ascending_intervals = []
+i = 0
+while i < len(ascending_sq):
+    if ascending_sq[i]:
+        start_index = i
+        while i < len(ascending_sq) and ascending_sq[i]:
+            i += 1
+        end_index = i - 1
+        ascending_intervals.append((start_index, end_index))
+
+    else:
+        i += 1
+
+ascending_intervals        
+```
+
+이번에는 역배열 하는 구간의 첫번째와 마지막번째의 인덱스를 찾았다.
+
+```{python}
+descending_intervals = []
+i = 0
+while i < len(descending_sq):
+    if descending_sq[i]:
+        start_index = i
+        while i < len(descending_sq) and descending_sq[i]:
+            i += 1
+        end_index = i - 1
+        descending_intervals.append((start_index, end_index))
+
+    else:
+        i += 1
+
+descending_intervals        
+```
+
+## 시각화
+
+이제 Plotly를 사용해보자. 우선 go.Figure() 를 통해 figure를 생성 해주고 시각화를 하나씩 추가 할 예정이다.
+
+```python
+fig = go.Figure()
+```
+
+이제 fig.add_trace()를 사용하여 캔들스틱을 추가 해준다.
+
+```python
+# 캔들스틱차트
+fig.add_trace(go.Candlestick(
+    x=df_raw['date'],
+    open=df_raw['open'],
+    high=df_raw['high'],
+    low=df_raw['low'],
+    close=df_raw['close'],
+    increasing_line_color= 'red', decreasing_line_color= 'blue', 
+    name = ''))
+```
+
+이제 이동평균선 MA5, MA20, MA60, MA120 라인을 하나씩 추가 해준다. 이번에도 fig.add_trace()를 사용해서 하나씩 추가.
+
+```python
+# MA 5 
+fig.add_trace(go.Scatter(
+    x=df_raw['date'],
+    y=df_raw['MA5'],
+    opacity=0.7,
+    line=dict(color='blue', width=2),
+    name='MA 5'))
+
+# MA 20
+fig.add_trace(go.Scatter(
+    x=df_raw['date'],
+    y=df_raw['MA20'],
+    opacity=0.7,
+    line=dict(color='orange', width=2),
+    name='MA 20'))
+
+# MA 60
+fig.add_trace(go.Scatter(
+    x=df_raw['date'],
+    y=df_raw['MA60'],
+    opacity=0.7,
+    line=dict(color='purple', width=2),
+    name='MA 60'))
+
+# MA 120
+fig.add_trace(go.Scatter(
+    x=df_raw['date'],
+    y=df_raw['MA120'],
+    opacity=0.7,
+    line=dict(color='green', width=2),
+    name='MA 120'))
+```
+
+그리고 골든 크로스와 데드 크로스 라인을 추가 해준다. fig.add_vline()를 사용하여 수직선을 그어껀데, 반복문을 사용하여 하나씩 그어 준다.
+
+```python
+# 골든, 데드 크로스
+for i in range(len(cross_df)):
+    cross_index = cross_df['index'][i]
+    cross_color = cross_df['color'][i]
+    cross_name = cross_df['name'][i]
+    cross_position = cross_df['position'][i]
+
+    cross_date = df_raw['date'][cross_index]
+
+    fig.add_vline(
+        x=pd.to_datetime(cross_date).timestamp() * 1000,
+        line_dash="dot",
+        line_color = cross_color,
+            annotation_text = cross_name,
+            annotation_position = cross_position
+    )
+```
+
+그리고 정배열과, 역배열을 추가 해준다. 반복문을 사용했으며 fig.add_vrect()함수를 통해 사각영역을 그려 주었다.
+
+```python
+# 정배열, 역배열
+# 정배열
+for i in range(len(ascending_intervals)):
+    start_date = ascending_intervals[i][0]
+    end_date = ascending_intervals[i][1]
+
+    fig.add_vrect(
+        x0=df_raw['date'][start_date], 
+        x1=df_raw['date'][end_date], 
+        annotation_text=" ", annotation_position="top left",
+                  fillcolor="red", opacity=0.1, line_width=0)
+    
+# 역배열
+for i in range(len(descending_intervals)):
+    start_date = descending_intervals[i][0]
+    end_date = descending_intervals[i][1]
+
+    fig.add_vrect(
+        x0=df_raw['date'][start_date], 
+        x1=df_raw['date'][end_date], 
+        annotation_text=" ", annotation_position="top left",
+                  fillcolor="blue", opacity=0.1, line_width=0)    
+```
+
+마지막으로 fig.update_layout() 를 사용하여 시각화의 구석구석 옵션을 지정 해준다. 
+
+```python
+# Rayout
+fig.update_layout(
+    title = '삼성전자 주가',
+    title_font_family="맑은고딕",
+    title_font_size = 18,
+    hoverlabel=dict(
+        bgcolor='black',
+        font_size=15,
+    ),
+    hovermode="x unified",
+    template='plotly_dark',
+    xaxis_tickangle=90,
+    yaxis_tickformat = ',',
+    legend = dict(orientation = 'h', xanchor = "center", x = 0.5, y= 1.2),
+    barmode='group',
+    margin=go.layout.Margin(
+        l=10, #left margin
+        r=10, #right margin
+        b=10, #bottom margin
+        t=100  #top margin
+    ),
+    height=400, width=900, 
+#         showlegend=False, 
+    xaxis_rangeslider_visible=False
+)
+
+
+# update y-axis label
+fig.update_yaxes(title_text="Price")
+
+fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"])])
+fig.show()
+```
+
+### 최종 코드
+
+그리고 이를 최종적으로 함수를 만들어 주면 다음과 같다. 이제 곧 Streamlit 대시보드를 생성 하게 되면 이렇게 잘 정리된 함수들이 꼭 필요하다.
+
+```python
+def ma_vis(data):
+    fig = go.Figure()
+
+    # 캔들스틱차트
+    fig.add_trace(go.Candlestick(
+        x=df_raw['date'],
+        open=df_raw['open'],
+        high=df_raw['high'],
+        low=df_raw['low'],
+        close=df_raw['close'],
+        increasing_line_color= 'red', decreasing_line_color= 'blue', 
+        name = ''))
+
+    # MA 5 
+    fig.add_trace(go.Scatter(
+        x=df_raw['date'],
+        y=df_raw['MA5'],
+        opacity=0.7,
+        line=dict(color='blue', width=2),
+        name='MA 5'))
+
+    # MA 20
+    fig.add_trace(go.Scatter(
+        x=df_raw['date'],
+        y=df_raw['MA20'],
+        opacity=0.7,
+        line=dict(color='orange', width=2),
+        name='MA 20'))
+
+    # MA 60
+    fig.add_trace(go.Scatter(
+        x=df_raw['date'],
+        y=df_raw['MA60'],
+        opacity=0.7,
+        line=dict(color='purple', width=2),
+        name='MA 60'))
+
+    # MA 120
+    fig.add_trace(go.Scatter(
+        x=df_raw['date'],
+        y=df_raw['MA120'],
+        opacity=0.7,
+        line=dict(color='green', width=2),
+        name='MA 120'))
+
+    # 골든, 데드 크로스
+    for i in range(len(cross_df)):
+        cross_index = cross_df['index'][i]
+        cross_color = cross_df['color'][i]
+        cross_name = cross_df['name'][i]
+        cross_position = cross_df['position'][i]
+
+        cross_date = df_raw['date'][cross_index]
+
+        fig.add_vline(
+            x=pd.to_datetime(cross_date).timestamp() * 1000,
+            line_dash="dot",
+            line_color = cross_color,
+                annotation_text = cross_name,
+                annotation_position = cross_position
+        )
+
+    # 정배열, 역배열
+    # 정배열
+    for i in range(len(ascending_intervals)):
+        start_date = ascending_intervals[i][0]
+        end_date = ascending_intervals[i][1]
+
+        fig.add_vrect(
+            x0=df_raw['date'][start_date], 
+            x1=df_raw['date'][end_date], 
+            annotation_text=" ", annotation_position="top left",
+                      fillcolor="red", opacity=0.1, line_width=0)
+
+    # 역배열
+    for i in range(len(descending_intervals)):
+        start_date = descending_intervals[i][0]
+        end_date = descending_intervals[i][1]
+
+        fig.add_vrect(
+            x0=df_raw['date'][start_date], 
+            x1=df_raw['date'][end_date], 
+            annotation_text=" ", annotation_position="top left",
+                      fillcolor="blue", opacity=0.1, line_width=0)    
+
+    # Rayout
+    fig.update_layout(
+        title = '삼성전자 주가',
+        title_font_family="맑은고딕",
+        title_font_size = 18,
+        hoverlabel=dict(
+            bgcolor='black',
+            font_size=15,
+        ),
+        hovermode="x unified",
+        template='plotly_dark',
+        xaxis_tickangle=90,
+        yaxis_tickformat = ',',
+        legend = dict(orientation = 'h', xanchor = "center", x = 0.5, y= 1.2),
+        barmode='group',
+        margin=go.layout.Margin(
+            l=10, #left margin
+            r=10, #right margin
+            b=10, #bottom margin
+            t=100  #top margin
+        ),
+        height=400, width=900, 
+    #         showlegend=False, 
+        xaxis_rangeslider_visible=False
+    )
+
+
+    # update y-axis label
+    fig.update_yaxes(title_text="Price")
+
+    fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"])])
+
+    return fig
+```
+
+
+# 총평
+
+이번에는 이동평균선과 Plotly에서 라인 추가 하는법, 사각영역 추가 하는 법 등등에 대해 알아 보았다. 자주 쓰는 주식 보조 지표중 하나로 이동평균선이 가장 기본중에 기본 이었으며, 다음에는 볼린져밴드에 대해 한번 알아보자.
+
+
