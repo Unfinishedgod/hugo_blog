@@ -50,14 +50,10 @@ df_raw['ticker'] = ticker_nm
 df_raw.columns = ['date', 'open', 'high', 'low', 'close', 'volume','trading_value','price_change_percentage', 'ticker']
  
 
-kor_stock_ohlcv_095570_total = df_raw
-
-
-
-kor_stock_ohlcv_095570_total['MA5'] = kor_stock_ohlcv_095570_total['close'].rolling(window=5).mean()
-kor_stock_ohlcv_095570_total['MA20'] = kor_stock_ohlcv_095570_total['close'].rolling(window=20).mean()
-kor_stock_ohlcv_095570_total['MA60'] = kor_stock_ohlcv_095570_total['close'].rolling(window=60).mean()
-kor_stock_ohlcv_095570_total['MA120'] = kor_stock_ohlcv_095570_total['close'].rolling(window=120).mean()
+df_raw['MA5'] = df_raw['close'].rolling(window=5).mean()
+df_raw['MA20'] = df_raw['close'].rolling(window=20).mean()
+df_raw['MA60'] = df_raw['close'].rolling(window=60).mean()
+df_raw['MA120'] = df_raw['close'].rolling(window=120).mean()
 
 
 now = datetime.now()
@@ -65,20 +61,20 @@ now = now + timedelta(days=-300)
 today_date2 = now.strftime('%Y-%m-%d')
 
 
-# kor_stock_ohlcv_095570_total = kor_stock_ohlcv_095570_total[kor_stock_ohlcv_095570_total['date'] > '2023-03-01']
-kor_stock_ohlcv_095570_total = kor_stock_ohlcv_095570_total[kor_stock_ohlcv_095570_total['date'] > today_date2]
-kor_stock_ohlcv_095570_total = kor_stock_ohlcv_095570_total.reset_index(drop = True)
+# df_raw = df_raw[df_raw['date'] > '2023-03-01']
+df_raw = df_raw[df_raw['date'] > today_date2]
+df_raw = df_raw.reset_index(drop = True)
 
 
 
-kor_stock_ohlcv_095570_total['MA5-20'] = kor_stock_ohlcv_095570_total['MA5'] - kor_stock_ohlcv_095570_total['MA20']
-kor_stock_ohlcv_095570_total['MA20-60'] = kor_stock_ohlcv_095570_total['MA20'] - kor_stock_ohlcv_095570_total['MA60']
-kor_stock_ohlcv_095570_total['MA60-120'] = kor_stock_ohlcv_095570_total['MA60'] - kor_stock_ohlcv_095570_total['MA120']
+df_raw['MA5-20'] = df_raw['MA5'] - df_raw['MA20']
+df_raw['MA20-60'] = df_raw['MA20'] - df_raw['MA60']
+df_raw['MA60-120'] = df_raw['MA60'] - df_raw['MA120']
 
 
 # 골든 크로스 5-20
 # 음수에서 양수로 바뀌는 모든 인덱스 찾기
-idx_5_20_gold_cross = [idx for idx in range(len(kor_stock_ohlcv_095570_total)) if kor_stock_ohlcv_095570_total["MA5-20"].iloc[idx] > 0 and kor_stock_ohlcv_095570_total["MA5-20"].iloc[idx - 1] <= 0]
+idx_5_20_gold_cross = [idx for idx in range(len(df_raw)) if df_raw["MA5-20"].iloc[idx] > 0 and df_raw["MA5-20"].iloc[idx - 1] <= 0]
 idx_5_20_gold_cross_df = pd.DataFrame({
     'index':idx_5_20_gold_cross,
     'name':'5-20 -><br> 골든크로스',
@@ -88,7 +84,7 @@ idx_5_20_gold_cross_df = pd.DataFrame({
 
 # 데드 크로스 5-20
 # 양수에서 음수로 바뀌는 모든 인덱스 찾기
-idx_5_20_dead_cross = [idx for idx in range(len(kor_stock_ohlcv_095570_total)) if kor_stock_ohlcv_095570_total["MA5-20"].iloc[idx] < 0 and kor_stock_ohlcv_095570_total["MA5-20"].iloc[idx - 1] >= 0]
+idx_5_20_dead_cross = [idx for idx in range(len(df_raw)) if df_raw["MA5-20"].iloc[idx] < 0 and df_raw["MA5-20"].iloc[idx - 1] >= 0]
 idx_5_20_dead_cross_df = pd.DataFrame({
     'index':idx_5_20_dead_cross,
     'name':'5-20 -> <br>  데드크로스',
@@ -98,7 +94,7 @@ idx_5_20_dead_cross_df = pd.DataFrame({
 
 # 골든 크로스 20-60
 # 음수에서 양수로 바뀌는 모든 인덱스 찾기
-idx_20_60_gold_cross = [idx for idx in range(len(kor_stock_ohlcv_095570_total)) if kor_stock_ohlcv_095570_total["MA20-60"].iloc[idx] > 0 and kor_stock_ohlcv_095570_total["MA20-60"].iloc[idx - 1] <= 0]
+idx_20_60_gold_cross = [idx for idx in range(len(df_raw)) if df_raw["MA20-60"].iloc[idx] > 0 and df_raw["MA20-60"].iloc[idx - 1] <= 0]
 idx_20_60_gold_cross_df = pd.DataFrame({
     'index':idx_20_60_gold_cross,
     'name':'20-60 -> <br> 골든크로스',
@@ -108,7 +104,7 @@ idx_20_60_gold_cross_df = pd.DataFrame({
 
 # 골든 크로스 20-60
 # 음수에서 양수로 바뀌는 모든 인덱스 찾기
-idx_20_60_dead_cross = [idx for idx in range(len(kor_stock_ohlcv_095570_total)) if kor_stock_ohlcv_095570_total["MA20-60"].iloc[idx] < 0 and kor_stock_ohlcv_095570_total["MA20-60"].iloc[idx - 1] >= 0]
+idx_20_60_dead_cross = [idx for idx in range(len(df_raw)) if df_raw["MA20-60"].iloc[idx] < 0 and df_raw["MA20-60"].iloc[idx - 1] >= 0]
 idx_20_60_dead_cross_df = pd.DataFrame({
     'index':idx_20_60_dead_cross,
     'name':'20-60 -> <br>  데드크로스',
@@ -120,7 +116,7 @@ idx_20_60_dead_cross_df = pd.DataFrame({
 
 # 골든 크로스 20-60
 # 음수에서 양수로 바뀌는 모든 인덱스 찾기
-idx_60_120_gold_cross = [idx for idx in range(len(kor_stock_ohlcv_095570_total)) if kor_stock_ohlcv_095570_total["MA60-120"].iloc[idx] > 0 and kor_stock_ohlcv_095570_total["MA60-120"].iloc[idx - 1] <= 0]
+idx_60_120_gold_cross = [idx for idx in range(len(df_raw)) if df_raw["MA60-120"].iloc[idx] > 0 and df_raw["MA60-120"].iloc[idx - 1] <= 0]
 idx_60_120_gold_cross_df = pd.DataFrame({
     'index':idx_60_120_gold_cross,
     'name':'60-120 골든크로스',
@@ -130,7 +126,7 @@ idx_60_120_gold_cross_df = pd.DataFrame({
 
 # 골든 크로스 20-60
 # 음수에서 양수로 바뀌는 모든 인덱스 찾기
-idx_60_120_dead_cross = [idx for idx in range(len(kor_stock_ohlcv_095570_total)) if kor_stock_ohlcv_095570_total["MA60-120"].iloc[idx] < 0 and kor_stock_ohlcv_095570_total["MA60-120"].iloc[idx - 1] >= 0]
+idx_60_120_dead_cross = [idx for idx in range(len(df_raw)) if df_raw["MA60-120"].iloc[idx] < 0 and df_raw["MA60-120"].iloc[idx - 1] >= 0]
 idx_60_120_dead_cross_df = pd.DataFrame({
     'index':idx_60_120_dead_cross,
     'name':'60-120 데드크로스',
@@ -143,13 +139,13 @@ cross_df = pd.concat([idx_5_20_gold_cross_df, idx_5_20_dead_cross_df,
 cross_df = cross_df.reset_index(drop = True)
 
 
-ascending_sq  = (kor_stock_ohlcv_095570_total['MA5-20'] > 0) & \
-(kor_stock_ohlcv_095570_total['MA20-60'] > 0) & \
-(kor_stock_ohlcv_095570_total['MA60-120'] > 0) 
+ascending_sq  = (df_raw['MA5-20'] > 0) & \
+(df_raw['MA20-60'] > 0) & \
+(df_raw['MA60-120'] > 0) 
 
-descending_sq  = (kor_stock_ohlcv_095570_total['MA5-20'] < 0) & \
-(kor_stock_ohlcv_095570_total['MA20-60'] < 0) & \
-(kor_stock_ohlcv_095570_total['MA60-120'] < 0) 
+descending_sq  = (df_raw['MA5-20'] < 0) & \
+(df_raw['MA20-60'] < 0) & \
+(df_raw['MA60-120'] < 0) 
 
 
 
@@ -187,42 +183,42 @@ def ma_vis(data):
 
     # 캔들스틱차트
     fig.add_trace(go.Candlestick(
-        x=kor_stock_ohlcv_095570_total['date'],
-        open=kor_stock_ohlcv_095570_total['open'],
-        high=kor_stock_ohlcv_095570_total['high'],
-        low=kor_stock_ohlcv_095570_total['low'],
-        close=kor_stock_ohlcv_095570_total['close'],
+        x=df_raw['date'],
+        open=df_raw['open'],
+        high=df_raw['high'],
+        low=df_raw['low'],
+        close=df_raw['close'],
         increasing_line_color= 'red', decreasing_line_color= 'blue', 
         name = ''))
 
     # MA 5 
     fig.add_trace(go.Scatter(
-        x=kor_stock_ohlcv_095570_total['date'],
-        y=kor_stock_ohlcv_095570_total['MA5'],
+        x=df_raw['date'],
+        y=df_raw['MA5'],
         opacity=0.7,
         line=dict(color='blue', width=2),
         name='MA 5'))
 
     # MA 20
     fig.add_trace(go.Scatter(
-        x=kor_stock_ohlcv_095570_total['date'],
-        y=kor_stock_ohlcv_095570_total['MA20'],
+        x=df_raw['date'],
+        y=df_raw['MA20'],
         opacity=0.7,
         line=dict(color='orange', width=2),
         name='MA 20'))
 
     # MA 60
     fig.add_trace(go.Scatter(
-        x=kor_stock_ohlcv_095570_total['date'],
-        y=kor_stock_ohlcv_095570_total['MA60'],
+        x=df_raw['date'],
+        y=df_raw['MA60'],
         opacity=0.7,
         line=dict(color='purple', width=2),
         name='MA 60'))
 
     # MA 120
     fig.add_trace(go.Scatter(
-        x=kor_stock_ohlcv_095570_total['date'],
-        y=kor_stock_ohlcv_095570_total['MA120'],
+        x=df_raw['date'],
+        y=df_raw['MA120'],
         opacity=0.7,
         line=dict(color='green', width=2),
         name='MA 120'))
@@ -234,7 +230,7 @@ def ma_vis(data):
         cross_name = cross_df['name'][i]
         cross_position = cross_df['position'][i]
 
-        cross_date = kor_stock_ohlcv_095570_total['date'][cross_index]
+        cross_date = df_raw['date'][cross_index]
 
         fig.add_vline(
             x=pd.to_datetime(cross_date).timestamp() * 1000,
@@ -251,8 +247,8 @@ def ma_vis(data):
         end_date = ascending_intervals[i][1]
 
         fig.add_vrect(
-            x0=kor_stock_ohlcv_095570_total['date'][start_date], 
-            x1=kor_stock_ohlcv_095570_total['date'][end_date], 
+            x0=df_raw['date'][start_date], 
+            x1=df_raw['date'][end_date], 
             annotation_text=" ", annotation_position="top left",
                       fillcolor="red", opacity=0.1, line_width=0)
 
@@ -262,8 +258,8 @@ def ma_vis(data):
         end_date = descending_intervals[i][1]
 
         fig.add_vrect(
-            x0=kor_stock_ohlcv_095570_total['date'][start_date], 
-            x1=kor_stock_ohlcv_095570_total['date'][end_date], 
+            x0=df_raw['date'][start_date], 
+            x1=df_raw['date'][end_date], 
             annotation_text=" ", annotation_position="top left",
                       fillcolor="blue", opacity=0.1, line_width=0)    
 
@@ -305,7 +301,7 @@ def ma_vis(data):
 
 
 
-ma_vis(kor_stock_ohlcv_095570_total)
+ma_vis(df_raw)
 ```
 
 
@@ -330,8 +326,8 @@ ma_vis(kor_stock_ohlcv_095570_total)
 - 240일: 1년을 의미한다.
 
 ## 이동평균선의 한계
-
-가장 쉽게 접할수 있는 보조지표이지만 한계는 뚜렷하다. 과거의 평균을 냈기 때문에 앞으로 예측에 대한 기대가 떨어진다. 이를 수행성 지표라고 하는데, 이 이동평균선의 약점을 많이 보완한 것이 앞으로 자주 나올 예정이다.
+ 
+가장 쉽게 접할수 있는 보조지표이지만 한계는 뚜렷하다. 과거의 평균을 냈기 때문에 앞으로 예측에 대한 기대가 떨어진다. 이를 후행성 지표라고 하는데, 이 이동평균선의 약점을 많이 보완한 것이 앞으로 자주 나올 예정이다.
 
 # 분석방법 
 

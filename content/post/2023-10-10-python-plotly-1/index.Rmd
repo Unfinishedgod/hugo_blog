@@ -45,62 +45,60 @@ df_raw['ticker'] = ticker_nm
 
 df_raw.columns = ['date', 'open', 'high', 'low', 'close', 'volume','trading_value','price_change_percentage', 'ticker']
 
-kor_stock_ohlcv_095570_total = df_raw
- 
-kor_stock_ohlcv_095570_total['MA5'] = kor_stock_ohlcv_095570_total['close'].rolling(window=5).mean()
-kor_stock_ohlcv_095570_total['MA20'] = kor_stock_ohlcv_095570_total['close'].rolling(window=20).mean()
-kor_stock_ohlcv_095570_total['MA60'] = kor_stock_ohlcv_095570_total['close'].rolling(window=60).mean()
-kor_stock_ohlcv_095570_total['MA120'] = kor_stock_ohlcv_095570_total['close'].rolling(window=120).mean()
+df_raw['MA5'] = df_raw['close'].rolling(window=5).mean()
+df_raw['MA20'] = df_raw['close'].rolling(window=20).mean()
+df_raw['MA60'] = df_raw['close'].rolling(window=60).mean()
+df_raw['MA120'] = df_raw['close'].rolling(window=120).mean()
 
 # MACD
-kor_stock_ohlcv_095570_total['ema_short'] = kor_stock_ohlcv_095570_total['close'].rolling(window=12).mean()
-kor_stock_ohlcv_095570_total['ema_long'] = kor_stock_ohlcv_095570_total['close'].rolling(window=26).mean()
-kor_stock_ohlcv_095570_total['macd'] = kor_stock_ohlcv_095570_total['ema_short'] - kor_stock_ohlcv_095570_total['ema_long']
+df_raw['ema_short'] = df_raw['close'].rolling(window=12).mean()
+df_raw['ema_long'] = df_raw['close'].rolling(window=26).mean()
+df_raw['macd'] = df_raw['ema_short'] - df_raw['ema_long']
 
 
-std = kor_stock_ohlcv_095570_total['close'].rolling(20).std(ddof=0)
+std = df_raw['close'].rolling(20).std(ddof=0)
 
-kor_stock_ohlcv_095570_total['upper'] = kor_stock_ohlcv_095570_total['MA20'] + 2 * std
-kor_stock_ohlcv_095570_total['lower'] = kor_stock_ohlcv_095570_total['MA20'] - 2 * std
+df_raw['upper'] = df_raw['MA20'] + 2 * std
+df_raw['lower'] = df_raw['MA20'] - 2 * std
 
-kor_stock_ohlcv_095570_total['변화량'] = kor_stock_ohlcv_095570_total['close'] - kor_stock_ohlcv_095570_total['close'].shift(1)
-kor_stock_ohlcv_095570_total['상승폭'] = np.where(kor_stock_ohlcv_095570_total['변화량']>=0, kor_stock_ohlcv_095570_total['변화량'], 0)
-kor_stock_ohlcv_095570_total['하락폭'] = np.where(kor_stock_ohlcv_095570_total['변화량'] <0, kor_stock_ohlcv_095570_total['변화량'].abs(), 0)
+df_raw['변화량'] = df_raw['close'] - df_raw['close'].shift(1)
+df_raw['상승폭'] = np.where(df_raw['변화량']>=0, df_raw['변화량'], 0)
+df_raw['하락폭'] = np.where(df_raw['변화량'] <0, df_raw['변화량'].abs(), 0)
 
 # welles moving average
-kor_stock_ohlcv_095570_total['AU'] = kor_stock_ohlcv_095570_total['상승폭'].ewm(alpha=1/14, min_periods=14).mean()
-kor_stock_ohlcv_095570_total['AD'] = kor_stock_ohlcv_095570_total['하락폭'].ewm(alpha=1/14, min_periods=14).mean()
-#kor_stock_ohlcv_095570_total['RS'] = kor_stock_ohlcv_095570_total['AU'] / kor_stock_ohlcv_095570_total['AD']
-#kor_stock_ohlcv_095570_total['RSI'] = 100 - (100 / (1 + kor_stock_ohlcv_095570_total['RS']))
-kor_stock_ohlcv_095570_total['RSI'] = kor_stock_ohlcv_095570_total['AU'] / (kor_stock_ohlcv_095570_total['AU'] + kor_stock_ohlcv_095570_total['AD']) * 100
-# kor_stock_ohlcv_095570_total[['RSI']].tail(n=10)
+df_raw['AU'] = df_raw['상승폭'].ewm(alpha=1/14, min_periods=14).mean()
+df_raw['AD'] = df_raw['하락폭'].ewm(alpha=1/14, min_periods=14).mean()
+#df_raw['RS'] = df_raw['AU'] / df_raw['AD']
+#df_raw['RSI'] = 100 - (100 / (1 + df_raw['RS']))
+df_raw['RSI'] = df_raw['AU'] / (df_raw['AU'] + df_raw['AD']) * 100
+# df_raw[['RSI']].tail(n=10)
 
 
 # RSI signal
-kor_stock_ohlcv_095570_total['RSI_signal'] = kor_stock_ohlcv_095570_total['RSI'].rolling(window=9).mean()
+df_raw['RSI_signal'] = df_raw['RSI'].rolling(window=9).mean()
 
 # MACD 
-macd = MACD(close=kor_stock_ohlcv_095570_total['close'], 
+macd = MACD(close=df_raw['close'], 
             window_slow=26,
             window_fast=12, 
             window_sign=9)
 # Stochastic
-stoch = StochasticOscillator(high=kor_stock_ohlcv_095570_total['high'],
-                             close=kor_stock_ohlcv_095570_total['close'],
-                             low=kor_stock_ohlcv_095570_total['low'],
+stoch = StochasticOscillator(high=df_raw['high'],
+                             close=df_raw['close'],
+                             low=df_raw['low'],
                              window=14, 
                              smooth_window=3)
 
 
-kor_stock_ohlcv_095570_total['MACD_DIFF'] = macd.macd_diff()
-kor_stock_ohlcv_095570_total['MACD'] = macd.macd()
-kor_stock_ohlcv_095570_total['MACD_Signal'] = macd.macd_signal()
+df_raw['MACD_DIFF'] = macd.macd_diff()
+df_raw['MACD'] = macd.macd()
+df_raw['MACD_Signal'] = macd.macd_signal()
 
 
-kor_stock_ohlcv_095570_total['Stoch'] = stoch.stoch()
-kor_stock_ohlcv_095570_total['Stoch_Signal'] = stoch.stoch_signal()
+df_raw['Stoch'] = stoch.stoch()
+df_raw['Stoch_Signal'] = stoch.stoch_signal()
 
-kor_stock_ohlcv_095570_total = kor_stock_ohlcv_095570_total[kor_stock_ohlcv_095570_total['date'] > '2023-01-01']
+df_raw = df_raw[df_raw['date'] > '2023-01-01']
 
 
 def func1(data):
@@ -267,7 +265,7 @@ def func1(data):
     return fig
 
 
-func1(kor_stock_ohlcv_095570_total)
+func1(df_raw)
 ```
 
 주식 데이터를 사용하는 프로젝트를 생각한 큰 키워드는 다음과 같다.
