@@ -266,8 +266,6 @@ $\mu$ 를 기준으로 $\mu + 2\sigma$와 $\mu - 2\sigma$ 에 해당하는 넓�
 
 데이터 수집 부분은 다음과 같다. 
 
-
-
 ```{python}
 import plotly.graph_objects as go
 

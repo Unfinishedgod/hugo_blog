@@ -1,0 +1,543 @@
+---
+title: '[Python] Plotly와 주식 보조지표로 보는 주식 데이터 시각화 4 (MACD)'
+author: 최의용
+date: '2023-10-21'
+slug: python-plotly-4-macd
+categories: []
+tags:
+  - MACD
+  - 보조지표
+---
+
+```{r, setup, echo=FALSE}
+library(reticulate)
+use_python("/home/ubuntu/anaconda3/bin/python3")
+```
+
+```{python echo = FALSE}
+import plotly.graph_objects as go
+
+from ta.trend import MACD
+from ta.momentum import StochasticOscillator
+
+import numpy as np
+import pandas as pd
+from pykrx import stock
+from pykrx import bond
+from time import sleep
+
+from datetime import datetime
+from datetime import timedelta
+import os
+import time
+from plotly.subplots import make_subplots
+import glob
+
+ticker_nm = '005930'
+# ticker_nm = '247540'
+start_date  = '20190101'
+today_date1 = '20231006'
+
+df_raw = stock.get_market_ohlcv(start_date, today_date1, ticker_nm)
+df_raw = df_raw.reset_index()
+df_raw['ticker'] = ticker_nm
+
+# df_raw.columns = ['date', 'open', 'high', 'low', 'close', 'volume','price_change_percentage', 'ticker']
+
+df_raw.columns = ['date', 'open', 'high', 'low', 'close', 'volume','trading_value','price_change_percentage', 'ticker']
+
+
+
+df_raw['MA5'] = df_raw['close'].rolling(window=5).mean()
+df_raw['MA20'] = df_raw['close'].rolling(window=20).mean()
+df_raw['MA60'] = df_raw['close'].rolling(window=60).mean()
+df_raw['MA120'] = df_raw['close'].rolling(window=120).mean()
+
+
+std = df_raw['close'].rolling(20).std(ddof=0)
+
+df_raw['upper'] = df_raw['MA20'] + 2 * std
+df_raw['lower'] = df_raw['MA20'] - 2 * std
+
+
+# MACD
+macd = MACD(close=df_raw['close'],
+            window_slow=26,
+            window_fast=12,
+            window_sign=9)
+
+
+df_raw['MACD_DIFF'] = macd.macd_diff()
+df_raw['MACD'] = macd.macd()
+df_raw['MACD_Signal'] = macd.macd_signal()
+
+
+
+# Stochastic
+stoch = StochasticOscillator(high=df_raw['high'],
+                             close=df_raw['close'],
+                             low=df_raw['low'],
+                             window=14,
+                             smooth_window=3)
+df_raw['Stoch'] = stoch.stoch()
+df_raw['Stoch_Signal'] = stoch.stoch_signal()
+
+
+now = datetime.now()
+now = now + timedelta(days=-300)
+today_date2 = now.strftime('%Y-%m-%d')
+# df_raw = df_raw[df_raw['date'] > today_date2]
+df_raw = df_raw[df_raw['date'] > '2023-01-01']
+df_raw = df_raw.reset_index(drop = True)
+
+
+
+signal_down_cross = [idx for idx in range(1,len(df_raw)) if df_raw['MACD_DIFF'][idx] < 0 and df_raw['MACD_DIFF'][idx-1] >= 0]
+signal_top_corss = [idx for idx in range(1,len(df_raw)) if df_raw['MACD_DIFF'][idx] > 0 and df_raw['MACD_DIFF'][idx-1] <= 0]
+
+down_reg_df = pd.DataFrame({
+    'index':signal_down_cross,
+    'name':'MACD <br> 하향 돌파 <br> 매도'})
+
+top_reg_df = pd.DataFrame({
+    'index':signal_top_corss,
+    'name':'MACD <br> 상향 돌파 <br> 매수'})
+
+cross_df = pd.concat([down_reg_df, top_reg_df])
+cross_df = cross_df.reset_index(drop = True)
+
+
+def macd_vis(df_raw):
+    # fig = go.Figure()
+    fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.01, row_heights=[0.5, 0.15, 0.35])
+
+    # 캔들스틱차트
+    fig.add_trace(go.Candlestick(
+        x=df_raw['date'],
+        open=df_raw['open'],
+        high=df_raw['high'],
+        low=df_raw['low'],
+        close=df_raw['close'],
+        increasing_line_color= 'red', decreasing_line_color= 'blue',
+        name = ''), row = 1, col = 1)
+
+    # MA 5
+    fig.add_trace(go.Scatter(x=df_raw['date'],y=df_raw['MA5'],
+                             opacity=0.7,
+                             line=dict(color='blue', width=2),
+                             name='MA 5') , row = 1, col = 1)
+
+    # MA 20
+    fig.add_trace(go.Scatter(x=df_raw['date'],y=df_raw['MA20'],
+                             opacity=0.7,
+                             line=dict(color='orange', width=2),
+                             name='MA 20'), row = 1, col = 1)
+
+    # MA 60
+    fig.add_trace(go.Scatter(x=df_raw['date'],y=df_raw['MA60'],
+                             opacity=0.7,
+                             line=dict(color='purple', width=2),
+                             name='MA 60'), row = 1, col = 1)
+
+    # MA 120
+    fig.add_trace(go.Scatter(x=df_raw['date'],y=df_raw['MA120'],
+                             opacity=0.7,
+                             line=dict(color='green', width=2),
+                             name='MA 120'), row = 1, col = 1)
+
+
+    fig.add_trace(go.Scatter(
+        x=pd.concat([df_raw['date'], df_raw['date'][::-1]]),
+        y=pd.concat([df_raw['upper'], df_raw['lower'][::-1]]),
+        fill='toself',
+        fillcolor='rgba(255,255,0,0.1)',
+        line=dict(color='rgba(255,255,255,0.2)', width=2),
+        name='Bollinger Band',
+        showlegend=False
+    ), row = 1, col = 1)
+
+    # 상향, 하향 회귀
+    for i in range(len(cross_df)):
+        cross_index = cross_df['index'][i]
+        cross_name = cross_df['name'][i]
+
+        cross_date = df_raw['date'][cross_index]
+        cross_value = df_raw['close'][cross_index]
+
+        fig.add_annotation(x=cross_date,
+                           y=cross_value,
+                           text=cross_name,
+                           showarrow=True,
+                           arrowhead=1,
+                           row = 1, col = 1)
+
+
+    # Row 2
+    # volume
+    colors = ['blue' if row['open'] - row['close'] >= 0
+              else 'red' for index, row in df_raw.iterrows()]
+
+    fig.add_trace(go.Bar(x=df_raw['date'],
+                         y=df_raw['volume'],
+                         marker_color=colors,
+                         name = 'Volume',
+                         showlegend=False
+                        ), row=2, col=1)
+
+    # MACD
+    colors = ['red' if val >= 0
+              else 'blue' for val in df_raw['MACD_DIFF']]
+    fig.add_trace(go.Bar(x=df_raw['date'],
+                         y=df_raw['MACD_DIFF'],
+                         marker_color=colors,
+                         name =  'MACD DIFF'
+                        ), row=3, col=1)
+
+    fig.add_trace(go.Scatter(x=df_raw['date'],
+                             y=df_raw['MACD'],
+                             line=dict(color='green', width=2),
+                             name = 'MACD'
+                            ), row=3, col=1)
+    fig.add_trace(go.Scatter(x=df_raw['date'],
+                             y=df_raw['MACD_Signal'],
+                             line=dict(color='orange', width=1),
+                             name = 'MACD Signal'
+                            ), row=3, col=1)
+
+
+    # Rayout
+    fig.update_layout(
+        title = '삼성전자 주가',
+        title_font_family="맑은고딕",
+        title_font_size = 18,
+        hoverlabel=dict(
+            bgcolor='black',
+            font_size=15,
+        ),
+        hovermode="x unified",
+        template='plotly_dark',
+        xaxis_tickangle=90,
+        yaxis_tickformat = ',',
+        legend = dict(orientation = 'h', xanchor = "center", x = 0.5, y= 1.2),
+        barmode='group',
+        margin=go.layout.Margin(
+            l=10, #left margin
+            r=10, #right margin
+            b=10, #bottom margin
+            t=100  #top margin
+        ),
+        height=400, width=900,
+    #     showlegend=False,
+        xaxis_rangeslider_visible=False
+    )
+
+
+    # update y-axis label
+    fig.update_yaxes(title_text="Price", row=1, col=1)
+    fig.update_yaxes(title_text="Volume", row=2, col=1)
+    fig.update_yaxes(title_text="MACD", row=3, col=1)
+
+    fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"])])
+    return fig
+
+macd_vis(df_raw)
+```
+
+
+이번에는 MACD에 대해 알아보자. MACD는 이동평균수렴발산(Moving Average Convergence Divergence)의 약자로 1970년대에 후반에 제럴드 아펠(Geraid Appel)이 만든 주가의 기술적 분석에 사용되는 지표이다. 
+
+### MACD 개념
+
+MACD의 원리는 단기 이동평균선과, 장기 이동평균선이 서로 가까워지거나(convergence - 수렴) 서로 멀어지게 되는(divergence - 발산) 원리로 만들어 졌다. MACD의 계산 방법은 다음과 같다. 
+
+- MACD: 단기 지수이동평균 - 장기 지수이동평균
+  - 단기 지수이동평균: 기본적으로 12일이다. 
+  - 장기 지수이동평균: 기본적으로 26일이다.
+- 시그널: MACD의 K일 지수이동평균
+  - K일은 기본적으로 9일을 사용한다
+- 히스토그램: MACD - 시그널
+
+### 한계 
+
+MACD역시 지수이동평균에 기반한 지표이기 때문에 후행성이 있다. 또한 주가가 불규칙하고 급격하게움직이는 경우에는 크게 유용하지 않을 수 있다
+ 
+### 분석방법
+
+#### 시그널 교차
+
+이번에는 이 MACD를 사용한 분석방법에 대해 알아보자. MACD와 시그널을 보면서 파악 해야 하는데 이 두 지표의 교차 시점을 통해 매매신호를 파악할 수 있다.
+ 시그널은 MACD 의 K일 지수이동평균이기 때문에 MACD보다 후행하는 성질을 가지고 있다. 따라서 MACD와 시그널이 교차 하는 경우를 파악하면 된다. 
+ 
+- MACD가 시그널을 상향돌파 하는 경우, 상승추세 전환으로로 판단할수 있기 때문에 매수
+- MACD가 시그널을 하향돌파 하는 경우, 하락추세 전환으로로 판단할수 있기 때문에 매도
+
+#### 기준선 교차
+
+MACD와 시그널의 교차가 아닌 기준선을 기준으로 교차 하는 시점을 파악하는 방법이 있다. 여기서 기준선은 0을 의미하며 계산은 다음과 같다.
+
+- MACD가 기준선을 상향돌파 하는 경우, 상승추세 전환으로로 판단할수 있기 때문에 매수
+- MACD가 기준선을 하향돌파 하는 경우, 하락추세 전환으로로 판단할수 있기 때문에 매도
+
+
+## 파이썬을 사용한 시각화
+
+그럼 이제 Plotly를 사용하여 이를 구현 해보도록 하자.
+
+### 데이터 수집
+
+데이터 수집 부분은 다음과 같다. 
+
+```{python}
+import plotly.graph_objects as go
+
+from ta.trend import MACD
+from ta.momentum import StochasticOscillator
+
+import numpy as np
+import pandas as pd
+from pykrx import stock
+from pykrx import bond
+from time import sleep
+
+from datetime import datetime
+from datetime import timedelta
+import os
+import time
+from plotly.subplots import make_subplots
+import glob
+
+
+ticker_nm = '005930'
+start_date  = '20200101'
+today_date1 = '20231006'
+
+df_raw = stock.get_market_ohlcv(start_date, today_date1, ticker_nm)
+df_raw = df_raw.reset_index()
+df_raw['ticker'] = ticker_nm
+
+df_raw.columns = ['date', 'open', 'high', 'low', 'close', 'volume','trading_value','price_change_percentage', 'ticker']
+```
+
+### 전처리
+
+#### 이동평균선
+
+우선 이동평균선을 추가 해주자. 종가(close)를 기준으로 rolling() 함수를 사용하여 계산해준다. 그리고 이를 각각 MA5, MA20, MA60, MA120으로 만들어 준다. 추가로 이 전처리한 데이터들은 Airflow에서 처리 하는 과정은 나중에 업로드 할 예정이다.
+
+```{python}
+df_raw['MA5'] = df_raw['close'].rolling(window=5).mean()
+df_raw['MA20'] = df_raw['close'].rolling(window=20).mean()
+df_raw['MA60'] = df_raw['close'].rolling(window=60).mean()
+df_raw['MA120'] = df_raw['close'].rolling(window=120).mean()
+```
+
+#### 볼린저밴드 계산
+
+볼린저 밴드는 기본적으로 다음과 같이 계산 한다.
+
+ - 볼린저 밴드의 상한선: 20일의 이동평균선 값 + 표준편차 * 2
+ - 볼린저 밴드의 하한선: 20일의 이동평균선 값 - 표준편차 * 2
+
+```{python}
+std = df_raw['close'].rolling(20).std(ddof=0)
+
+df_raw['upper'] = df_raw['MA20'] + 2 * std
+df_raw['lower'] = df_raw['MA20'] - 2 * std
+```
+
+#### MACD 계산
+
+MACD를 계산 해주자. 여기서 기본이동평균이아닌 지수이동평균을 구해야 하는데,이러한 모든것을을 편리하게 한번에 MACD를 계산 해주는 라이브러리를 소개 하려고 한다. ta 라이브러리인데, 여기서 MACD 함수를 따로 가져와서 계산 해준다.
+
+- from ta.trend import MACD
+
+```{python}
+# MACD 
+macd = MACD(close=df_raw['close'], 
+            window_slow=26,
+            window_fast=12, 
+            window_sign=9)
+
+
+df_raw['MACD_DIFF'] = macd.macd_diff()
+df_raw['MACD'] = macd.macd()
+df_raw['MACD_Signal'] = macd.macd_signal()
+```
+
+#### 날짜 
+
+데이터는 2019년도 부터 수집 되어있지만 이동평균 120일을 하게 되면 NA가 생긴다 (처음 120일 정도) 따라서 이는 미리 처리하고 2023년 3월 부터 시각화에 볼 수 있도록 처리 해주었다.
+
+```{python}
+df_raw = df_raw[df_raw['date'] > '2023-01-01']
+df_raw = df_raw.reset_index(drop = True)
+```
+
+#### MACD 시그널 교차 계산
+
+이제 MACD와 시그널 교차를 계산해주자. 
+
+```{python}
+signal_down_cross = [idx for idx in range(1,len(df_raw)) if df_raw['MACD_DIFF'][idx] < 0 and df_raw['MACD_DIFF'][idx-1] >= 0]
+signal_top_corss = [idx for idx in range(1,len(df_raw)) if df_raw['MACD_DIFF'][idx] > 0 and df_raw['MACD_DIFF'][idx-1] <= 0]
+
+down_reg_df = pd.DataFrame({
+    'index':signal_down_cross,
+    'name':'MACD <br> 하향 돌파 <br> 매도'})
+
+top_reg_df = pd.DataFrame({
+    'index':signal_top_corss,
+    'name':'MACD <br> 상향 돌파 <br> 매수'})
+    
+cross_df = pd.concat([down_reg_df, top_reg_df])
+cross_df = cross_df.reset_index(drop = True)
+```
+
+### 시각화
+
+이제 시각화를 진행 해주자. plotly에서 사용하는 시각화는 지난번 내용인 볼린저밴드의 시각화 내용과 크게 다르지 않다. 다음을 참고 하면서 코드를 확인해보자.
+
+- [볼린저밴드](https://unfinishedgod.netlify.app/2023/10/18/python-plotly-3/)
+
+따라서, 시각화의 경우에는 최종 코드만 남겨두도록 한다.
+
+```{python}
+def macd_vis(df_raw):
+    # fig = go.Figure()
+    fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.01, row_heights=[0.5, 0.15, 0.35])
+
+    # 캔들스틱차트
+    fig.add_trace(go.Candlestick(
+        x=df_raw['date'],
+        open=df_raw['open'],
+        high=df_raw['high'],
+        low=df_raw['low'],
+        close=df_raw['close'],
+        increasing_line_color= 'red', decreasing_line_color= 'blue', 
+        name = ''), row = 1, col = 1)
+
+    # MA 5 
+    fig.add_trace(go.Scatter(x=df_raw['date'],y=df_raw['MA5'],
+                             opacity=0.7,
+                             line=dict(color='blue', width=2),
+                             name='MA 5') , row = 1, col = 1)
+
+    # MA 20
+    fig.add_trace(go.Scatter(x=df_raw['date'],y=df_raw['MA20'],
+                             opacity=0.7,
+                             line=dict(color='orange', width=2),
+                             name='MA 20'), row = 1, col = 1)
+
+    # MA 60
+    fig.add_trace(go.Scatter(x=df_raw['date'],y=df_raw['MA60'],
+                             opacity=0.7,
+                             line=dict(color='purple', width=2),
+                             name='MA 60'), row = 1, col = 1)
+
+    # MA 120
+    fig.add_trace(go.Scatter(x=df_raw['date'],y=df_raw['MA120'],
+                             opacity=0.7,
+                             line=dict(color='green', width=2),
+                             name='MA 120'), row = 1, col = 1)
+
+
+    fig.add_trace(go.Scatter(
+        x=pd.concat([df_raw['date'], df_raw['date'][::-1]]),
+        y=pd.concat([df_raw['upper'], df_raw['lower'][::-1]]),
+        fill='toself',
+        fillcolor='rgba(255,255,0,0.1)',
+        line=dict(color='rgba(255,255,255,0.2)', width=2),
+        name='Bollinger Band',
+        showlegend=False
+    ), row = 1, col = 1)
+
+    # 상향, 하향 회귀
+    for i in range(len(cross_df)):
+        cross_index = cross_df['index'][i]
+        cross_name = cross_df['name'][i]
+
+        cross_date = df_raw['date'][cross_index]
+        cross_value = df_raw['close'][cross_index]
+
+        fig.add_annotation(x=cross_date, 
+                           y=cross_value,
+                           text=cross_name,
+                           showarrow=True,
+                           arrowhead=1,
+                           row = 1, col = 1)
+
+
+    # Row 2 
+    # volume
+    colors = ['blue' if row['open'] - row['close'] >= 0 
+              else 'red' for index, row in df_raw.iterrows()]
+
+    fig.add_trace(go.Bar(x=df_raw['date'], 
+                         y=df_raw['volume'],
+                         marker_color=colors,
+                         name = 'Volume',
+                         showlegend=False
+                        ), row=2, col=1)
+
+    # MACD
+    colors = ['red' if val >= 0 
+              else 'blue' for val in df_raw['MACD_DIFF']]
+    fig.add_trace(go.Bar(x=df_raw['date'], 
+                         y=df_raw['MACD_DIFF'],
+                         marker_color=colors,
+                         name =  'MACD DIFF'
+                        ), row=3, col=1)
+
+    fig.add_trace(go.Scatter(x=df_raw['date'],
+                             y=df_raw['MACD'],
+                             line=dict(color='green', width=2),
+                             name = 'MACD'
+                            ), row=3, col=1)
+    fig.add_trace(go.Scatter(x=df_raw['date'],
+                             y=df_raw['MACD_Signal'],
+                             line=dict(color='orange', width=1),
+                             name = 'MACD Signal'
+                            ), row=3, col=1)
+
+
+    # Rayout
+    fig.update_layout(
+        title = '삼성전자 주가',
+        title_font_family="맑은고딕",
+        title_font_size = 18,
+        hoverlabel=dict(
+            bgcolor='black',
+            font_size=15,
+        ),
+        hovermode="x unified",
+        template='plotly_dark',
+        xaxis_tickangle=90,
+        yaxis_tickformat = ',',
+        legend = dict(orientation = 'h', xanchor = "center", x = 0.5, y= 1.2),
+        barmode='group',
+        margin=go.layout.Margin(
+            l=10, #left margin
+            r=10, #right margin
+            b=10, #bottom margin
+            t=100  #top margin
+        ),
+        height=400, width=900, 
+    #     showlegend=False, 
+        xaxis_rangeslider_visible=False
+    )
+
+
+    # update y-axis label
+    fig.update_yaxes(title_text="Price", row=1, col=1)
+    fig.update_yaxes(title_text="Volume", row=2, col=1)
+    fig.update_yaxes(title_text="MACD", row=3, col=1)
+
+    fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"])])
+    return fig
+    
+macd_vis(df_raw)    
+```
+
+## 총평 
+
+이렇게 MACD까지 진행 했다. 자주쓰는 주가 보조지표를 기준으로 선정 했는데, 앞으로 RSI만 남았다. 
