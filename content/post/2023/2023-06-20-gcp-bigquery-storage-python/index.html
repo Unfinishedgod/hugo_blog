@@ -78,7 +78,7 @@ tags:
 </div>
 <div id="step-4." class="section level3">
 <h3>Step 4.</h3>
-<p>Cloud Storage의 역할이다. 여기서는 Cluod Storage &gt; 저장소 관리자 버튼을 클릭한다. 역시 각각의 자세한 권한은 다음의 공식문서를 참고 한다.</p>
+<p>Cloud Storage의 역할이다. 여기서는 cloud Storage &gt; 저장소 관리자 버튼을 클릭한다. 역시 각각의 자세한 권한은 다음의 공식문서를 참고 한다.</p>
 <center>
 <img src="images/python-bigquery-storage_7.png" style="width:80.0%" />
 </center>
@@ -276,7 +276,7 @@ blob.upload_from_filename(source_file_name) # 업로드할 파일 업로드</cod
 <p>이번에는 다운로드를 해보자. 업로드 했던것과 매우 비슷하다. Bucket명, Bucket에 저장되어 있는 파일이름, 다운받고 저장할 이름을 각각 넣어 주자.</p>
 <pre><code>bucket_name = &#39;owen-bucket-test&#39;  #  Bucket 이름  
 source_blob_name = &#39;iris_upload.csv&#39;    # Bucket에 저장되어 있는 파일 이름
-destination_file_name = &#39;iris_download.csv&#39;    # 파일을 저장할 경로</code></pre>
+destination_file_name = &#39;iris_download.csv&#39;    # 파일을 저장할 경로 </code></pre>
 <p>이제 다운을 받아보자.</p>
 <pre><code>bucket = storage_client.bucket(bucket_name) # Bucket 접속
 blob = bucket.blob(source_blob_name) # 저장되어 있는 파일 연결

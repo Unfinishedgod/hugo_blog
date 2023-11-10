@@ -71,7 +71,7 @@ IAM 및 관리자 페이지로 넘어 가게 되는데 여기서 '서비스 계�
 
 ### Step 4. 
 
-Cloud Storage의 역할이다. 여기서는 Cluod Storage > 저장소 관리자 버튼을 클릭한다. 역시 각각의 자세한 권한은 다음의 공식문서를 참고 한다.
+Cloud Storage의 역할이다. 여기서는 cloud Storage > 저장소 관리자 버튼을 클릭한다. 역시 각각의 자세한 권한은 다음의 공식문서를 참고 한다.
 
 <center>![](images/python-bigquery-storage_7.png){width=80%}</center>
 
@@ -241,7 +241,7 @@ blob.upload_from_filename(source_file_name) # 업로드할 파일 업로드
 ```
 bucket_name = 'owen-bucket-test'  #  Bucket 이름  
 source_blob_name = 'iris_upload.csv'    # Bucket에 저장되어 있는 파일 이름
-destination_file_name = 'iris_download.csv'    # 파일을 저장할 경로
+destination_file_name = 'iris_download.csv'    # 파일을 저장할 경로 
 ```
 
 이제 다운을 받아보자. 
