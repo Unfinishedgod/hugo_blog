@@ -68,7 +68,7 @@ start_date2 = '2017-01-01'
 
 ### S&P 500 종목 리스트 생성
 
-이번엔 S&P 500 종목 리스트를 저장 해주자. fdr.StockListing() 함수를 통해 가져올 수 있으며 컬렴명은 ticker. corp_name, sector, industry로 저장해준다.
+이번엔 S&P 500 종목 리스트를 저장 해주자. fdr.StockListing() 함수를 통해 가져올 수 있으며 컬럼명은 ticker. corp_name, sector, industry로 저장해준다.
 
 ```python
 # S&P 500 symbol list
