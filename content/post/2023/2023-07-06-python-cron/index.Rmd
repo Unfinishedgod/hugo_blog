@@ -55,7 +55,7 @@ Choose 1-4 [1]:
 
 ### 스케쥴러 리스트 확인
 
-이번에는 crontab에 들어가 있는 리스트를 확인하는 커맨드를 알아보자. 역시나 여기서 -l은 list의 약자 이다.
+이번에는 crontab에 들어가 있는 리스트를 확인하는 커맨드를 알아보자. 역시나 여기서 -l은 list의 약자이다.
 
 ```
 $ crontab -l
@@ -63,7 +63,7 @@ $ crontab -l
 
 ### crontab 삭제
 
-crontab 삭제는 다음의 커맨드를 입력 하면 된다. -r은 remove의 약자 이다.
+crontab 삭제는 다음의 커맨드를 입력 하면 된다. -r은 remove의 약자이다.
 
 ```
 $ crontab -r
