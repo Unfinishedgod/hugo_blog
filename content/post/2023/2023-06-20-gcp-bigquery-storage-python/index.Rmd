@@ -138,8 +138,8 @@ $ pip3 install google-cloud-storage
 
 ### 라이브러리
 
-이제 파이썬을 통해 BigQuery와 Storage에 각각 연동 해보자. 우선 다음의 모듈을 불러오는 것으로 시작한다.
-
+이제 파이썬을 통해 Bigquery와 Storage에 각각 연동 해보자. 우선 다음의 모듈을 불러오는 것으로 시작한다.
+ 
 ```
 import glob
 from google.cloud import bigquery
