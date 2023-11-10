@@ -1,0 +1,50 @@
+---
+title: '[GCP] Cloud Function & Cloud Scheduler를 사용한 주가 데이터 수집 2 (Cloud Scheduler 편)'
+author: 최의용
+date: '2023-11-10'
+slug: gcp-cloud-function-cloud-scheduler-2-cloud-scheduler
+categories:
+  - GCP
+tags:
+  - Cloud Scheduler
+---
+
+
+
+<center>
+<img src="images/cloud_scheduler.png" style="width:60.0%" />
+</center>
+<p>지난 블로그에서는 Cloud Function에 대해 알아보았으며, 이번에는 이를 주기적으로 실행하기 위한 서비스인 Cloud Scheduler에 대해 알아보자. Cloud Scheduler 서비스를 사용하게 되면 Cloud Function을 Cron 형식으로 사용이 가능하기 때문에 기존의 Airflow에서 데이터를 수집하기 위해 24시간 서버를 켜야할 필요가 없어진다. 그럼 지난 블로그에서 만들었던 환율 수집에 대한 Cloud Function을 Cloud Scheduler를 하나씩 사용해보자.</p>
+<p>우선 Cloud Schedule 메뉴를 클릭하고 함수를 만들어 주자.</p>
+<center>
+<img src="images/cloud_scheduler_1.png" style="width:80.0%" />
+</center>
+<p>그렇게 되면 다음 화면과 같이 본격적으로 Scheduler를 구성하기 위한 옵션을 알 수 있다. 여기서 빈도는 Cron식을 그대로 따라가기 때문에 Cron식을 알아두는것이 편리하다. 다음을 확인 하자.</p>
+<ul>
+<li><a href="https://unfinishedgod.netlify.app/2023/07/06/python-cron/">Cron을 사용한 금융 데이터 수집 자동화</a></li>
+</ul>
+<center>
+<img src="images/cloud_scheduler_2.png" style="width:80.0%" />
+</center>
+<p>아래로 내려가서 계속 버튼을 클릭해서 넘어 가주자. 여기서 복잡할 수 있는데. 다음을 확인해 보자.</p>
+<ul>
+<li>실행구성: HTTP</li>
+<li>URL: 사용하고 싶은 Cloud Function의 트리거의 URL</li>
+<li>인증헤더: OICD 토큰 추가</li>
+<li>서비스 계정: IAM 계정</li>
+</ul>
+<center>
+<img src="images/cloud_scheduler_3.png" style="width:80.0%" />
+</center>
+<p>이 과정을 마무리 하고 Scheduler를 생성하면 다음과 같은 화면을 볼 수 있다. Cron주기에 따라 실행하기 때문에 아직은 실행이 안되기 때문에 우측의 강제실행 버튼을 클릭하여 테스트를 진행 해보자.</p>
+<center>
+<img src="images/cloud_scheduler_4.png" style="width:80.0%" />
+</center>
+<p>결과는 성공</p>
+<center>
+<img src="images/cloud_scheduler_5.png" style="width:60.0%" />
+</center>
+<div id="총평" class="section level2">
+<h2>총평</h2>
+<p>이렇게 Cloud Function과 Cloud Scheduler에 대해 알아 보았다. 각각에 필요한 IAM권한을 알아내느날 정말로 오랜 시간이 걸렸다. 그래도 이번 기회에 잘 정리 해두었으니 이제 곧 Serverless의 주식 분석 대시보드를 구축할 날이 얼마 남지 않았다.</p>
+</div>
