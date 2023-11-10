@@ -56,8 +56,8 @@ Step 6
 Step 2
 </h2>
 <ul>
-<li><a href="https://unfinishedgod.netlify.app/2023/07/03/python-pykrk-part-1/">2-1. Pykrk를 사용한 금융데이터 수집 PART 1</a> <br></li>
-<li><a href="https://unfinishedgod.netlify.app/2023/07/09/python-pykrk-part-2/">2-2. Pykrk를 사용한 금융데이터 수집 PART 2</a> <br></li>
+<li><a href="https://unfinishedgod.netlify.app/2023/07/03/python-pykrk-part-1/">2-1.pykrx를 사용한 금융데이터 수집 PART 1</a> <br></li>
+<li><a href="https://unfinishedgod.netlify.app/2023/07/09/python-pykrk-part-2/">2-2.pykrx를 사용한 금융데이터 수집 PART 2</a> <br></li>
 <li><a href="https://unfinishedgod.netlify.app/2023/07/11/python-financedatareader-s-p500/">2-3. FinanceDataReader을 사용한 금융 데이터 수집 (S&amp;P500, 비트코인)</a> <br></li>
 <li><a href="https://unfinishedgod.netlify.app/2023/07/26/python-publicdatareader-fred/">2-4. PublicDataReader 라이브러리를 사용한 FRED 데이터 수집</a> <br></li>
 <li><a href="https://unfinishedgod.netlify.app/2023/07/14/python-chatgpt-api/">2-5. Chatgpt API 사용 및 네이버 뉴스 요약 응용</a> <br>
@@ -216,9 +216,13 @@ for market_nm in market_list:
         kor_ticker_list_df = pd.concat([kor_ticker_list_df,df])
 kor_ticker_list_df = kor_ticker_list_df.reset_index(drop = True)
 
-file_name = &#39;kor_ticker_list&#39;
-upload_df(kor_ticker_list_df, file_name, project_id, dataset_id, time_line)
 
+
+now1 = datetime.now()
+time_line = now1.strftime(&quot;%Y%m%d_%H:%M:%S&quot;)  
+
+file_name = &#39;kor_ticker_list&#39;
+upload_df(kor_ticker_list_df, file_name, project_id, dataset_id, time_line, today_date1)
 kor_ticker_list = kor_ticker_list_df[&#39;ticker&#39;]</code></pre>
 </div>
 <div id="주가정보" class="section level3">
