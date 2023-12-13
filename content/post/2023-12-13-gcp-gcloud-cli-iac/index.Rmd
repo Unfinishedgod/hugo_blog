@@ -1,0 +1,13 @@
+---
+title: '[GCP] gcloud CLI 설치 및 IaC에 대해'
+author: 최의용
+date: '2023-12-13'
+slug: gcp-gcloud-cli-iac
+categories:
+  - GCP
+tags:
+  - Iac
+  - CLI
+---
+
+이번에는 gcloud cli에 대해 알아보고, 설치를 진행 해보자. 우선 gcloud CLI( Command Line Interface)에 대해 알아 보자. gcloud cli는 Google Cloud 플랫폼을 관리 하고 제어하기 위한 명령줄 도구 이다. 이 CLI를 사용하면 커맨드라인에서 우리가 사용하는 gcp의 기능들을 사용할 수 있다.
