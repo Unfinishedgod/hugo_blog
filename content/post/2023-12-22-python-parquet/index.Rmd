@@ -1,0 +1,26 @@
+---
+title: '[Python] Parquet 파일 읽고/쓰기'
+author: 최의용
+date: '2023-12-22'
+slug: python-parquet
+categories:
+  - python
+tags:
+  - parquet
+---
+
+
+[Reading and Writing the Apache Parquet Format](https://arrow.apache.org/docs/python/parquet.html#)
+
+
+```python
+from pyarrow import csv
+import pyarrow as pa
+import pyarrow.parquet as pq
+
+import pandas as pd 
+```
+
+
+
+
