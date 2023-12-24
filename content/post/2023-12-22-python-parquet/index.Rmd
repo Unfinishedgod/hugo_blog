@@ -9,9 +9,38 @@ tags:
   - parquet
 ---
 
+Parquet에 대해 알아보자. 그리고 Python에서 Parquet를 읽고 쓰는법 또한 같이 알아보자. 
 
-[Reading and Writing the Apache Parquet Format](https://arrow.apache.org/docs/python/parquet.html#)
+## Parquet란?
 
+Parqeut(파케이라고 부른다.)는 Apache Hadoop 및 Apache Spark와 같은 분산처리 시스템에서 사용되는 열 기반 파일 형식이다. 다양한 데이터 형식을 지원하고 고성능의 압축을 사용하여 파일크기를 상당히 많이 줄일 수 있다. 그렇기 때문에 Parquet는 대규모의 데이터를 효율적으로 저장하고 처리하는 데 적합하다. Parquet의 주요 특징은 다음과 같다.
+
+- 열 기반 저장: Parquet은 데이터를 열 단위로 하게 되는데, 이게 Parquet의 핵심이라고 볼 수 있다. 이는 특정 열에 대한 질의(query)가 매우 효율적이며, 데이터 압축과 열별 스캔 최적화에 유리하다.
+- 압축 및 인코딩: Parquet은 다양한 압축 기법과 인코딩 방식을 지원하고 있다. 이를 통해 저장 공간이 절약될다.
+- 스키마 지원: Parquet 파일은 스키마 정보를 내장하고 있어, 다양한 데이터 타입을 지원한다.
+- 분산 시스템과의 호환성: Hadoop, Spark, Impala 등의 분산 컴퓨팅 시스템과의 호환성이 뛰어나며, 이를 통해 대규모 데이터셋을 효율적으로 처리가 가능하다.
+- 성능 최적화: Parquet은 데이터의 읽기 및 쓰기 작업에 대해 성능을 최적화하도록 설계되었다. 이는 특히 대규모 데이터 처리에 유리하다. 
+
+보통 우리가 데이터 관련 공부를 시작하게 되면 가장 먼저 csv를 접하게 되기 때문에 Parquet는 익숙하지 않으라 수 있다. 그러다 보니 대부분의 데이터를 csv로 처리 하려는 경향이 있는데, 조금만 데이터가 커져도 csv는 적합하지 않다. 이번엔 csv와 Parquet의 차이점에 대해 알아보자.
+
+
+|특징	|Parquet	|CSV|
+|:-:|:-:|:-:|
+|파일 형식	|열 기반	|행 기반|
+|지원하는 데이터 형식|	다양한 데이터 형식	|문자열 데이터 형식만|
+|압축 지원	|지원	지원하지 않음|
+|효율성	|더 효율적	|덜 효율적|
+|적합한 사용 사례	|대규모 데이터 세트, 다양한 데이터 형식	|작은 데이터 세트, 단일 데이터 형식|
+ 
+## Python 에서의 Parquet
+
+그럼 이제 Python에 Parquet를 읽고 쓰는 방법에 대해 알아보자. 공식문서는 다음과 같다.
+
+- [Reading and Writing the Apache Parquet Format](https://arrow.apache.org/docs/python/parquet.html#)
+
+### 라이브러리 
+
+Parquet를 컨트롤하는데 필요한 라이브러리는 pyarrow 이다. 
 
 ```python
 from pyarrow import csv
@@ -21,6 +50,55 @@ import pyarrow.parquet as pq
 import pandas as pd 
 ```
 
+우선 필요한 데이터 프레임을 생성 해주자. 
+
+```python
+df = pd.DataFrame({'one': [-1, 0, 2.5],
+                   'two': ['foo', 'bar', 'baz'],
+                   'three': [True, False, True]},
+                   index=list('abc'))
+                   
+df
+```
+
+```
+	one	two	three
+a	-1.0	foo	True
+b	0.0	bar	False
+c	2.5	baz	True
+```
+
+### Parquet 저장하기
+
+생성된 df를 우선 pa.Table.from_pandas()를 통해 데이터 형식을 변경 해준다. 그리고 나서 pq.write_table()함수를 통해 저장 해주면 끝.
+
+```python
+table_from_pandas = pa.Table.from_pandas(df,preserve_index = False)
+pq.write_table(table_from_pandas, 'df.parquet')
+```
+
+### Parquet 불러오기
 
 
+이번에는 저장된 parquet를 불러와보자. pq.read_table() 함수를 통해 df.paquet를 불러오면 끝. 그리고 나서 이를 to_pandas()함수를 사용하여 판다스 형식으로 변경해주면 된다.
+
+```python
+t = pq.read_table('df.parquet')
+df = t.to_pandas()
+```
+
+### 실제 데이터 와의 비교
+
+Google Storage에 주가데이터를 저장하고 이를 Streamlit에 실시간으로 배포하는 구조를 구상하고 있다. 지난 몇년간의 주가데이터를 모두 저장 해둔 csv인데 이를 parquet로 변경 하면 다음과 같이 상당한 압축이 진행 된다. (물론 Streamlit에 서빙 하기 위해서는 조금 더 파일을 쪼개봐야 한다.)
+
+- csv:
+  - kor_stock_ohlcv.csv 
+  - 파일 용량: 214 MB
+- parquet:
+  - kor_stock_ohlcv.parquet 
+  - 파일 용량: 65.9 MB
+  
+## 총평
+
+이번에는 Parquet에 대해 알아보았다. 그동안 csv를 위주로 데이터를 다루었던 분들에게 추천하는 블로그. csv에만 익숙해지다 보면 100 MB가 넘어 가는 데이터 또한 무의식적으로 csv로 저장하고 처리 하게 되는데 이때 머리에서 떠올려서 알아 두면 좋겠다.
 

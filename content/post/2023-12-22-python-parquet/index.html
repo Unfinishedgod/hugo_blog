@@ -1,0 +1,126 @@
+---
+title: '[Python] Parquet 파일 읽고/쓰기'
+author: 최의용
+date: '2023-12-22'
+slug: python-parquet
+categories:
+  - python
+tags:
+  - parquet
+---
+
+
+
+<p>Parquet에 대해 알아보자. 그리고 Python에서 Parquet를 읽고 쓰는법 또한 같이 알아보자.</p>
+<div id="parquet란" class="section level2">
+<h2>Parquet란?</h2>
+<p>Parqeut(파케이라고 부른다.)는 Apache Hadoop 및 Apache Spark와 같은 분산처리 시스템에서 사용되는 열 기반 파일 형식이다. 다양한 데이터 형식을 지원하고 고성능의 압축을 사용하여 파일크기를 상당히 많이 줄일 수 있다. 그렇기 때문에 Parquet는 대규모의 데이터를 효율적으로 저장하고 처리하는 데 적합하다. Parquet의 주요 특징은 다음과 같다.</p>
+<ul>
+<li>열 기반 저장: Parquet은 데이터를 열 단위로 하게 되는데, 이게 Parquet의 핵심이라고 볼 수 있다. 이는 특정 열에 대한 질의(query)가 매우 효율적이며, 데이터 압축과 열별 스캔 최적화에 유리하다.</li>
+<li>압축 및 인코딩: Parquet은 다양한 압축 기법과 인코딩 방식을 지원하고 있다. 이를 통해 저장 공간이 절약될다.</li>
+<li>스키마 지원: Parquet 파일은 스키마 정보를 내장하고 있어, 다양한 데이터 타입을 지원한다.</li>
+<li>분산 시스템과의 호환성: Hadoop, Spark, Impala 등의 분산 컴퓨팅 시스템과의 호환성이 뛰어나며, 이를 통해 대규모 데이터셋을 효율적으로 처리가 가능하다.</li>
+<li>성능 최적화: Parquet은 데이터의 읽기 및 쓰기 작업에 대해 성능을 최적화하도록 설계되었다. 이는 특히 대규모 데이터 처리에 유리하다.</li>
+</ul>
+<p>보통 우리가 데이터 관련 공부를 시작하게 되면 가장 먼저 csv를 접하게 되기 때문에 Parquet는 익숙하지 않으라 수 있다. 그러다 보니 대부분의 데이터를 csv로 처리 하려는 경향이 있는데, 조금만 데이터가 커져도 csv는 적합하지 않다. 이번엔 csv와 Parquet의 차이점에 대해 알아보자.</p>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">특징</th>
+<th align="center">Parquet</th>
+<th align="center">CSV</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">파일 형식</td>
+<td align="center">열 기반</td>
+<td align="center">행 기반</td>
+</tr>
+<tr class="even">
+<td align="center">지원하는 데이터 형식</td>
+<td align="center">다양한 데이터 형식</td>
+<td align="center">문자열 데이터 형식만</td>
+</tr>
+<tr class="odd">
+<td align="center">압축 지원</td>
+<td align="center">지원 지원하지 않음</td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td align="center">효율성</td>
+<td align="center">더 효율적</td>
+<td align="center">덜 효율적</td>
+</tr>
+<tr class="odd">
+<td align="center">적합한 사용 사례</td>
+<td align="center">대규모 데이터 세트, 다양한 데이터 형식</td>
+<td align="center">작은 데이터 세트, 단일 데이터 형식</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="python-에서의-parquet" class="section level2">
+<h2>Python 에서의 Parquet</h2>
+<p>그럼 이제 Python에 Parquet를 읽고 쓰는 방법에 대해 알아보자. 공식문서는 다음과 같다.</p>
+<ul>
+<li><a href="https://arrow.apache.org/docs/python/parquet.html#">Reading and Writing the Apache Parquet Format</a></li>
+</ul>
+<div id="라이브러리" class="section level3">
+<h3>라이브러리</h3>
+<p>Parquet를 컨트롤하는데 필요한 라이브러리는 pyarrow 이다.</p>
+<pre class="python"><code>from pyarrow import csv
+import pyarrow as pa
+import pyarrow.parquet as pq
+
+import pandas as pd </code></pre>
+<p>우선 필요한 데이터 프레임을 생성 해주자.</p>
+<pre class="python"><code>df = pd.DataFrame({&#39;one&#39;: [-1, 0, 2.5],
+                   &#39;two&#39;: [&#39;foo&#39;, &#39;bar&#39;, &#39;baz&#39;],
+                   &#39;three&#39;: [True, False, True]},
+                   index=list(&#39;abc&#39;))
+                   
+df</code></pre>
+<pre><code>	one	two	three
+a	-1.0	foo	True
+b	0.0	bar	False
+c	2.5	baz	True</code></pre>
+</div>
+<div id="parquet-저장하기" class="section level3">
+<h3>Parquet 저장하기</h3>
+<p>생성된 df를 우선 pa.Table.from_pandas()를 통해 데이터 형식을 변경 해준다. 그리고 나서 pq.write_table()함수를 통해 저장 해주면 끝.</p>
+<pre class="python"><code>table_from_pandas = pa.Table.from_pandas(df,preserve_index = False)
+pq.write_table(table_from_pandas, &#39;df.parquet&#39;)</code></pre>
+</div>
+<div id="parquet-불러오기" class="section level3">
+<h3>Parquet 불러오기</h3>
+<p>이번에는 저장된 parquet를 불러와보자. pq.read_table() 함수를 통해 df.paquet를 불러오면 끝. 그리고 나서 이를 to_pandas()함수를 사용하여 판다스 형식으로 변경해주면 된다.</p>
+<pre class="python"><code>t = pq.read_table(&#39;df.parquet&#39;)
+df = t.to_pandas()</code></pre>
+</div>
+<div id="실제-데이터-와의-비교" class="section level3">
+<h3>실제 데이터 와의 비교</h3>
+<p>Google Storage에 주가데이터를 저장하고 이를 Streamlit에 실시간으로 배포하는 구조를 구상하고 있다. 지난 몇년간의 주가데이터를 모두 저장 해둔 csv인데 이를 parquet로 변경 하면 다음과 같이 상당한 압축이 진행 된다. (물론 Streamlit에 서빙 하기 위해서는 조금 더 파일을 쪼개봐야 한다.)</p>
+<ul>
+<li>csv:
+<ul>
+<li>kor_stock_ohlcv.csv</li>
+<li>파일 용량: 214 MB</li>
+</ul></li>
+<li>parquet:
+<ul>
+<li>kor_stock_ohlcv.parquet</li>
+<li>파일 용량: 65.9 MB</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="총평" class="section level2">
+<h2>총평</h2>
+<p>이번에는 Parquet에 대해 알아보았다. 그동안 csv를 위주로 데이터를 다루었던 분들에게 추천하는 블로그. csv에만 익숙해지다 보면 100 MB가 넘어 가는 데이터 또한 무의식적으로 csv로 저장하고 처리 하게 되는데 이때 머리에서 떠올려서 알아 두면 좋겠다.</p>
+</div>
