@@ -14,7 +14,6 @@ tags:
 <center>
 <img src="images/VM_start_stop_0.png" style="width:80.0%" />
 </center>
-<p>[]</p>
 <p>이번에는 GCP의 Compute Engine을 일정에 맞춰서 자동으로 시작 &amp; 중지를 진행 해보자. 추가로 리눅스 서버가 부팅이 되면 자동으로 파이썬으로 만든 데이터 수집 및 전처리 파일이 실행 되도록 진행 해보려 한다.
 주가 데이터를 자동으로 수집하는데 airflow에 대한 블로그를 썼었고, 이후에 Serverless 관점에서 cloud function 을 썼다. 더 나아가서 cloud run에 대한 글을 작성하고 테스트 도중에 이번 글을 쓰게 되었다. cloud function과 cloud run 모두 시간제한이 3600초(1시간) 이기 때문에 1시간이 넘는 작업이 필요한 경우가 있다. 예를 들어 30일 또는 6개월 마다 30시간이 넘어 가는 모델링이 자동으로 돌아가야 하는 작업이 생기는 경우가 대표적이다. 물론 물리서버가 존재 해서 airflow를 사용하면 되지만 GCP를 사용하는 요즘에 serverless를 최대한 활용 해보고자 한다.</p>
 <center>
