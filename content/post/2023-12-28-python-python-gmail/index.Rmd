@@ -1,0 +1,122 @@
+---
+title: '[Python] Python으로 Gmail 보내기'
+author: 최의용
+date: '2023-12-28'
+slug: python-python-gmail
+categories:
+  - python
+tags:
+  - Python
+---
+
+
+
+<center>
+![](images/python_gmail.png){width=80%}
+</center>
+
+
+ 이번에는 Python으로 이메일을 보내보자. Airflow에도 에러가 나는 경우 Email을 보낼 수 있고, Cloud function, run에서도 에러가 나는 경우 로그를 보낼 수가 있다. 지난번에 Compute Engine 을 스케쥴링 하게 되면서 에러가 나는 경우 Email을 보내야할 필요가 있기 때문에 이번에 Python으로 Gmail로 메일보내는 과정을 담아보려 한다. 파이썬의 smtplib 라이브러리를 사용할 예정이다. smtplib는 이메일을 보내는 데 사용되는 SMTP(Simple MAil Transfer Protocol) 프로토콜 클라이언트이다. 파이썬에서 smtplib를 사용해서 Gmail을 사용하기 위해서 Gmail 계정의 보안 키가 필요하다. 
+
+## 1. Gmail 
+
+그럼 우선 Gmail 계정의 보안 키를 얻어 보자. 구글의 메뉴 아이콘 클릭후 계정 아이콘을 클릭 해준다.
+
+<center>
+![](images/python_gmail_1.png){width=40%}
+</center>
+
+그리고 나서 보안 탭에서 '2단계 인증'을 클릭해준다.
+
+<center>
+![](images/python_gmail_2.png){width=100%}
+</center>
+
+2단계 인증을 위한 절차를 그대로 진행 한다.
+
+<center>
+![](images/python_gmail_3.png){width=100%}
+</center>
+
+2단계 인증 계속 진행
+
+<center>
+![](images/python_gmail_4.png){width=100%}
+</center>
+
+2단계 인증이 마무리 되면 이제 '앱 비밀번호'를 클릭 해주고 비밀번호 이름을 적어주고 만들기 버튼을 클릭 해준다. 
+
+<center>
+![](images/python_gmail_5.png){width=100%}
+</center>
+
+이 과정을 마무리 했으면, 총 16자리의 앱 비밀번호가 생성 된다. 이는 smtplib 라이브러리를 사용하여 email을 보내야 하기 때문에 따로 저장 해둔다.
+
+<center>
+![](images/python_gmail_6.png){width=40%}
+</center>
+
+## 2. Python
+
+이제 Gmail 계정의 키를 얻었으니 python에서 Email을 보내보자. 우선 다음의 라이브러리를 불러 온다.
+
+```python
+import smtplib
+from email.mime.text import MIMEText
+```
+
+이제 Gmail의 계정정보(보내는사람)와 받는 사람의 이메일을 적어 주자.
+
+```python
+# Gmail 계정 정보
+username = "shjj08@gmail.com"
+password = "Gmail key"
+
+# 메일 정보
+receiver = "shjj08@gmail.com"
+```
+
+그리고 나서 메일의 전송 정보를 설정 해준다.
+
+```python
+# 메일 전송 정보 입력
+server = smtplib.SMTP("smtp.gmail.com", 587)
+server.starttls()
+server.login(username, 
+             password)
+```
+
+이제 메일의 내용을 적어 준다. MIMEText()함수를 사용해서 본문을 적어 주고, 제목도 다음과 같이 적어 준다. 그리고 이를 mail_msg로 지정 해주었다.
+
+```python
+# Email 본문 내용
+message = MIMEText(
+'''
+안녕하세요 최의용입니다.
+본 메일은 python으로 메일을 보냅니다. 
+
+최의용 드림
+'''
+)
+
+# Email 제목
+message['Subject'] = '파이썬으로 gmail 보내기' 
+
+mail_msg = message.as_string()
+```
+
+그리고 나서 다음과 같이 메일을 전송 하면 끝. server.sendmail()함 수를 사용하고, username, receiver, mail_msg를 사용하여 메일을 보낸다.
+
+```python
+# 메일 전송 정보 입력
+server.sendmail(username, 
+                receiver,
+                mail_msg)
+server.quit()
+```
+
+위와 같이 마무리 하면 다음과 같은 결과 화면을 확인할 수 있다.
+
+<center>
+![](images/python_gmail_7.png){width=40%}
+</center>
