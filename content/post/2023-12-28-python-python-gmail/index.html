@@ -12,7 +12,7 @@ tags:
 
 
 <center>
-<img src="images/python_gmail.png" style="width:80.0%" />
+<img src="images/python_gmail.png" style="width:60.0%" />
 </center>
 <p>이번에는 Python으로 이메일을 보내보자. Airflow에도 에러가 나는 경우 Email을 보낼 수 있고, Cloud function, run에서도 에러가 나는 경우 로그를 보낼 수가 있다. 지난번에 Compute Engine 을 스케쥴링 하게 되면서 에러가 나는 경우 Email을 보내야할 필요가 있기 때문에 이번에 Python으로 Gmail로 메일보내는 과정을 담아보려 한다. 파이썬의 smtplib 라이브러리를 사용할 예정이다. smtplib는 이메일을 보내는 데 사용되는 SMTP(Simple MAil Transfer Protocol) 프로토콜 클라이언트이다. 파이썬에서 smtplib를 사용해서 Gmail을 사용하기 위해서 Gmail 계정의 보안 키가 필요하다.</p>
 <div id="gmail" class="section level2">
@@ -23,19 +23,19 @@ tags:
 </center>
 <p>그리고 나서 보안 탭에서 ’2단계 인증’을 클릭해준다.</p>
 <center>
-<img src="images/python_gmail_2.png" style="width:100.0%" />
+<img src="images/python_gmail_2.png" style="width:80.0%" />
 </center>
 <p>2단계 인증을 위한 절차를 그대로 진행 한다.</p>
 <center>
-<img src="images/python_gmail_3.png" style="width:100.0%" />
+<img src="images/python_gmail_3.png" style="width:80.0%" />
 </center>
 <p>2단계 인증 계속 진행</p>
 <center>
-<img src="images/python_gmail_4.png" style="width:100.0%" />
+<img src="images/python_gmail_4.png" style="width:80.0%" />
 </center>
 <p>2단계 인증이 마무리 되면 이제 ’앱 비밀번호’를 클릭 해주고 비밀번호 이름을 적어주고 만들기 버튼을 클릭 해준다.</p>
 <center>
-<img src="images/python_gmail_5.png" style="width:100.0%" />
+<img src="images/python_gmail_5.png" style="width:80.0%" />
 </center>
 <p>이 과정을 마무리 했으면, 총 16자리의 앱 비밀번호가 생성 된다. 이는 smtplib 라이브러리를 사용하여 email을 보내야 하기 때문에 따로 저장 해둔다.</p>
 <center>

@@ -12,7 +12,7 @@ tags:
 
 
 <center>
-![](images/python_gmail.png){width=80%}
+![](images/python_gmail.png){width=60%}
 </center>
 
 
@@ -29,25 +29,25 @@ tags:
 그리고 나서 보안 탭에서 '2단계 인증'을 클릭해준다.
 
 <center>
-![](images/python_gmail_2.png){width=100%}
+![](images/python_gmail_2.png){width=80%}
 </center>
 
 2단계 인증을 위한 절차를 그대로 진행 한다.
 
 <center>
-![](images/python_gmail_3.png){width=100%}
+![](images/python_gmail_3.png){width=80%}
 </center>
 
 2단계 인증 계속 진행
 
 <center>
-![](images/python_gmail_4.png){width=100%}
+![](images/python_gmail_4.png){width=80%}
 </center>
 
 2단계 인증이 마무리 되면 이제 '앱 비밀번호'를 클릭 해주고 비밀번호 이름을 적어주고 만들기 버튼을 클릭 해준다. 
 
 <center>
-![](images/python_gmail_5.png){width=100%}
+![](images/python_gmail_5.png){width=80%}
 </center>
 
 이 과정을 마무리 했으면, 총 16자리의 앱 비밀번호가 생성 된다. 이는 smtplib 라이브러리를 사용하여 email을 보내야 하기 때문에 따로 저장 해둔다.
