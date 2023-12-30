@@ -201,6 +201,35 @@ $ sudo systemctl start pykrx.service
 $ sudo systemctl status pykrx.service
 ```
 
+## 3. Google Compute Engine에서 파이썬 자동 실행
+
+직전에 리눅스 부팅시 파이썬 파일을 자동실행을 알아 보았다. 그러나 Google Compute Engine 에서는 이와 동일한 기능을 제공한다. 하나씩 알아보자. 
+
+### 3-1. 
+
+우선 우리가 생성산 VM 인스턴스를 클릭 해준다. 
+
+<center>
+![](images/VM_start_stop_13.png){width=60%}
+</center>
+
+### 3-2. 
+
+그리고 나서 수정 버튼을 클릭해준다.
+
+<center>
+![](images/VM_start_stop_14.png){width=60%}
+</center>
+
+### 3-3. 
+
+이제 내려가다보면 자동화-시작 스크립트 부분이 보이게 된다. 이곳에서 우리가 원하는대로 부팅시 실행해야할 스크립트를 넣어 주면 된다.  
+
+<center>
+![](images/VM_start_stop_15.png){width=60%}
+</center>
+
+
 ## 총평
 
 airflow 부터 시작해서 cloud function, cloud run을 진행 했었다. pykrx함수의 경우에 하나의 종목은 cloud function, cloud run에서 잘 작동을 하는데, 전체 종목에서 PORT=8080에러가 난다. 이를 어떻게 해결하면 좋을까 여러 방면으로 에러를 찾던 도중에 문득 Compute Engine 자체를 주기적으로 실행하는 방법을 알게 되었다. 더구나 이를 알아두면 cloud function, cloud run의 제한시간 3600초(1시간)을 넘어서는 작업을 추후에 진행할때 유용하기 때문에 기록으로 남겨 둔다.
