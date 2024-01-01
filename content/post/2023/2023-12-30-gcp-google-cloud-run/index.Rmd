@@ -136,7 +136,7 @@ if __name__ == "__main__":
 
 #### requirements.txt
 
-이제 requirements.txt에 는 다음과 같이 필요한 라이브러리를 적어 주자.
+이제 requirements.txt에 는 다음과 같이 필요한 라이브러리를 적어 주자. 
 
 ```
 functions-framework==3.*
