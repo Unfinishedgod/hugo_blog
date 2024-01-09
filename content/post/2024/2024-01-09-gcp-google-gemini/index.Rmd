@@ -1,0 +1,138 @@
+---
+title: '[GCP] 아주 간단한 파이썬에서 Google Gemini 사용하기'
+author: 최의용
+date: '2024-01-09'
+slug: gcp-google-gemini
+categories:
+  - Gemini
+tags:
+  - AI
+---
+
+<center>
+![](images/gemini_main.png){width=80%}
+</center>
+
+
+이번에는 파이썬에서 Google이 발표한 Gemini를 사용해보자. Gemini(Generalized Multimodal Intelligence Network) 구글과 딥마인드가 개발한 멀티모달 생성형 인공지능이다. 지난번에 파이썬에서 Bard와 ChatGPT 사용하는 방법에 대해 글을 적었었다. 그러나 Bard는 이제 사용이 불가 하고 ChatGPT만 python 에서 사용하고 있다. 조만간 하루하루 주식 정보에 대한 요약을 정리하기 위해서는 Chatgpt 뿐만 아니라 Gemini도 같이 파이썬에서 사용해볼 예정이기 때문에 이렇게 블로그를 작성한다. 막상 해보니 아주 간단하고, 구글에서 정리도 잘 해놓았기 때문에 그림을 보면서 클릭 몇번, 복사 붙혀넣기 한번이면 바로 끝날 정도로 쉽다.
+ 
+ - 준비물: GCP 계정
+
+
+## Gemini API KEY 발급
+
+우선 Gemini API KEY 부터 발급 해보자. 다음의 Google AI for Developers 링크를 타고 들어가자.
+
+- [Google AI for Developers](https://ai.google.dev/)
+
+<center>
+![](images/gemini.png){width=80%}
+</center>
+
+### 가격 
+
+메인화면에서 Pricing 탭 메뉴를 클릭해보면 다음과 같이 가격과 정보들을 알 수 있다. 우리는 여기서 'Free for everyone' 버전을 사용할 예정이며, 분당 제한 횟수는 60번이다. 자 그럼, 이제 'Get API key in Google AI Studio' 버튼을 클릭 해보자.
+
+<center>
+![](images/gemini_0.png){width=80%}
+</center>
+
+버튼을 클릭하게 되면 Google AI studio로 넘어가게 된다. 이곳에서 'Get API key' 버튼을 클릭 해준다.
+
+- [Google AI Studio](https://makersuite.google.com/)
+
+<center>
+![](images/gemini_1.png){width=80%}
+</center>
+
+이제 API key를 얻을 수 있는데 여기서 GCP의 새로운 프로젝트의 API Key를 얻을지, 기존의 프로젝트의 API Key를 얻을지 나오는데 기존에 사용하고 있는 프로젝트로 클릭 해주었다.
+
+<center>
+![](images/gemini_2.png){width=80%}
+</center>
+
+그러면 기존에 사용하고 있는 프로젝트들이 나오는데 원하는 프로젝트를 클릭.
+
+<center>
+![](images/gemini_3.png){width=60%}
+</center>
+
+그리고 나서 'Create new API Key' 버튼을 클릭하면 끝
+
+<center>
+![](images/gemini_4.png){width=60%}
+</center>
+
+그러면 이제 다음과 같이 API Key가 생성된것을 확인할 수 있다. 이제 이를 잘 복사 해두어야 하니 다음 API Key 를 클릭해주자.
+
+<center>
+![](images/gemini_5.png){width=60%}
+</center>
+
+다음과 같이 복사를 해주고 보관 해주면 끝이다. 아주 간단하다.
+
+<center>
+![](images/gemini_6.png){width=60%}
+</center>
+
+## Python 에서 Gemini 사용해보기
+
+이렇게 API Key를 얻었으니 이제 Python에서 Gemini를 사용해보자. 다음은 Google이 친절하게 정리해놓은 문서 이며, 자세한건 이 공식문서를 참고 하면 된다.
+
+-[python_quickstart](https://ai.google.dev/tutorials/python_quickstart)
+
+그러면 이제 하나씩 알아보자. 
+
+우선 서버에 google-generativeai를 설치 해주자. 서버는 끝
+
+```bash
+$ pip3 install google-generativeai
+```
+
+그리고 나서 라이브러리를 불러와주고
+
+```python
+import google.generativeai as genai
+```
+
+다음과 같이 API Key와 함께 코드를 복사 해주면 된다. generation_config() 부분은 따로 공식문서를 확인하자.
+
+```python
+GOOGLE_API_KEY = 'Gemini Api key'
+
+genai.configure(api_key=GOOGLE_API_KEY)
+
+# Set up the model
+generation_config = {
+  "temperature": 0.9,
+  "top_p": 1,
+  "top_k": 1,
+  "max_output_tokens": 2048,
+}
+
+model = genai.GenerativeModel('gemini-pro',
+                             generation_config=generation_config)
+```
+
+그리고 마지막으로 다음과 같이 프롬프트와 model.generate_content() 함수를 사용하면 결과를 얻어낼 수 있다. 아주 간단하다.
+
+```python
+prompt = """
+- 날짜: 2024-01-09
+- 회사: 삼성전자
+- 5-20 골든크로스: 매수 신호
+- 등락률: -2.35%
+위 내용만 사용해서 보고서 형식으로 요약해줘.
+이 외에 다른 내용은 사용하지 말아줘.
+
+"""   
+
+response = model.generate_content(prompt)
+print(response.text)
+```
+
+## 총평
+
+이번에는 Google Gemini에 대해 알아보았다. 현재 GCP에서 매일 주식 데이터를 수집, 분석, 시각화 대시보드하는 과정을 Serverless로 진행을 하고 있다. 그러다가 분석한 결과를 증권 리포트 처럼 만들어 보려고 하는데 매일 짧은 시간(약 1시간 정도)에 국내 주식 2700여개의 증권 리포트를 생성하려니 부담이 되었는데, 이번에 Gemini를 사용하게 되면서 ChatGPT와 병행이 가능할것으로 보인다.
+
+
