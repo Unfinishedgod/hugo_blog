@@ -193,17 +193,23 @@ sudo systemctl enable --now kubelet</code></pre>
 <div id="section" class="section level3">
 <h3>3-1.</h3>
 <p>우선 우리가 방금 만들어 둔 ‘k8s-default-image’ VM을 클릭한다.</p>
-<p><img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_1.png" style="width:60.0%" /></p>
+<center>
+<img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_1.png" style="width:60.0%" />
+</center>
 </div>
 <div id="section-1" class="section level3">
 <h3>3-2.</h3>
 <p>그리고 나서 우측 상단의 ‘머신 이미지 만들기’ 버튼을 클릭해주자.</p>
-<p><img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_2.png" style="width:60.0%" /></p>
+<center>
+<img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_2.png" style="width:60.0%" />
+</center>
 </div>
 <div id="section-2" class="section level3">
 <h3>3-3.</h3>
 <p>머신 이미지를 만들어 준다. ‘k8s-setup’ 이라고 이름을 지어준다. 이렇게 이미지 생성은 끝.</p>
-<p><img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_3.png" style="width:60.0%" /></p>
+<center>
+<img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_3.png" style="width:60.0%" />
+</center>
 </div>
 </div>
 <div id="개의-master-node와-3개의-worker-node-구축" class="section level2">
@@ -212,43 +218,61 @@ sudo systemctl enable --now kubelet</code></pre>
 <div id="section-3" class="section level3">
 <h3>4-1.</h3>
 <p>Compute Engine으로 넘어가서 ‘인스턴스 만들기’ 버튼을 클릭 해준다.</p>
-<p><img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_4.png" style="width:60.0%" /></p>
+<center>
+<img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_4.png" style="width:60.0%" />
+</center>
 </div>
 <div id="section-4" class="section level3">
 <h3>4-2.</h3>
 <p>왼쪽의 ‘머신 이미지에서 VM 인스턴스 만들기’ 버튼을 클릭해주면 우리가 생성한 이미지가 보이게 된다. 그리고 나서 ‘CONTINUE’ 버튼을 클릭해주자.</p>
-<p><img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_5.png" style="width:60.0%" /></p>
+<center>
+<img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_5.png" style="width:60.0%" />
+</center>
 </div>
 <div id="section-5" class="section level3">
 <h3>4-3.</h3>
 <p>쿠버네티스가 설치된 VM이미지를 기준으로 Master Node에 해당하는 VM을 생성한다. ‘k8s-mastet-1’ 이라는 이름과, e2-medium 으로 해서 맞춰주고 만들기 버튼을 클릭해준다.</p>
-<p><img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_6.png" style="width:80.0%" />
-### 4-4.</p>
+<center>
+<img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_6.png" style="width:80.0%" />
+</center>
+</div>
+<div id="section-6" class="section level3">
+<h3>4-4.</h3>
 <p>이번에는 Worker Node를 만들어 준다. 다음 그림과 같이 e2-small로 설정 해주고 VM이름도 k8s-worker-1,2,3 로 해서 총 3개를 만들어 준다.</p>
-<p><img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_7.png" style="width:80.0%" /></p>
+<center>
+<img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_7.png" style="width:80.0%" />
+</center>
 </div>
 </div>
 <div id="설치된-각각의-노드들을-mobaxterm에서-확인" class="section level2">
 <h2>5. 설치된 각각의 노드들을 MobaXterm에서 확인</h2>
-<div id="section-6" class="section level3">
+<div id="section-7" class="section level3">
 <h3>5-1.</h3>
 <p>설치한 총 4개의 VM을 MovaXterm에 다음과 같이 추가 시켜 주자. 그리고 각각 서버를 클릭해서 열어 준다.</p>
-<p><img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_8.png" style="width:40.0%" /></p>
-</div>
-<div id="section-7" class="section level3">
-<h3>5-2.</h3>
-<p>4개 서버를 열었으면. 왼쪽 홈 탭을 ‘Close tab’ 버튼을 클릭해서 없애준다.</p>
-<p><img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_9.png" style="width:40.0%" /></p>
+<center>
+<img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_8.png" style="width:40.0%" />
+</center>
 </div>
 <div id="section-8" class="section level3">
-<h3>5-3.</h3>
-<p>그리고 나서 상단 ‘Split’ &gt; ‘4 terminals mode’ 를 클릭 해주자.</p>
-<p><img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_10.png" style="width:60.0%" /></p>
+<h3>5-2.</h3>
+<p>4개 서버를 열었으면. 왼쪽 홈 탭을 ‘Close tab’ 버튼을 클릭해서 없애준다.</p>
+<center>
+<img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_9.png" style="width:40.0%" />
+</center>
 </div>
 <div id="section-9" class="section level3">
+<h3>5-3.</h3>
+<p>그리고 나서 상단 ‘Split’ &gt; ‘4 terminals mode’ 를 클릭 해주자.</p>
+<center>
+<img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_10.png" style="width:60.0%" />
+</center>
+</div>
+<div id="section-10" class="section level3">
 <h3>5-4.</h3>
 <p>그러면 이렇게 총 4개의 화면을 볼 수가 있다. 이렇게 총 4개의 VM을 확인했으니 Master, Worker Node를 만들어 주자.</p>
-<p><img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_11.png" style="width:80.0%" /></p>
+<center>
+<img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_11.png" style="width:80.0%" />
+</center>
 </div>
 </div>
 <div id="쿠버네티스-클러스터-생성" class="section level2">
@@ -268,7 +292,9 @@ swapoff -a</code></pre>
 <p>우선 마스터 노드 부터 세팅 해보자. kubeadm init 커맨드를 사용하여 클러스터를 초기화 한다.</p>
 <pre class="bash"><code>kubeadm init</code></pre>
 <p>이를 실행하게 되면 다음과 같은 결과를 볼 수 있다.</p>
-<p><img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_12.png" style="width:80.0%" /></p>
+<center>
+<img src="images/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4%EC%84%A4%EC%B9%98_12.png" style="width:80.0%" />
+</center>
 <p>여기서 다음의 커맨드를 그대로 복사 해서 Master Node에 그대로 입력 해준다.</p>
 <pre><code>mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config

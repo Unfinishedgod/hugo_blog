@@ -229,20 +229,20 @@ sudo systemctl enable --now kubelet
 
 우선 우리가 방금 만들어 둔 'k8s-default-image' VM을 클릭한다.
 
-![](images/쿠버네티스설치_1.png){width=60%}
+<center>![](images/쿠버네티스설치_1.png){width=60%}</center>
 
 ### 3-2. 
 
 그리고 나서 우측 상단의 '머신 이미지 만들기' 버튼을 클릭해주자.
 
-![](images/쿠버네티스설치_2.png){width=60%}
+<center>![](images/쿠버네티스설치_2.png){width=60%}</center>
 
 
 ### 3-3. 
 
 머신 이미지를 만들어 준다. 'k8s-setup' 이라고 이름을 지어준다. 이렇게 이미지 생성은 끝. 
 
-![](images/쿠버네티스설치_3.png){width=60%}
+<center>![](images/쿠버네티스설치_3.png){width=60%}</center>
 
 ## 4. 1개의 Master Node와 3개의 Worker Node 구축
 
@@ -252,25 +252,25 @@ sudo systemctl enable --now kubelet
 
 Compute Engine으로 넘어가서 '인스턴스 만들기' 버튼을 클릭 해준다.
 
-![](images/쿠버네티스설치_4.png){width=60%}
+<center>![](images/쿠버네티스설치_4.png){width=60%}</center>
 
 ### 4-2. 
 
 왼쪽의 '머신 이미지에서 VM 인스턴스 만들기' 버튼을 클릭해주면 우리가 생성한 이미지가 보이게 된다. 그리고 나서 'CONTINUE' 버튼을 클릭해주자.
 
-![](images/쿠버네티스설치_5.png){width=60%}
+<center>![](images/쿠버네티스설치_5.png){width=60%}</center>
 
 
 ### 4-3. 
 
 쿠버네티스가 설치된 VM이미지를 기준으로 Master Node에 해당하는 VM을 생성한다. 'k8s-mastet-1' 이라는 이름과, e2-medium 으로 해서 맞춰주고 만들기 버튼을 클릭해준다.
 
-![](images/쿠버네티스설치_6.png){width=80%}
+<center>![](images/쿠버네티스설치_6.png){width=80%}</center>
 ### 4-4. 
 
 이번에는 Worker Node를 만들어 준다. 다음 그림과 같이 e2-small로 설정 해주고 VM이름도 k8s-worker-1,2,3 로 해서 총 3개를 만들어 준다.
 
-![](images/쿠버네티스설치_7.png){width=80%}
+<center>![](images/쿠버네티스설치_7.png){width=80%}</center>
 
 
 ## 5. 설치된 각각의 노드들을 MobaXterm에서 확인
@@ -279,25 +279,25 @@ Compute Engine으로 넘어가서 '인스턴스 만들기' 버튼을 클릭 해�
 
 설치한 총 4개의 VM을 MovaXterm에 다음과 같이 추가 시켜 주자. 그리고 각각 서버를 클릭해서 열어 준다.
 
-![](images/쿠버네티스설치_8.png){width=40%}
+<center>![](images/쿠버네티스설치_8.png){width=40%}</center>
 
 ### 5-2. 
 
 4개 서버를 열었으면. 왼쪽 홈 탭을 'Close tab' 버튼을 클릭해서 없애준다.
 
-![](images/쿠버네티스설치_9.png){width=40%}
+<center>![](images/쿠버네티스설치_9.png){width=40%}</center>
 
 ### 5-3. 
 
 그리고 나서 상단 'Split' > '4 terminals mode' 를 클릭 해주자.
 
-![](images/쿠버네티스설치_10.png){width=60%}
+<center>![](images/쿠버네티스설치_10.png){width=60%}</center>
 
 ### 5-4. 
 
 그러면 이렇게 총 4개의 화면을 볼 수가 있다. 이렇게 총 4개의 VM을 확인했으니 Master, Worker Node를 만들어 주자.
 
-![](images/쿠버네티스설치_11.png){width=80%}
+<center>![](images/쿠버네티스설치_11.png){width=80%}</center>
 
 
 ## 6. 쿠버네티스 클러스터 생성
@@ -328,7 +328,7 @@ kubeadm init
 
 이를 실행하게 되면 다음과 같은 결과를 볼 수 있다.
 
-![](images/쿠버네티스설치_12.png){width=80%}
+<center>![](images/쿠버네티스설치_12.png){width=80%}</center>
 
 여기서 다음의 커맨드를 그대로 복사 해서 Master Node에 그대로 입력 해준다.
 
