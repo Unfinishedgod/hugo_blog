@@ -52,7 +52,7 @@ swapoff -a
 그리고 나서 이제 Master Node에서 생성된 값을 복사 해주면 된다.
 
 ```
-kubeadm join 10.178.0.15:6443 --token w26aq9.y8ezn4jxs6zikb9b --discovery-token-ca-cert-hash sha256:{토큰값}
+kubeadm join xx.xxx.x.xx:xxxx --token xxxxxx.xxxxxxxxxxxxxxxx --discovery-token-ca-cert-hash sha256:{토큰값}
 ```
 
 ### Master Node 에서 확인
