@@ -28,7 +28,7 @@ tags:
 <p>k8s-worker-4라는 서버가 생성 되었으면 Master Node에서 다음의 커맨드를 입력하자.</p>
 <pre class="bash"><code>kubeadm token create --print-join-command</code></pre>
 <p>그러면 다음과 같은 결과가 나오게 되는데 이를 복사해서 Worker Node로 넘어가자.</p>
-<pre><code>kubeadm join 10.178.0.15:6443 --token w26aq9.y8ezn4jxs6zikb9b --discovery-token-ca-cert-hash sha256:{토큰값}</code></pre>
+<pre><code>kubeadm join xx.xxx.x.xx:xxxx --token xxxxxx.xxxxxxxxxxxxxxxx --discovery-token-ca-cert-hash sha256:{토큰값}</code></pre>
 </div>
 <div id="worker-node-세팅" class="section level3">
 <h3>Worker Node 세팅</h3>
@@ -37,7 +37,7 @@ tags:
 <pre class="bash"><code>sed -i &#39;/ swap / s/^\(.*\)$/#\1/g&#39; /etc/fstab
 swapoff -a</code></pre>
 <p>그리고 나서 이제 Master Node에서 생성된 값을 복사 해주면 된다.</p>
-<pre><code>kubeadm join 10.178.0.15:6443 --token w26aq9.y8ezn4jxs6zikb9b --discovery-token-ca-cert-hash sha256:{토큰값}</code></pre>
+<pre><code>kubeadm join xx.xxx.x.xx:xxxx --token xxxxxx.xxxxxxxxxxxxxxxx --discovery-token-ca-cert-hash sha256:{토큰값}</code></pre>
 </div>
 <div id="master-node-에서-확인" class="section level3">
 <h3>Master Node 에서 확인</h3>
