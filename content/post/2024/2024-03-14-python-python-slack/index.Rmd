@@ -154,3 +154,10 @@ response = client.chat_postMessage(
 <center>
 ![](images/python_slack_10.png){width=60%}
 </center>
+
+
+--- 
+
+## Reference
+
+- [파이썬 슬랙 봇 만들기(1): 봇 메세지 보내기](https://develop-davi-kr.tistory.com/entry/%ED%8C%8C%EC%9D%B4%EC%8D%AC-%EB%8F%85%ED%95%99%E[…]EC%99%80-%EC%8B%A4%EC%A0%84-%ED%99%9C%EC%9A%A9%EB%B2%95)
