@@ -1,0 +1,33 @@
+---
+title: '[LLM] Ollama에 대해 알아보자 1'
+author: 최의용
+date: '2024-04-26'
+slug: llm-ollama-1
+categories:
+  - LLM
+tags:
+  - LLM
+  - OLLAMA
+---
+
+
+LLM의 열기가 매우 뜨겁다. OpenAI의 GPT, Google의 Gemini 등등 듣기는 들었으나 이를 사용하기 위해서는 API 키를 통해 사용할 수 밖에 없었다. 물론 Huggingface가 다른 해결책이긴 하지만 사용하기는 여간 어려운게 아니다. 그래서 아주 쉽게 로컬 PC에 설치하여 사용이 가능한 Ollama에 대해 알아보려고 한다.
+
+## Ollama 란?
+
+Ollama란, 오픈소스 LLM을 로컬 PC에서 실행할수 있는 플랫폼이다. Ollama를 사용하게 되면 메타의 llama 이나 미스트랄에서 만든 mistral 등등의 오픈소스 LLM 을 개인 컴퓨터에서 사용할 수 있다는 장점이 있다. 또한, 최근에 Meta에서 LLama3가 출시되면서 발빠르게 Ollama도 Llama 3도 지원한다.
+
+## Ollama는 
+
+
+
+
+- [Ollama 공식 링크](https://ollama.com/)
+
+
+
+
+
+
+
+
