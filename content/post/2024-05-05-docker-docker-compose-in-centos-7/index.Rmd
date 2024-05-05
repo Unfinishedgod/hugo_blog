@@ -1,0 +1,69 @@
+---
+title: Docker & Docker-compose 설치 in Centos 7
+author: 최의용
+date: '2024-05-05'
+slug: docker-docker-compose-in-centos-7
+categories:
+  - Docker
+tags:
+  - Docker
+  - docker compose
+---
+
+Docker-compose에 대해 간단히 알아보고 설치 해보자. 
+
+## Docker Compose란?
+
+Docker compose는 여러개의 Docker 컨테이너를 정의하고 실행하는 도구이다. 단일 Docker의 컨테이너의 경우는 매우 간단하다. 그러나 여러개의 컨테이너로 이루어진 경우에 Docker를 각각 실행하고 종료해야 하는 번거로움이 있다. 이럴때 yaml형식의 Docker compose를 사용하게 되면 매우 편리하게 사용할 수 있다.
+
+## Docker Compose의 주요 기능 
+
+- 단일 명령어로 여러 컨테이너 실행: 한 번의 명령어로 여러 개의 컨테이너를 한꺼번에 실행할 수 있습니다.
+- 서비스 의존성 관리: 특정 컨테이너가 다른 컨테이너에 의존하는 경우, 의존성 관계를 정의하여 올바른 실행 순서를 보장할 수 있습니다.
+- 간편한 환경 설정 관리: 환경 변수, 볼륨 마운트, 네트워크 설정 등을 YAML 파일에 정의하여 쉽게 관리할 수 있습니다.
+
+## Docker Compose 사용 방법
+
+Docker compose는 기본적으로 docker-compose.yaml 파일을 사용한다. 이 파일에 각 컨테이너의 이미지와 환경변수, 볼륨, 포트 매핑등의 정보를 담을 수 있다.
+
+
+## Docker 설치
+
+우선 Docker를 설치 해주자. 다음의 커맨드를 통해 설치 해주면 완료.
+
+```bash
+$ sudo yum install -y yum-utils
+$ sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+$ sudo yum install docker-ce docker-ce-cli containerd.io
+$ sudo systemctl start docker
+
+$ docker -v
+$ sudo service docker start
+$ sudo usermod -aG docker {계정명}
+```
+
+## Docker-compose 설치
+
+이번에는 Docker-compose를 설치 해보자. 다음의 커맨드를 입력하면 되며, Docker-compose에 대한 최신 버전은 다음의 링크를 참고 하면 된다. 
+
+- [Docker-compose 버전](https://github.com/docker/compose/releases)
+
+```bash
+$ sudo curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+$ sudo chmod +x /usr/local/bin/docker-compose
+$ docker-compose --version
+```
+
+```
+docker-compose version 1.23.2, build 
+```
+
+## 총평
+
+이렇게 Docker compose와 설치에 대해 간단히 알아 보았다. Docker compose를 사용하게 되면 여러개의 컨테이너를 편리하게  컨트롤할 수 있다는 장점이 있다. 이후에는 Docker compose의 문법에 대해 하나씩 알아보도록 하자.
+
+---
+
+## Reference 
+
+- []()
