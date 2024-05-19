@@ -10,7 +10,7 @@ tags: []
 
 
 <center>
-![](images/hf_up_download_4 (1).png){width=50%}
+![](images/hf_up_download_4.png){width=50%}
 </center>
 
 
