@@ -1,0 +1,54 @@
+---
+title: Huggingface에 API 발급 받기
+author: 최의용
+date: '2024-05-19'
+slug: huggingface-api
+categories:
+  - Huggingface
+tags:
+  - Huggingface
+---
+
+
+HuggingFace에 대해 알아보자. HuggingFace는 자연어 처리에 사용되는 모델 및 데이터를 공유하는 플랫폼이다. 특히 ChatGPT가 2023년에 유행을 하면서 많은 오픈소스 LLM이 HuggingFace에 올라와 있다. 특히 최근에 공개된 LLama3 같은 경우 많은 사람들이 파인튜닝을 하며 사용을 하고 있는데, 이번에는 HuggingFace에 모델/데이터를 upload하는 방법을 알아보자.
+
+### API key 발급
+
+HuggingFace를 잘 사용하기 위해서는 api key가 필요하다. 다음의 공식 링크를 방문하고 회원가입을 완료 하자.
+
+- [Huggingface 공식 사이트](https://huggingface.co/)
+
+
+#### Step 1. 
+
+회원가입을 했으면 우측 상단에 Profile 아이콘을 클릭하고 Setting 버튼을 클릭해주자.
+
+<center>
+![](images/huggingface_1.png){width=60%}
+</center>
+
+#### Step 2. 
+
+그렇게 Setting 화면으로 넘어가게되면, 왼족의 Access Tokens 버튼을 클릭하고 New token 버튼을 클릭해주자.
+
+<center>
+![](images/huggingface_2.png){width=60%}
+</center>
+
+#### Step 3. 
+
+Create a new access token 창이 나오게 된다. 여기 Type에 Read/Write가 나뉘는데 이는 각각 따로 만들어 주면 된다.
+
+<center>
+![](images/huggingface_3.png){width=70%}
+</center>
+
+#### API key 발급 
+
+이렇게 API key를 발급받게 되면 다음과 같이 성공적으로 api key가 등록된것을 확인할 수 있다.
+
+<center>
+![](images/huggingface_6.png){width=60%}
+</center>
+
+
