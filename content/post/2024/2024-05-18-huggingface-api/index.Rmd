@@ -1,7 +1,7 @@
 ---
 title: Huggingface에 API 발급 받기
 author: 최의용
-date: '2024-05-19'
+date: '2024-05-18'
 slug: huggingface-api
 categories:
   - Huggingface
