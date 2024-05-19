@@ -9,6 +9,9 @@ tags:
   - Huggingface
 ---
 
+<center>
+![](images/huggingface_5.png){width=70%}
+</center>
 
 HuggingFace에 대해 알아보자. HuggingFace는 자연어 처리에 사용되는 모델 및 데이터를 공유하는 플랫폼이다. 특히 ChatGPT가 2023년에 유행을 하면서 많은 오픈소스 LLM이 HuggingFace에 올라와 있다. 특히 최근에 공개된 LLama3 같은 경우 많은 사람들이 파인튜닝을 하며 사용을 하고 있는데, 이번에는 HuggingFace에 모델/데이터를 upload하는 방법을 알아보자.
 
