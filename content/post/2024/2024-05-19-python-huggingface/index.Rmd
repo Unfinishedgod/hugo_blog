@@ -43,6 +43,14 @@ huggingface_hub.login()
 ![](images/hf_up_download_2.png){width=60%}
 </center>
 
+
+또는 다음과 같이 바로 api키를 입력해줘도 된다
+
+```python
+import huggingface_hub
+huggingface_hub.login('huggingface apikey')
+```
+
 ### Dataset 변환
 
 이제 본격적으로 데이터를 업로드 해보자. 우선 `gemini_result_kospi_0517.csv` 라는 csv 파일을 하나 만들어 두었다. 이 파일은 5월 17일 주가에 대한 지표를 분석 하고 이를 gemini api를 통해 만들어둔 지표 들을 정리 해둔 파일이다. 이를 huggingface dataset 에 업로드를 할 예정이다.
@@ -99,10 +107,36 @@ dataset.push_to_hub("uiyong/gemini_result_kospi_0517")
 </center>
 
 
-데이터셋을 클릭하면 다음과 같이 데이터가 성공적으로 올라간것을 확인할 수 있다. 이제 다운로드를 해보자. 그전에 이 데이터셋의 주소를 클릭하여 복사를 해주자.
+데이터셋을 클릭하면 다음과 같이 데이터가 성공적으로 올라간것을 확인할 수 있다. 
 
+### 파인튜닝용 데이터셋 업로드 
+
+이제 파인튜닝을 위한 데이터셋을 만들어보고 파인튜닝용 데이터셋을 업로드 해주자. 파인튜닝용 데이터셋을 만들기 위해서 질문과 답변에 대해 나눠주고, 다음과 같이 <s>, [INST]로 감싸주고 </s>, [/INST]로 감싸주었다. 추후에 파인튜닝에 대한 데이터와 파인튜닝에 대한 내용은 몇개의 블로그로 나뉘어서 상세하게 작성할 예정이다. 현재는 간단하게 구현을 목적으로 작업을 진행해보자.
+
+```python
+df['inputs'] = df['date'] +'에 ' +  df['corp_name'] + '의 주가 보고서는 어떤가요?'
+df['total'] = '<s>[INST] ' + df['inputs'] + ' [/INST] ' + df["response_msg"] + ' </s>'
+df['total']
+```
+```
+0      <s>[INST] 2024-05-17에 삼성전자우의 주가 보고서는 어떤가요? [/I...
+1      <s>[INST] 2024-05-17에 LG에너지솔루션의 주가 보고서는 어떤가요? ...
+2      <s>[INST] 2024-05-17에 삼성바이오로직스의 주가 보고서는 어떤가요? ...
+3      <s>[INST] 2024-05-17에 삼성전자의 주가 보고서는 어떤가요? [/IN...
+4      <s>[INST] 2024-05-17에 SK하이닉스의 주가 보고서는 어떤가요? [/...
+```
+
+이제 이 df['total'] 부분을 `Dataset.from_dict()` 함수로 감싸주고 'uiyong/gemini_result_kospi_0517_jsonl'에 업로드 해보자.
+
+```python
+fine_tune_data = Dataset.from_dict({"text": df['total']})
+fine_tune_data.push_to_hub("uiyong/gemini_result_kospi_0517_jsonl")
+```
+
+이제 다운로드를 해보자. 그전에 이 데이터셋의 주소를 클릭하여 복사를 해주자.
+ 
 <center>
-![](images/hf_up_download_4 (1).png){width=70%}
+![](images/hf_up_download_5.png){width=70%}
 </center>
 
 
@@ -111,13 +145,13 @@ dataset.push_to_hub("uiyong/gemini_result_kospi_0517")
 이렇게 성공적으로 데이터를 업로드 했으니 업로드한 데이터셋을 다운로드 해보자. `load_dataset()` 함수를 사용하여 dataset이 있는 계정과 파일명 주소를 같이 입력해주면 된다.
 
 ```python
-dataset = load_dataset('uiyong/gemini_result_kospi_0517')
+dataset = load_dataset('uiyong/gemini_result_kospi_0517_jsonl')
 dataset
 ```
 ```
 DatasetDict({
     train: Dataset({
-        features: ['ticker', 'corp_name', 'date', 'response_msg'],
+        features: ['text'],
         num_rows: 230
     })
 })
@@ -138,3 +172,4 @@ pd.DataFrame(dataset['train'])
 ## Reference 
 
 - [Huggingface 공식문서: Upload a dataset to the Hub](https://huggingface.co/docs/datasets/v1.16.0/upload_dataset.html)
+- [HK CODE님의 유튜브: 학습데이터 생성](https://www.youtube.com/watch?v=mljLcQ_N9h0)
