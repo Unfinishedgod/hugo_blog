@@ -76,9 +76,11 @@ tags:
 <li>SFTTrainer: Supervised Fine-Tuning을 지원하는 트레이너 라이브러리 이다.</li>
 </ul></li>
 </ul>
-<p>그리고 Huggingface API키를 입력하기 위한 라이브러리르 호출해 준다. 이 내용은 직전의 블로그들을 참고한다.
-- <a href="https://unfinishedgod.netlify.app/2024/05/18/huggingface-api/">Huggingface에 API 발급 받기</a>
-- <a href="https://unfinishedgod.netlify.app/2024/05/19/python-huggingface/">Huggingface에 데이터셋 업로드</a></p>
+<p>그리고 Huggingface API키를 입력하기 위한 라이브러리르 호출해 준다. 이 내용은 직전의 블로그들을 참고한다.</p>
+<ul>
+<li><a href="https://unfinishedgod.netlify.app/2024/05/18/huggingface-api/">Huggingface에 API 발급 받기</a></li>
+<li><a href="https://unfinishedgod.netlify.app/2024/05/19/python-huggingface/">Huggingface에 데이터셋 업로드</a></li>
+</ul>
 <pre class="python"><code>import os
 import torch
 from datasets import load_dataset
@@ -155,8 +157,8 @@ quant_config = BitsAndBytesConfig(
 </div>
 <div id="데이터-로드-및-모델-설정" class="section level3">
 <h3>6. 데이터 로드 및 모델 설정</h3>
-<div id="데이터-로드" class="section level4">
-<h4>데이터 로드</h4>
+<div id="모델-로드" class="section level4">
+<h4>모델 로드</h4>
 <p>이제 HuggingFace에서 사전학습된 모델을 불러오자. AutoModelForCausalLM.from_pretrained() 함수를 사용하여 사전 학습된 모델을 불러온다. 코드에 대한 설명은 다음과 같다.</p>
 <ul>
 <li>AutoModelForCausalLM.from_pretrained()
@@ -174,6 +176,11 @@ quant_config = BitsAndBytesConfig(
 <li>model.config.pretraining_tp = 1: 모델의 텐서 병렬화(Tensor Parallelism) 설정을 1로 지정한다. 설정값 1은 단일 GPU에서 실행되도록 설정 해주는 의미 이다.</li>
 </ul>
 <pre class="python"><code># llama 데이터 로드
+dataset = load_dataset(hkcode_dataset, split=&quot;train&quot;)
+
+# 데이터 확인
+print( dataset[5] )</code></pre>
+<pre class="python"><code>### 모델 로드
 model = AutoModelForCausalLM.from_pretrained(
     base_model,
     quantization_config=quant_config,
@@ -287,6 +294,17 @@ Special tokens have been added in the vocabulary, make sure the associated word 
 <div id="모델-학습" class="section level3">
 <h3>10. 모델 학습</h3>
 <p>trl 라이브러리의 SFTTrainer클래스의 인스턴스인 trainer 객체를 사용하여 모델 학습을 시작하자. trainer.train()는 직전에 정의했던 TrainingArguments와 함께 설정된 모든 매개변수를 사용하여 모델을 학습시킨다.</p>
+<pre class="python"><code># 파인튜닝
+trainer = SFTTrainer(
+    model=model,
+    train_dataset=dataset,
+    peft_config=peft_params,
+    dataset_text_field=&quot;text&quot;,
+    max_seq_length=None,
+    tokenizer=tokenizer,
+    args=training_params,
+    packing=False,
+)</code></pre>
 <pre class="python"><code>trainer.train()</code></pre>
 <pre><code>[580/580 13:21, Epoch 10/10]
 Step	Training Loss
