@@ -28,7 +28,7 @@ AWS의 GPU 서버를 사용해보자. 최근에 LLM을 사용하면서 파인튜
 - Amazon EC2 G4dn - NVIDIA T4 GPU
  
 그리고 현재 24년 6월 21일 기준으로 가격은 다음과 같다.
-
+ 
 <center>
 ![](images/aws-gpu-ec2.png){width=100%}
 </center>
