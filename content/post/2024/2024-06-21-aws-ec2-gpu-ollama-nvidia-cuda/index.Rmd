@@ -1,0 +1,13 @@
+---
+title: '[AWS] EC2 GPU 서버 & ollama통한 nvidia,cuda 구축'
+author: 최의용
+date: '2024-06-21'
+slug: aws-ec2-gpu-ollama-nvidia-cuda
+categories:
+  - AWS
+tags:
+  - AWS
+  - GPU
+---
+
+

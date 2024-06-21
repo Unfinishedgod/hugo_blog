@@ -1,0 +1,33 @@
+인스턴스 유형,vCPU,아키텍처,메모리(GiB),스토리지(GB),네트워크 성능,온디맨드 Linux 요금
+g3.4xlarge,16,x86_64,122,-,Up to 10 Gigabit,1.42 USD 시간당
+g3.8xlarge,32,x86_64,244,-,10 Gigabit,2.84 USD 시간당
+g3.16xlarge,64,x86_64,488,-,25 Gigabit,5.68 USD 시간당
+g3s.xlarge,4,x86_64,30.5,-,Up to 10 Gigabit,0.934 USD 시간당
+g4dn.xlarge,4,x86_64,16,125,Up to 25 Gigabit,0.647 USD 시간당
+g4dn.2xlarge,8,x86_64,32,225,Up to 25 Gigabit,0.925 USD 시간당
+g4dn.4xlarge,16,x86_64,64,225,Up to 25 Gigabit,1.481 USD 시간당
+g4dn.8xlarge,32,x86_64,128,900,50 Gigabit,2.677 USD 시간당
+g4dn.12xlarge,48,x86_64,192,900,50 Gigabit,4.812 USD 시간당
+g4dn.16xlarge,64,x86_64,256,900,50 Gigabit,5.353 USD 시간당
+g4dn.metal,96,x86_64,384,1800,100 Gigabit,9.624 USD 시간당
+g5.xlarge,4,x86_64,16,250,Up to 10 Gigabit,1.237 USD 시간당
+g5.2xlarge,8,x86_64,32,450,Up to 10 Gigabit,1.4903 USD 시간당
+g5.4xlarge,16,x86_64,64,600,Up to 25 Gigabit,1.99691 USD 시간당
+g5.8xlarge,32,x86_64,128,900,25 Gigabit,3.01012 USD 시간당
+g5.12xlarge,48,x86_64,192,3800,40 Gigabit,6.97442 USD 시간당
+g5.16xlarge,64,x86_64,256,1900,25 Gigabit,5.03653 USD 시간당
+g5.24xlarge,96,x86_64,384,3800,50 Gigabit,10.01404 USD 시간당
+g5.48xlarge,192,x86_64,768,7600,100 Gigabit,20.02809 USD 시간당
+g5g.xlarge,4,arm64,8,-,Up to 10 Gigabit,0.5166 USD 시간당
+g5g.2xlarge,8,arm64,16,-,Up to 10 Gigabit,0.6839 USD 시간당
+g5g.4xlarge,16,arm64,32,-,Up to 10 Gigabit,1.0185 USD 시간당
+g5g.8xlarge,32,arm64,64,-,12 Gigabit,1.6876 USD 시간당
+g5g.16xlarge,64,arm64,128,-,25 Gigabit,3.3752 USD 시간당
+g5g.metal,64,arm64,128,-,25 Gigabit,3.3752 USD 시간당
+p2.xlarge,4,x86_64,61,-,High,1.465 USD 시간당
+p2.8xlarge,32,x86_64,488,-,10 Gigabit,11.72 USD 시간당
+p2.16xlarge,64,x86_64,732,-,25 Gigabit,23.44 USD 시간당
+p3.2xlarge,8,x86_64,61,-,Up to 10 Gigabit,4.234 USD 시간당
+p3.8xlarge,32,x86_64,244,-,10 Gigabit,16.936 USD 시간당
+p3.16xlarge,64,x86_64,488,-,25 Gigabit,33.872 USD 시간당
+p4d.24xlarge,96,x86_64,1152,8000,4x 100 Gigabit,45.38848 USD 시간당
