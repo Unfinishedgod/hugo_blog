@@ -51,7 +51,7 @@ $ git lfs clone https://huggingface.co/yanolja/EEVE-Korean-Instruct-2.8B-v1.0</c
 </div>
 <div id="실행" class="section level2">
 <h2>3. 실행</h2>
-<p>이렇게 모델도 받았으니 이제 간단하게 테스트를 진행해보자. 공식 문서대로라면 다음과 같이 llm 모델을 불러오면 된다. 참고로 파이썬 파일을 생성할때 ’vllm.py’와 같은 실수는 하면 안된다.</p>
+<p>이렇게 모델도 받았으니 이제 간단하게 테스트를 진행해보자. 공식 문서대로라면 다음과 같이 llm 모델을 불러오면 된다.</p>
 <pre class="python"><code>from vllm import LLM, SamplingParams
 
 llm = LLM(model=&quot;/home/ubuntu/vllm_model/EEVE-Korean-Instruct-2.8B-v1.0&quot;, 

@@ -55,8 +55,8 @@ $ git lfs clone https://huggingface.co/yanolja/EEVE-Korean-Instruct-2.8B-v1.0
 
 ## 3. 실행
 
-이렇게 모델도 받았으니 이제 간단하게 테스트를 진행해보자. 공식 문서대로라면 다음과 같이 llm 모델을 불러오면 된다. 참고로 파이썬 파일을 생성할때 'vllm.py'와 같은 실수는 하면 안된다. 
-
+이렇게 모델도 받았으니 이제 간단하게 테스트를 진행해보자. 공식 문서대로라면 다음과 같이 llm 모델을 불러오면 된다. 
+ 
 ```python
 from vllm import LLM, SamplingParams
 
@@ -67,6 +67,7 @@ llm = LLM(model="/home/ubuntu/vllm_model/EEVE-Korean-Instruct-2.8B-v1.0",
 ### 에러발생
 
 그러나 이렇게 진행 했을 경우 다음과 같은 에러가 발생하는데, 여기서 핵심 키워드는 'Bfloat16'이다. 숫자 형식중 하나인데, T4 GPU에서는 이를 지원하지 않기 때문에 이를 사용하기 위해서는 dtype를 반으로 줄이라는 메시지이다. **Bfloat16를 지원하지 않는 서버가 생각보다 많다.** 
+
 ```
 Bfloat16 is only supported on GPUs with compute capability of at least 8.0. Your Tesla T4 GPU has compute capability 7.5. You can use float16 instead by explicitly setting the`dtype` flag in CLI, for example: --dtype=half.
 ```
