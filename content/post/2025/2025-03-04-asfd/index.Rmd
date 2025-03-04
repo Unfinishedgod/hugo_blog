@@ -1,8 +1,0 @@
----
-title: asfd
-author: ''
-date: '2025-03-04'
-slug: asfd
-categories: []
-tags: []
----
